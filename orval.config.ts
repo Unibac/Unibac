@@ -8,14 +8,14 @@ export default defineConfig({
     },
     output: {
       mode: "tags-split",
-      target: "./api/generated/endpoints.ts",
-      schemas: "./api/generated/models",
+      target: "./src/api/generated/endpoints.ts",
+      schemas: "./src/api/generated/models",
       client: "axios",
       httpClient: "axios",
       clean: true,
       override: {
         mutator: {
-          path: "./lib/api/mutator.ts",
+          path: "./src/lib/api/mutator.ts",
           name: "customInstance",
         },
       },

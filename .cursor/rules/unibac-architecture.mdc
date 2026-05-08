@@ -1,0 +1,157 @@
+---
+description: Arquitectura por features, estructura src/, TypeScript, imports y escalabilidad Unibac
+globs: "**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# Unibac — Arquitectura, TypeScript, imports y mantenibilidad
+
+## Estado del repo
+
+- **Layout canónico**: código de aplicación bajo `src/` (ver §1): `src/app`, `src/modules`, `src/api/generated`, `src/lib`, `src/providers`, `src/components`, etc.
+- **Features nuevas**: crear `src/modules/<feature>/` con `api`, `hooks`, `query-keys`, `schemas`, `components` según §1 y §9.
+- **Hooks transversales** (p. ej. auth hasta modularizar): pueden vivir en `src/hooks/` mientras se migran a `src/modules/<dominio>/hooks`; la UI **no** importa cliente Orval generado directamente.
+
+---
+
+## §1 Reglas de estructura del proyecto
+
+### Layout canónico
+
+```
+src/
+├── app/                 # Rutas App Router, layouts, loading.tsx, error.tsx; sin lógica de dominio
+├── modules/
+│   ├── auth/
+│   ├── usuarios/
+│   ├── permisos/
+│   ├── acciones/
+│   └── shared/          # Helpers compartidos entre features (no primitives UI)
+├── api/
+│   └── generated/       # Solo Orval — READ-ONLY
+├── lib/                 # Infra transversal (axios client, utils, env, formato sin negocio)
+├── providers/           # QueryClientProvider, tema, etc.
+├── components/
+│   └── ui/              # Design system shadcn; composiciones globales sin reglas de negocio
+└── styles/              # Estilos globales únicos (alternativa acceptable mantener globals.css bajo app hasta migración)
+```
+
+### Contrato por feature: `src/modules/<feature>/`
+
+| Carpeta / archivo | Responsabilidad |
+|-------------------|-----------------|
+| `api/` | Wrappers HTTP; **único** lugar del feature que importa código generado Orval |
+| `hooks/` | TanStack Query (`useQuery`, `useMutation`, …); API estable para la UI |
+| `query-keys.ts` | Factories de query keys del feature |
+| `schemas/` | Esquemas Zod del dominio del feature |
+| `components/` | UI del feature (presentacional + contenedores del feature) |
+| `types.ts` o `model/` | Tipos de dominio/UI; no duplicar DTOs si bastan tipos inferidos/generated |
+| `index.ts` | Opcional: **solo** export público deliberado del módulo |
+
+### Global vs local
+
+- **Global**: `components/ui`, tokens Tailwind, `lib/*`, `providers/*`, shell de `app/*`.
+- **Por feature**: reglas de negocio, copy específico, datos servidor vía hooks, wrappers HTTP, validación de formularios del dominio.
+
+### Convenciones de nombres
+
+- Carpetas de módulos: dominio en plural cuando aplique (`usuarios`, `permisos`).
+- Hooks: `useNombreClaro`; archivo `use-nombre-claro.ts`.
+- Query keys: objeto/factory `recursoKeys` (ej. `permisosKeys`).
+
+### Código generado
+
+- **Prohibido** editar manualmente `src/api/generated/**`.
+- Cambios solo vía contrato OpenAPI + `npm run codegen` (Orval [`orval.config.ts`](orval.config.ts)).
+
+### Barrel exports
+
+- Evitar barrels masivos que re-exportan todo el módulo (impacto en bundle y ciclos).
+- Si existe `modules/foo/index.ts`, exportar solo la **API pública** acordada (componentes/symbols permitidos para otros paquetes internos).
+
+---
+
+## §5 Reglas TypeScript
+
+- Mantener `strict: true` en [`tsconfig.json`](tsconfig.json).
+- **Prohibido** `any`. Usar tipos concretos, `unknown` solo con **narrowing** inmediato (guard, schema Zod, discriminant).
+- Separar mentalmente y en código: **DTO/generated** vs **modelo UI/dominio** (opcionalmente `readonly` en vistas).
+- Preferir **uniones discriminadas** para estados (`status: "idle" | "loading" | "success" | "error"`).
+- Exhaustividad: usar `switch` con `assertNever`/`satisfies` cuando el dominio lo exija.
+- Tipos: preferir `import type { … }` para imports solo de tipos.
+- Naming: componentes y tipos React `PascalCase`; funciones/vars `camelCase`; constantes verdaderamente globales `SCREAMING_SNAKE` con moderación.
+
+### Orden de imports (alinear con §9)
+
+1. Dependencias externas (`react`, `@tanstack/react-query`, …).
+2. Línea en blanco.
+3. Alias internos `@/…`.
+4. Línea en blanco.
+5. Imports relativos del mismo feature/módulo.
+
+---
+
+## §9 Reglas de imports y dependencias
+
+### Grafo permitido (dirección)
+
+- `src/app/**` → puede importar `modules/*/components`, `components/ui`, `providers`, `lib` (infra).
+- `src/app/**` → **no** importar `@/api/generated/*` ni instanciar cliente HTTP salvo casos excepcionales documentados (ej. metadata estática sin sesión).
+- `modules/<A>/components` → hooks del mismo feature, `components/ui`, tipos locales.
+- `modules/<A>/hooks` → wrappers `modules/<A>/api`, `query-keys`, utilidades del mismo feature o `modules/shared`.
+- `modules/<A>/api` → `@/api/generated/*`, tipos DTO, eventualmente `lib/api-client` solo si el wrapper lo necesita (preferir mutador ya cableado en Orval).
+
+### Prohibido
+
+- Imports **profundos** entre features: `modules/permisos/...` desde dentro de `modules/usuarios/...`.
+- UI (`components`, páginas) importando cliente **generado** directamente.
+- Infra (`lib`) importando implementaciones internas de `modules/*` (dependencia invertida).
+- Dependencias circulares entre capas (detectar y romper moviendo tipos a `types.ts` o `shared`).
+
+### Composición cross-feature
+
+- Orquestar en **`src/app/`** (ruta/layout) o exponer API mínima desde `modules/B/index.ts` si el equipo lo define explícitamente.
+- Lógica compartida genuina → `modules/shared/` (sin acoplarse a un solo feature).
+
+---
+
+## §10 Escalabilidad y mantenibilidad
+
+### Evolución del código
+
+1. Prefiere **`src/modules/<dominio>/`** para dominio nuevo (`api`, `hooks`, `query-keys`, `schemas`, `components`).
+2. Refactor progresivo: mover hooks que llaman API desde `src/hooks/` al módulo correspondiente cuando el dominio esté claro (wrappers + query-keys).
+
+### Estrategia de tests (orientativa)
+
+- **Wrappers `api/`**: tests unitarios de mapeo de respuesta/error y normalización de paginación.
+- **Hooks**: mockear wrapper o MSW contra OpenAPI; cubrir éxito + error + invalidación esperada.
+- **Componentes**: Testing Library; enfasis en accesibilidad y estados loading/error.
+
+### Rendimiento
+
+- Confiar en deduplicación de TanStack Query; no duplicar fetch manual.
+- Memoización (`useMemo`, `memo`) solo tras evidencia (profiler, lists grandes).
+- Imágenes con `next/image`; code-splitting natural por rutas App Router.
+
+### Anti-patrones globales (vetados)
+
+- Fetch/axios/generated llamados desde componentes de presentación o páginas.
+- Estado servidor duplicado en Context, Zustand o estado global React.
+- Query keys como strings sueltas sin factory central.
+- Validación duplicada (JS suelto + Zod incongruentes).
+- Componentes > ~250 líneas sin división.
+- Edición manual de `src/api/generated`.
+- Cruce de boundaries entre features sin composición en `app/` o `shared`.
+
+### Checklist de revisión (PR)
+
+- [ ] Capas respetadas: UI → hook → wrapper → generated.
+- [ ] Query keys desde `query-keys.ts` del feature.
+- [ ] Sin `any`; narrowing claro de errores.
+- [ ] Sin imports generated fuera de `modules/*/api/` (salvo infra explícita acordada, p. ej. mutador).
+- [ ] Schemas Zod únicos para formularios del caso de uso.
+- [ ] Límite RSC/client correcto (`"use client"` solo donde haga falta).
+- [ ] Mutaciones invalidan keys definidas en convención del feature.
+- [ ] Nuevos hooks que encapsulan API del dominio viven en `src/modules/<feature>/hooks` (no como pegotes sueltos fuera de módulo sin acuerdo).
+- [ ] Accesibilidad básica en UI nueva (labels, foco, Radix/shadcn bien usados).

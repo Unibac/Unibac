@@ -1,0 +1,202 @@
+---
+description: TanStack Query, capa API, Zod/forms, estado, componentes y App Router Unibac
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Unibac — Datos remotos, API, formularios, estado, UI y Next.js
+
+Coherente con [unibac-architecture.mdc](unibac-architecture.mdc) (estructura bajo `src/`, imports, TypeScript).
+
+---
+
+## §2 Reglas TanStack Query
+
+### Principios
+
+- **TanStack Query es la fuente única de verdad del estado servidor** (listas, detalle, perfil, paginación).
+- Los **componentes de UI no** llaman HTTP, no conocen URLs ni métodos REST; consumen hooks del feature.
+
+### Ubicación del código
+
+- Toda configuración de `useQuery`, `useMutation`, `useInfiniteQuery` vive en `src/modules/<feature>/hooks/`.
+- **Prohibido** definir `queryFn`/`mutationFn` inline en componentes de página o árbol presentacional que llame a `getX()` generado.
+
+### Query keys
+
+- Centralizar en `src/modules/<feature>/query-keys.ts`.
+- Forma jerárquica y estable; incluir parámetros serializables en el nivel hoja.
+
+Ejemplo orientativo:
+
+```ts
+export const permisosKeys = {
+  all: ["permisos"] as const,
+  list: (usuarioId?: string) =>
+    [...permisosKeys.all, "list", usuarioId ?? "all"] as const,
+};
+```
+
+### Opciones por defecto y overrides
+
+- Defaults globales (`staleTime`, `retry`, `refetchOnWindowFocus`) en `QueryClient` dentro de `providers/`.
+- Overrides locales cuando el dominio lo exija (ej. `retry: false` para endpoints que devuelven 401 esperado en rutas públicas).
+
+### Invalidación
+
+- Cada mutación debe documentar qué keys invalida (array explícito o helper `invalidatePermisos()`).
+- Evitar `invalidateQueries` disperso sin convención ni comentario de intención.
+
+### Optimistic updates
+
+- Usar solo cuando el UX lo requiera y el rollback esté claro; encapsular en el hook de mutación.
+- Combinar con invalidación o `setQueryData` según consistencia con el backend.
+
+### Suspense
+
+- `useSuspenseQuery` **solo** donde exista boundary explícita (`loading.tsx`, `<Suspense>` en `app/`).
+- Si no hay boundary garantizada, usar `useQuery` y manejar `isPending`/`isError` en UI.
+
+### Anti-patrones Query
+
+- Duplicar datos del servidor en Context o Zustand.
+- Keys mágicas repartidas por archivos.
+- Mutaciones sin manejo de error normalizado (ver §3).
+- Mezclar lógica de negocio pesada dentro del `queryFn` (extraer a wrapper `api/`).
+
+---
+
+## §3 Reglas de la capa API (wrappers)
+
+### Flujo obligatorio (código nuevo)
+
+```
+Componente (UI)
+  → Hook del feature (`modules/<feature>/hooks`)
+  → Wrapper (`modules/<feature>/api/*.ts`)
+  → Cliente generado Orval (`src/api/generated/...`)
+  → Mutador Axios (`src/lib/api/mutator.ts` → `src/lib/api-client.ts`)
+```
+
+### Wrappers
+
+- Un archivo o grupo coherente por agregado (`login.ts`, `permisos.ts`, …).
+- Funciones **puras del lado cliente** que delegan en funciones generadas; firma tipada con DTO generated o tipos de entrada estrechos.
+- Responsabilidades permitidas: normalizar paginación (`items`, `nextCursor`, etc.), mapear DTO → modelo de vista si reduce acoplamiento, unificar errores Axios en tipo de aplicación.
+
+### Infraestructura
+
+- [`lib/api-client.ts`](lib/api-client.ts): `baseURL`, `withCredentials`, timeout, headers por defecto.
+- [`src/lib/api/mutator.ts`](src/lib/api/mutator.ts): punto único para interceptores futuros (401, tracing); Orval ya usa `customInstance`.
+
+### Qué no hace la UI
+
+- **Prohibido** `import { getUsuarios } from "@/api/generated/..."` fuera de `modules/*/api/` y código infra autorizado.
+
+### Errores y paginación
+
+- Clasificar: red, 4xx cliente, 5xx servidor, validación; no propagar stack traces al usuario.
+- Paginación: si el backend cambia forma de envelope, **absorber el cambio en el wrapper**, no en diez hooks.
+
+---
+
+## §4 Reglas Zod y formularios
+
+- **Zod es la única fuente de verdad de validación** para datos introducidos por el usuario.
+- **React Hook Form + `@hookform/resolvers` + `zodResolver`** es el estándar para forms interactivos.
+
+### Ubicación
+
+- Esquemas en `src/modules/<feature>/schemas/` con nombre explícito (`loginSchema`, `crearUsuarioSchema`).
+- Componentes de formulario del feature junto a `components/` del mismo feature (o subcarpeta `forms/` si crece).
+
+### Tipos
+
+- Inferir: `type LoginValues = z.infer<typeof loginSchema>`; **no** duplicar interfaces idénticas al schema.
+
+### Relación con DTOs backend
+
+- Los schemas del frontend son **independientes** del contrato OpenAPI; pueden alinearse pero no se regeneran solos.
+- Tras `npm run codegen`, revisar drift DTO ↔ schema; usar tests o capa de mapping en `api/` al enviar (`schema.parse` → construir DTO generated).
+
+### Anti-patrones
+
+- Validación condicional dispersa en `onSubmit` sin Zod.
+- Dos fuentes de verdad (regex en UI + schema distinto).
+- Cast agresivo `as LoginDto` sin validación previa.
+
+---
+
+## §6 Reglas de gestión de estado
+
+| Herramienta | Uso permitido |
+|-------------|----------------|
+| **TanStack Query** | Estado servidor: entidades, listas, resultado de mutaciones cacheadas |
+| **useState / useReducer** | Estado UI local: toggles, pasos de wizard, inputs controlados efímeros |
+| **React Context** | Infra transversal (tema, i18n futuro, flags de shell); **no** almacenar listados de negocio ni copias de respuestas API |
+| **Zustand** (opcional futuro) | Estado cliente global persistente en navegación: preferencias UI, filtros de lista **no** respaldados por servidor, estado de UI compleja **sin** duplicar entidades del backend |
+
+### Vetado
+
+- Stores globales que espejan usuarios, permisos o cualquier entidad ya cubierta por Query (salvo caché deliberada y documentada con TTL propio — preferir no).
+
+---
+
+## §7 Reglas de componentes
+
+### Separación
+
+- **Presentacional**: recibe datos y callbacks por props; sin hooks de datos remotos.
+- **Contenedor / feature**: ensambla hooks del feature y pasa props a presentacionales.
+- Evitar “god components”; partir por responsabilidad cuando se acerque a ~200–250 líneas.
+
+### Server vs Client
+
+- **Server Components por defecto** en `app/`.
+- `"use client"` solo cuando se necesite: estado local, efectos, event handlers del navegador, TanStack Query, librerías solo cliente.
+
+### Feature leakage
+
+- `modules/A/components` **no** importa `modules/B/components` directamente.
+- Componer en ruta (`src/app/...`) o mover piezas realesmente compartidas a `modules/shared` o `components` globales sin negocio.
+
+### Accesibilidad y composición
+
+- Respetar primitivas Radix/shadcn; no romper roles ni foco.
+- Preferir composición (slots, children) frente a props booleanas explosivas.
+
+---
+
+## §8 Reglas Next.js App Router
+
+- Antes de usar APIs nuevas de Next, revisar la guía local del runtime en `node_modules/next/dist/docs/` (ver también [`AGENTS.md`](../../AGENTS.md)).
+
+### Datos en servidor vs cliente
+
+- **RSC + `fetch`** (u helpers del servidor) para datos públicos, SEO, primera pintura sin sesión cookie compleja; respetar políticas de cache de Next cuando aplique.
+- **TanStack Query en cliente** cuando: datos dependen de sesión cookie con UX rica, invalidación fina tras mutaciones, uploads, polling o interacción frecuente.
+
+### loading / error
+
+- Usar `loading.tsx` y `error.tsx` por segmento cuando mejore UX; alinear con boundaries de Suspense si se usa suspense queries.
+
+### Server Actions
+
+- Política **conservadora**: el stack principal es REST + cookies vía wrappers.
+- Server Actions solo tras decisión explícita del equipo (formularios muy simples, integración estrecha con servidor sin duplicar contrato REST).
+
+### SEO y metadata
+
+- Metadata estática/dinámica en layouts y páginas según App Router; no acoplar SEO a hooks cliente-only.
+
+---
+
+## Referencia rápida de capas
+
+```
+UI (RSC/client)
+  → hooks (TanStack Query)
+  → api wrappers (feature)
+  → generated Orval
+  → mutator + apiClient
+```
