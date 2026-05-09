@@ -7,8 +7,8 @@
  */
 
 export type ModulosControllerFindAllParams = {
-/**
- * Si es true, solo módulos activos
- */
-activo?: string;
+  /**
+   * Si es true, solo módulos activos
+   */
+  activo?: string;
 };

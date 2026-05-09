@@ -80,7 +80,11 @@ export function AppSidebar() {
                       pathname.startsWith(`${item.href}/`);
                 return (
                   <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={active} tooltip={item.label}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={active}
+                      tooltip={item.label}
+                    >
                       <Link href={item.href}>
                         <Icon />
                         <span>{item.label}</span>

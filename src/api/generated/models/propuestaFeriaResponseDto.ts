@@ -5,12 +5,12 @@
  * Autenticación: POST /auth/login fija la cookie HttpOnly access_token. En Swagger UI, ejecuta login en este mismo origen y luego las rutas protegidas enviarán la cookie automáticamente. Desde el frontend usa fetch/axios con credentials: include. Registro público: POST /auth/register-public solo si PUBLIC_REGISTRATION_ENABLED=true.
  * OpenAPI spec version: 1.0
  */
-import type { FeriaResponseDto } from './feriaResponseDto';
-import type { PropuestaFeriaResponseDtoAreaCreativa } from './propuestaFeriaResponseDtoAreaCreativa';
-import type { PropuestaFeriaResponseDtoCelular } from './propuestaFeriaResponseDtoCelular';
-import type { PropuestaFeriaResponseDtoEstado } from './propuestaFeriaResponseDtoEstado';
-import type { PropuestaFeriaResponseDtoImagenUrl } from './propuestaFeriaResponseDtoImagenUrl';
-import type { PropuestaFeriaResponseDtoRedesContacto } from './propuestaFeriaResponseDtoRedesContacto';
+import type { FeriaResponseDto } from "./feriaResponseDto";
+import type { PropuestaFeriaResponseDtoAreaCreativa } from "./propuestaFeriaResponseDtoAreaCreativa";
+import type { PropuestaFeriaResponseDtoCelular } from "./propuestaFeriaResponseDtoCelular";
+import type { PropuestaFeriaResponseDtoEstado } from "./propuestaFeriaResponseDtoEstado";
+import type { PropuestaFeriaResponseDtoImagenUrl } from "./propuestaFeriaResponseDtoImagenUrl";
+import type { PropuestaFeriaResponseDtoRedesContacto } from "./propuestaFeriaResponseDtoRedesContacto";
 
 export interface PropuestaFeriaResponseDto {
   id: number;

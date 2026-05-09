@@ -9,65 +9,91 @@ import type {
   CreatePermisoDto,
   PermisoDeletedResponseDto,
   PermisoResponseDto,
-  PermisosControllerFindAllParams
-} from '../models';
+  PermisosControllerFindAllParams,
+} from "../models";
 
-import { customInstance } from '../../../lib/api/mutator';
-
+import { customInstance } from "../../../lib/api/mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-  export const getPermisos = () => {
-/**
- * @summary Listar permisos (opcional por usuario)
- */
-const permisosControllerFindAll = (
+export const getPermisos = () => {
+  /**
+   * @summary Listar permisos (opcional por usuario)
+   */
+  const permisosControllerFindAll = (
     params?: PermisosControllerFindAllParams,
- options?: SecondParameter<typeof customInstance<PermisoResponseDto[]>>,) => {
-      return customInstance<PermisoResponseDto[]>(
-      {url: `/permisos`, method: 'GET',
-        params
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<PermisoResponseDto[]>>,
+  ) => {
+    return customInstance<PermisoResponseDto[]>(
+      { url: `/permisos`, method: "GET", params },
+      options,
+    );
+  };
   /**
- * @summary Crear permiso
- */
-const permisosControllerCreate = (
+   * @summary Crear permiso
+   */
+  const permisosControllerCreate = (
     createPermisoDto: CreatePermisoDto,
- options?: SecondParameter<typeof customInstance<PermisoResponseDto>>,) => {
-      return customInstance<PermisoResponseDto>(
-      {url: `/permisos`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createPermisoDto
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<PermisoResponseDto>>,
+  ) => {
+    return customInstance<PermisoResponseDto>(
+      {
+        url: `/permisos`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        data: createPermisoDto,
+      },
+      options,
+    );
+  };
   /**
- * @summary Obtener permiso por id
- */
-const permisosControllerFindOne = (
+   * @summary Obtener permiso por id
+   */
+  const permisosControllerFindOne = (
     id: number,
- options?: SecondParameter<typeof customInstance<PermisoResponseDto>>,) => {
-      return customInstance<PermisoResponseDto>(
-      {url: `/permisos/${id}`, method: 'GET'
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<PermisoResponseDto>>,
+  ) => {
+    return customInstance<PermisoResponseDto>(
+      { url: `/permisos/${id}`, method: "GET" },
+      options,
+    );
+  };
   /**
- * @summary Eliminar permiso
- */
-const permisosControllerRemove = (
+   * @summary Eliminar permiso
+   */
+  const permisosControllerRemove = (
     id: number,
- options?: SecondParameter<typeof customInstance<PermisoDeletedResponseDto>>,) => {
-      return customInstance<PermisoDeletedResponseDto>(
-      {url: `/permisos/${id}`, method: 'DELETE'
-    },
-      options);
-    }
-  return {permisosControllerFindAll,permisosControllerCreate,permisosControllerFindOne,permisosControllerRemove}};
-export type PermisosControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPermisos>['permisosControllerFindAll']>>>
-export type PermisosControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPermisos>['permisosControllerCreate']>>>
-export type PermisosControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPermisos>['permisosControllerFindOne']>>>
-export type PermisosControllerRemoveResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPermisos>['permisosControllerRemove']>>>
+    options?: SecondParameter<typeof customInstance<PermisoDeletedResponseDto>>,
+  ) => {
+    return customInstance<PermisoDeletedResponseDto>(
+      { url: `/permisos/${id}`, method: "DELETE" },
+      options,
+    );
+  };
+  return {
+    permisosControllerFindAll,
+    permisosControllerCreate,
+    permisosControllerFindOne,
+    permisosControllerRemove,
+  };
+};
+export type PermisosControllerFindAllResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getPermisos>["permisosControllerFindAll"]>
+  >
+>;
+export type PermisosControllerCreateResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getPermisos>["permisosControllerCreate"]>
+  >
+>;
+export type PermisosControllerFindOneResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getPermisos>["permisosControllerFindOne"]>
+  >
+>;
+export type PermisosControllerRemoveResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getPermisos>["permisosControllerRemove"]>
+  >
+>;

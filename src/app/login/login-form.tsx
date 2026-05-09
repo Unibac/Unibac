@@ -71,9 +71,7 @@ export function LoginForm() {
             </p>
           ) : null}
           <FieldGroup>
-            <Field
-              data-invalid={!!form.formState.errors.usuario}
-            >
+            <Field data-invalid={!!form.formState.errors.usuario}>
               <FieldLabel htmlFor="login-usuario">Usuario</FieldLabel>
               <Input
                 id="login-usuario"
@@ -97,11 +95,7 @@ export function LoginForm() {
           </FieldGroup>
         </CardContent>
         <CardFooter className="flex flex-col gap-4 border-t border-border pt-6">
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={login.isPending}
-          >
+          <Button type="submit" className="w-full" disabled={login.isPending}>
             {login.isPending ? (
               <Spinner data-icon="inline-start" />
             ) : (

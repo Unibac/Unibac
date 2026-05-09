@@ -6,10 +6,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export type RegisterDtoNivel = typeof RegisterDtoNivel[keyof typeof RegisterDtoNivel];
-
+export type RegisterDtoNivel =
+  (typeof RegisterDtoNivel)[keyof typeof RegisterDtoNivel];
 
 export const RegisterDtoNivel = {
-  USUARIO: 'USUARIO',
-  ADMINISTRADOR: 'ADMINISTRADOR',
+  USUARIO: "USUARIO",
+  ADMINISTRADOR: "ADMINISTRADOR",
 } as const;

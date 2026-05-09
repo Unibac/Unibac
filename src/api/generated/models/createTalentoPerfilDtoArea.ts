@@ -6,13 +6,13 @@
  * OpenAPI spec version: 1.0
  */
 
-export type CreateTalentoPerfilDtoArea = typeof CreateTalentoPerfilDtoArea[keyof typeof CreateTalentoPerfilDtoArea];
-
+export type CreateTalentoPerfilDtoArea =
+  (typeof CreateTalentoPerfilDtoArea)[keyof typeof CreateTalentoPerfilDtoArea];
 
 export const CreateTalentoPerfilDtoArea = {
-  MUSICA: 'MUSICA',
-  ARTES_PLASTICAS: 'ARTES_PLASTICAS',
-  DISENO: 'DISENO',
-  AUDIOVISUAL: 'AUDIOVISUAL',
-  ARTES_ESCENICAS: 'ARTES_ESCENICAS',
+  MUSICA: "MUSICA",
+  ARTES_PLASTICAS: "ARTES_PLASTICAS",
+  DISENO: "DISENO",
+  AUDIOVISUAL: "AUDIOVISUAL",
+  ARTES_ESCENICAS: "ARTES_ESCENICAS",
 } as const;

@@ -8,79 +8,114 @@
 import type {
   AccionResponseDto,
   CreateAccionDto,
-  UpdateAccionDto
-} from '../models';
+  UpdateAccionDto,
+} from "../models";
 
-import { customInstance } from '../../../lib/api/mutator';
-
+import { customInstance } from "../../../lib/api/mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-  export const getAcciones = () => {
-/**
- * @summary Listar acciones
- */
-const accionesControllerFindAll = (
-
- options?: SecondParameter<typeof customInstance<AccionResponseDto[]>>,) => {
-      return customInstance<AccionResponseDto[]>(
-      {url: `/acciones`, method: 'GET'
-    },
-      options);
-    }
+export const getAcciones = () => {
   /**
- * @summary Crear acción
- */
-const accionesControllerCreate = (
+   * @summary Listar acciones
+   */
+  const accionesControllerFindAll = (
+    options?: SecondParameter<typeof customInstance<AccionResponseDto[]>>,
+  ) => {
+    return customInstance<AccionResponseDto[]>(
+      { url: `/acciones`, method: "GET" },
+      options,
+    );
+  };
+  /**
+   * @summary Crear acción
+   */
+  const accionesControllerCreate = (
     createAccionDto: CreateAccionDto,
- options?: SecondParameter<typeof customInstance<AccionResponseDto>>,) => {
-      return customInstance<AccionResponseDto>(
-      {url: `/acciones`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createAccionDto
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<AccionResponseDto>>,
+  ) => {
+    return customInstance<AccionResponseDto>(
+      {
+        url: `/acciones`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        data: createAccionDto,
+      },
+      options,
+    );
+  };
   /**
- * @summary Obtener acción por id
- */
-const accionesControllerFindOne = (
+   * @summary Obtener acción por id
+   */
+  const accionesControllerFindOne = (
     id: number,
- options?: SecondParameter<typeof customInstance<AccionResponseDto>>,) => {
-      return customInstance<AccionResponseDto>(
-      {url: `/acciones/${id}`, method: 'GET'
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<AccionResponseDto>>,
+  ) => {
+    return customInstance<AccionResponseDto>(
+      { url: `/acciones/${id}`, method: "GET" },
+      options,
+    );
+  };
   /**
- * @summary Actualizar acción
- */
-const accionesControllerUpdate = (
+   * @summary Actualizar acción
+   */
+  const accionesControllerUpdate = (
     id: number,
     updateAccionDto: UpdateAccionDto,
- options?: SecondParameter<typeof customInstance<AccionResponseDto>>,) => {
-      return customInstance<AccionResponseDto>(
-      {url: `/acciones/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateAccionDto
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<AccionResponseDto>>,
+  ) => {
+    return customInstance<AccionResponseDto>(
+      {
+        url: `/acciones/${id}`,
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        data: updateAccionDto,
+      },
+      options,
+    );
+  };
   /**
- * @summary Eliminar acción
- */
-const accionesControllerRemove = (
+   * @summary Eliminar acción
+   */
+  const accionesControllerRemove = (
     id: number,
- options?: SecondParameter<typeof customInstance<AccionResponseDto>>,) => {
-      return customInstance<AccionResponseDto>(
-      {url: `/acciones/${id}`, method: 'DELETE'
-    },
-      options);
-    }
-  return {accionesControllerFindAll,accionesControllerCreate,accionesControllerFindOne,accionesControllerUpdate,accionesControllerRemove}};
-export type AccionesControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAcciones>['accionesControllerFindAll']>>>
-export type AccionesControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAcciones>['accionesControllerCreate']>>>
-export type AccionesControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAcciones>['accionesControllerFindOne']>>>
-export type AccionesControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAcciones>['accionesControllerUpdate']>>>
-export type AccionesControllerRemoveResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAcciones>['accionesControllerRemove']>>>
+    options?: SecondParameter<typeof customInstance<AccionResponseDto>>,
+  ) => {
+    return customInstance<AccionResponseDto>(
+      { url: `/acciones/${id}`, method: "DELETE" },
+      options,
+    );
+  };
+  return {
+    accionesControllerFindAll,
+    accionesControllerCreate,
+    accionesControllerFindOne,
+    accionesControllerUpdate,
+    accionesControllerRemove,
+  };
+};
+export type AccionesControllerFindAllResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getAcciones>["accionesControllerFindAll"]>
+  >
+>;
+export type AccionesControllerCreateResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getAcciones>["accionesControllerCreate"]>
+  >
+>;
+export type AccionesControllerFindOneResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getAcciones>["accionesControllerFindOne"]>
+  >
+>;
+export type AccionesControllerUpdateResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getAcciones>["accionesControllerUpdate"]>
+  >
+>;
+export type AccionesControllerRemoveResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getAcciones>["accionesControllerRemove"]>
+  >
+>;

@@ -6,12 +6,12 @@
  * OpenAPI spec version: 1.0
  */
 
-export type DirectorioEmprendimientoResponseDtoAreaCreativa = typeof DirectorioEmprendimientoResponseDtoAreaCreativa[keyof typeof DirectorioEmprendimientoResponseDtoAreaCreativa];
-
+export type DirectorioEmprendimientoResponseDtoAreaCreativa =
+  (typeof DirectorioEmprendimientoResponseDtoAreaCreativa)[keyof typeof DirectorioEmprendimientoResponseDtoAreaCreativa];
 
 export const DirectorioEmprendimientoResponseDtoAreaCreativa = {
-  ARTES_PLASTICAS: 'ARTES_PLASTICAS',
-  MUSICA: 'MUSICA',
-  DISENO: 'DISENO',
-  AUDIOVISUAL: 'AUDIOVISUAL',
+  ARTES_PLASTICAS: "ARTES_PLASTICAS",
+  MUSICA: "MUSICA",
+  DISENO: "DISENO",
+  AUDIOVISUAL: "AUDIOVISUAL",
 } as const;

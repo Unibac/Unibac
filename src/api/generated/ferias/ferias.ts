@@ -17,191 +17,292 @@ import type {
   ModerarPropuestaFeriaDto,
   PropuestaFeriaResponseDto,
   UpdateFeriaDto,
-  UpdatePropuestaFeriaPropietarioDto
-} from '../models';
+  UpdatePropuestaFeriaPropietarioDto,
+} from "../models";
 
-import { customInstance } from '../../../lib/api/mutator';
-
+import { customInstance } from "../../../lib/api/mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-  export const getFerias = () => {
-/**
- * Incluye ferias próximas, activas y finalizadas. El campo periodo se deriva de las fechas.
- * @summary Listar ferias virtuales
- */
-const feriasControllerFindAll = (
-
- options?: SecondParameter<typeof customInstance<FeriaResponseDto[]>>,) => {
-      return customInstance<FeriaResponseDto[]>(
-      {url: `/ferias`, method: 'GET'
-    },
-      options);
-    }
+export const getFerias = () => {
   /**
- * @summary Crear feria virtual
- */
-const feriasControllerCreate = (
+   * Incluye ferias próximas, activas y finalizadas. El campo periodo se deriva de las fechas.
+   * @summary Listar ferias virtuales
+   */
+  const feriasControllerFindAll = (
+    options?: SecondParameter<typeof customInstance<FeriaResponseDto[]>>,
+  ) => {
+    return customInstance<FeriaResponseDto[]>(
+      { url: `/ferias`, method: "GET" },
+      options,
+    );
+  };
+  /**
+   * @summary Crear feria virtual
+   */
+  const feriasControllerCreate = (
     createFeriaDto: CreateFeriaDto,
- options?: SecondParameter<typeof customInstance<FeriaResponseDto>>,) => {
-      return customInstance<FeriaResponseDto>(
-      {url: `/ferias`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createFeriaDto
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<FeriaResponseDto>>,
+  ) => {
+    return customInstance<FeriaResponseDto>(
+      {
+        url: `/ferias`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        data: createFeriaDto,
+      },
+      options,
+    );
+  };
   /**
- * Requiere variables S3_* configuradas. Devuelve imagenBannerUrl para usar en POST/PATCH de feria.
- * @summary Subir banner de feria
- */
-const feriasControllerUploadBanner = (
+   * Requiere variables S3_* configuradas. Devuelve imagenBannerUrl para usar en POST/PATCH de feria.
+   * @summary Subir banner de feria
+   */
+  const feriasControllerUploadBanner = (
     feriasControllerUploadBannerBody: FeriasControllerUploadBannerBody,
- options?: SecondParameter<typeof customInstance<FeriaBannerUploadResponseDto>>,) => {const formData = new FormData();
-formData.append(`archivo`, feriasControllerUploadBannerBody.archivo);
+    options?: SecondParameter<
+      typeof customInstance<FeriaBannerUploadResponseDto>
+    >,
+  ) => {
+    const formData = new FormData();
+    formData.append(`archivo`, feriasControllerUploadBannerBody.archivo);
 
-      return customInstance<FeriaBannerUploadResponseDto>(
-      {url: `/ferias/banner`, method: 'POST',
-      headers: {'Content-Type': 'multipart/form-data', },
-       data: formData
-    },
-      options);
-    }
+    return customInstance<FeriaBannerUploadResponseDto>(
+      {
+        url: `/ferias/banner`,
+        method: "POST",
+        headers: { "Content-Type": "multipart/form-data" },
+        data: formData,
+      },
+      options,
+    );
+  };
   /**
- * Requiere usuario interno o administrador (misma regla que crear propuesta).
- * @summary Mis propuestas de feria
- */
-const feriasControllerFindMisPropuestas = (
-
- options?: SecondParameter<typeof customInstance<PropuestaFeriaResponseDto[]>>,) => {
-      return customInstance<PropuestaFeriaResponseDto[]>(
-      {url: `/ferias/mis-propuestas`, method: 'GET'
-    },
-      options);
-    }
+   * Requiere usuario interno o administrador (misma regla que crear propuesta).
+   * @summary Mis propuestas de feria
+   */
+  const feriasControllerFindMisPropuestas = (
+    options?: SecondParameter<
+      typeof customInstance<PropuestaFeriaResponseDto[]>
+    >,
+  ) => {
+    return customInstance<PropuestaFeriaResponseDto[]>(
+      { url: `/ferias/mis-propuestas`, method: "GET" },
+      options,
+    );
+  };
   /**
- * @summary Editar propuesta propia (POSTULADO, feria en vigencia)
- */
-const feriasControllerUpdateMisPropuesta = (
+   * @summary Editar propuesta propia (POSTULADO, feria en vigencia)
+   */
+  const feriasControllerUpdateMisPropuesta = (
     propuestaId: number,
     updatePropuestaFeriaPropietarioDto: UpdatePropuestaFeriaPropietarioDto,
- options?: SecondParameter<typeof customInstance<PropuestaFeriaResponseDto>>,) => {
-      return customInstance<PropuestaFeriaResponseDto>(
-      {url: `/ferias/mis-propuestas/${propuestaId}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updatePropuestaFeriaPropietarioDto
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<PropuestaFeriaResponseDto>>,
+  ) => {
+    return customInstance<PropuestaFeriaResponseDto>(
+      {
+        url: `/ferias/mis-propuestas/${propuestaId}`,
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        data: updatePropuestaFeriaPropietarioDto,
+      },
+      options,
+    );
+  };
   /**
- * Solo administrador en tiempo de ejecución. Solo desde estado POSTULADO.
- * @summary Moderar propuesta (ACEPTADO / RECHAZADO)
- */
-const feriasControllerModerarPropuesta = (
+   * Solo administrador en tiempo de ejecución. Solo desde estado POSTULADO.
+   * @summary Moderar propuesta (ACEPTADO / RECHAZADO)
+   */
+  const feriasControllerModerarPropuesta = (
     propuestaId: number,
     moderarPropuestaFeriaDto: ModerarPropuestaFeriaDto,
- options?: SecondParameter<typeof customInstance<PropuestaFeriaResponseDto>>,) => {
-      return customInstance<PropuestaFeriaResponseDto>(
-      {url: `/ferias/propuestas/${propuestaId}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: moderarPropuestaFeriaDto
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<PropuestaFeriaResponseDto>>,
+  ) => {
+    return customInstance<PropuestaFeriaResponseDto>(
+      {
+        url: `/ferias/propuestas/${propuestaId}`,
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        data: moderarPropuestaFeriaDto,
+      },
+      options,
+    );
+  };
   /**
- * Usuarios no administradores solo ven propuestas ACEPTADO (se ignora query estado). Administradores pueden filtrar por estado para moderación.
- * @summary Listar propuestas de una feria (vitrina / moderación)
- */
-const feriasControllerFindPropuestasPorFeria = (
+   * Usuarios no administradores solo ven propuestas ACEPTADO (se ignora query estado). Administradores pueden filtrar por estado para moderación.
+   * @summary Listar propuestas de una feria (vitrina / moderación)
+   */
+  const feriasControllerFindPropuestasPorFeria = (
     feriaId: number,
     params?: FeriasControllerFindPropuestasPorFeriaParams,
- options?: SecondParameter<typeof customInstance<PropuestaFeriaResponseDto[]>>,) => {
-      return customInstance<PropuestaFeriaResponseDto[]>(
-      {url: `/ferias/${feriaId}/propuestas`, method: 'GET',
-        params
-    },
-      options);
-    }
+    options?: SecondParameter<
+      typeof customInstance<PropuestaFeriaResponseDto[]>
+    >,
+  ) => {
+    return customInstance<PropuestaFeriaResponseDto[]>(
+      { url: `/ferias/${feriaId}/propuestas`, method: "GET", params },
+      options,
+    );
+  };
   /**
- * Requiere usuario interno o administrador y feria en vigencia inclusiva.
- * @summary Registrar propuesta en una feria
- */
-const feriasControllerCreatePropuesta = (
+   * Requiere usuario interno o administrador y feria en vigencia inclusiva.
+   * @summary Registrar propuesta en una feria
+   */
+  const feriasControllerCreatePropuesta = (
     feriaId: number,
     createPropuestaFeriaDto: CreatePropuestaFeriaDto,
- options?: SecondParameter<typeof customInstance<PropuestaFeriaResponseDto>>,) => {
-      return customInstance<PropuestaFeriaResponseDto>(
-      {url: `/ferias/${feriaId}/propuestas`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createPropuestaFeriaDto
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<PropuestaFeriaResponseDto>>,
+  ) => {
+    return customInstance<PropuestaFeriaResponseDto>(
+      {
+        url: `/ferias/${feriaId}/propuestas`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        data: createPropuestaFeriaDto,
+      },
+      options,
+    );
+  };
   /**
- * Valida feria existente, usuario interno o administrador y feria en vigencia inclusiva. Subidas sin confirmar la propuesta pueden dejar objetos huérfanos en el bucket (v1).
- * @summary Subir imagen para propuesta de feria
- */
-const feriasControllerUploadImagenPropuesta = (
+   * Valida feria existente, usuario interno o administrador y feria en vigencia inclusiva. Subidas sin confirmar la propuesta pueden dejar objetos huérfanos en el bucket (v1).
+   * @summary Subir imagen para propuesta de feria
+   */
+  const feriasControllerUploadImagenPropuesta = (
     feriaId: number,
     feriasControllerUploadImagenPropuestaBody: FeriasControllerUploadImagenPropuestaBody,
- options?: SecondParameter<typeof customInstance<FeriaPropuestaImagenUploadResponseDto>>,) => {const formData = new FormData();
-formData.append(`archivo`, feriasControllerUploadImagenPropuestaBody.archivo);
+    options?: SecondParameter<
+      typeof customInstance<FeriaPropuestaImagenUploadResponseDto>
+    >,
+  ) => {
+    const formData = new FormData();
+    formData.append(
+      `archivo`,
+      feriasControllerUploadImagenPropuestaBody.archivo,
+    );
 
-      return customInstance<FeriaPropuestaImagenUploadResponseDto>(
-      {url: `/ferias/${feriaId}/propuestas/imagen`, method: 'POST',
-      headers: {'Content-Type': 'multipart/form-data', },
-       data: formData
-    },
-      options);
-    }
+    return customInstance<FeriaPropuestaImagenUploadResponseDto>(
+      {
+        url: `/ferias/${feriaId}/propuestas/imagen`,
+        method: "POST",
+        headers: { "Content-Type": "multipart/form-data" },
+        data: formData,
+      },
+      options,
+    );
+  };
   /**
- * @summary Detalle de feria
- */
-const feriasControllerFindOne = (
+   * @summary Detalle de feria
+   */
+  const feriasControllerFindOne = (
     id: number,
- options?: SecondParameter<typeof customInstance<FeriaResponseDto>>,) => {
-      return customInstance<FeriaResponseDto>(
-      {url: `/ferias/${id}`, method: 'GET'
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<FeriaResponseDto>>,
+  ) => {
+    return customInstance<FeriaResponseDto>(
+      { url: `/ferias/${id}`, method: "GET" },
+      options,
+    );
+  };
   /**
- * @summary Actualizar feria
- */
-const feriasControllerUpdate = (
+   * @summary Actualizar feria
+   */
+  const feriasControllerUpdate = (
     id: number,
     updateFeriaDto: UpdateFeriaDto,
- options?: SecondParameter<typeof customInstance<FeriaResponseDto>>,) => {
-      return customInstance<FeriaResponseDto>(
-      {url: `/ferias/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateFeriaDto
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<FeriaResponseDto>>,
+  ) => {
+    return customInstance<FeriaResponseDto>(
+      {
+        url: `/ferias/${id}`,
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        data: updateFeriaDto,
+      },
+      options,
+    );
+  };
   /**
- * Solo nivel ADMINISTRADOR puede eliminar. Si hay propuestas asociadas responde 409.
- * @summary Eliminar feria
- */
-const feriasControllerRemove = (
+   * Solo nivel ADMINISTRADOR puede eliminar. Si hay propuestas asociadas responde 409.
+   * @summary Eliminar feria
+   */
+  const feriasControllerRemove = (
     id: number,
- options?: SecondParameter<typeof customInstance<void>>,) => {
-      return customInstance<void>(
-      {url: `/ferias/${id}`, method: 'DELETE'
-    },
-      options);
-    }
-  return {feriasControllerFindAll,feriasControllerCreate,feriasControllerUploadBanner,feriasControllerFindMisPropuestas,feriasControllerUpdateMisPropuesta,feriasControllerModerarPropuesta,feriasControllerFindPropuestasPorFeria,feriasControllerCreatePropuesta,feriasControllerUploadImagenPropuesta,feriasControllerFindOne,feriasControllerUpdate,feriasControllerRemove}};
-export type FeriasControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getFerias>['feriasControllerFindAll']>>>
-export type FeriasControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getFerias>['feriasControllerCreate']>>>
-export type FeriasControllerUploadBannerResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getFerias>['feriasControllerUploadBanner']>>>
-export type FeriasControllerFindMisPropuestasResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getFerias>['feriasControllerFindMisPropuestas']>>>
-export type FeriasControllerUpdateMisPropuestaResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getFerias>['feriasControllerUpdateMisPropuesta']>>>
-export type FeriasControllerModerarPropuestaResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getFerias>['feriasControllerModerarPropuesta']>>>
-export type FeriasControllerFindPropuestasPorFeriaResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getFerias>['feriasControllerFindPropuestasPorFeria']>>>
-export type FeriasControllerCreatePropuestaResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getFerias>['feriasControllerCreatePropuesta']>>>
-export type FeriasControllerUploadImagenPropuestaResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getFerias>['feriasControllerUploadImagenPropuesta']>>>
-export type FeriasControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getFerias>['feriasControllerFindOne']>>>
-export type FeriasControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getFerias>['feriasControllerUpdate']>>>
-export type FeriasControllerRemoveResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getFerias>['feriasControllerRemove']>>>
+    options?: SecondParameter<typeof customInstance<void>>,
+  ) => {
+    return customInstance<void>(
+      { url: `/ferias/${id}`, method: "DELETE" },
+      options,
+    );
+  };
+  return {
+    feriasControllerFindAll,
+    feriasControllerCreate,
+    feriasControllerUploadBanner,
+    feriasControllerFindMisPropuestas,
+    feriasControllerUpdateMisPropuesta,
+    feriasControllerModerarPropuesta,
+    feriasControllerFindPropuestasPorFeria,
+    feriasControllerCreatePropuesta,
+    feriasControllerUploadImagenPropuesta,
+    feriasControllerFindOne,
+    feriasControllerUpdate,
+    feriasControllerRemove,
+  };
+};
+export type FeriasControllerFindAllResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getFerias>["feriasControllerFindAll"]>>
+>;
+export type FeriasControllerCreateResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getFerias>["feriasControllerCreate"]>>
+>;
+export type FeriasControllerUploadBannerResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getFerias>["feriasControllerUploadBanner"]>
+  >
+>;
+export type FeriasControllerFindMisPropuestasResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof getFerias>["feriasControllerFindMisPropuestas"]
+    >
+  >
+>;
+export type FeriasControllerUpdateMisPropuestaResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof getFerias>["feriasControllerUpdateMisPropuesta"]
+    >
+  >
+>;
+export type FeriasControllerModerarPropuestaResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getFerias>["feriasControllerModerarPropuesta"]>
+  >
+>;
+export type FeriasControllerFindPropuestasPorFeriaResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof getFerias>["feriasControllerFindPropuestasPorFeria"]
+    >
+  >
+>;
+export type FeriasControllerCreatePropuestaResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getFerias>["feriasControllerCreatePropuesta"]>
+  >
+>;
+export type FeriasControllerUploadImagenPropuestaResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof getFerias>["feriasControllerUploadImagenPropuesta"]
+    >
+  >
+>;
+export type FeriasControllerFindOneResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getFerias>["feriasControllerFindOne"]>>
+>;
+export type FeriasControllerUpdateResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getFerias>["feriasControllerUpdate"]>>
+>;
+export type FeriasControllerRemoveResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getFerias>["feriasControllerRemove"]>>
+>;

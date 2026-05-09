@@ -6,11 +6,12 @@
  * OpenAPI spec version: 1.0
  */
 
-export type ConvocatoriasEmprendimientoControllerFindAllPublicacionesTipoConvocatoria = typeof ConvocatoriasEmprendimientoControllerFindAllPublicacionesTipoConvocatoria[keyof typeof ConvocatoriasEmprendimientoControllerFindAllPublicacionesTipoConvocatoria];
+export type ConvocatoriasEmprendimientoControllerFindAllPublicacionesTipoConvocatoria =
+  (typeof ConvocatoriasEmprendimientoControllerFindAllPublicacionesTipoConvocatoria)[keyof typeof ConvocatoriasEmprendimientoControllerFindAllPublicacionesTipoConvocatoria];
 
-
-export const ConvocatoriasEmprendimientoControllerFindAllPublicacionesTipoConvocatoria = {
-  FINANCIAMIENTO: 'FINANCIAMIENTO',
-  FORMACION: 'FORMACION',
-  PRACTICAS: 'PRACTICAS',
-} as const;
+export const ConvocatoriasEmprendimientoControllerFindAllPublicacionesTipoConvocatoria =
+  {
+    FINANCIAMIENTO: "FINANCIAMIENTO",
+    FORMACION: "FORMACION",
+    PRACTICAS: "PRACTICAS",
+  } as const;

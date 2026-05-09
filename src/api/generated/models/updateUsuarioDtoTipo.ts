@@ -6,10 +6,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export type UpdateUsuarioDtoTipo = typeof UpdateUsuarioDtoTipo[keyof typeof UpdateUsuarioDtoTipo];
-
+export type UpdateUsuarioDtoTipo =
+  (typeof UpdateUsuarioDtoTipo)[keyof typeof UpdateUsuarioDtoTipo];
 
 export const UpdateUsuarioDtoTipo = {
-  INTERNO: 'INTERNO',
-  EXTERNO: 'EXTERNO',
+  INTERNO: "INTERNO",
+  EXTERNO: "EXTERNO",
 } as const;

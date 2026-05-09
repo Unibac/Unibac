@@ -6,13 +6,13 @@
  * OpenAPI spec version: 1.0
  */
 
-export type TalentoPerfilResponseDtoArea = typeof TalentoPerfilResponseDtoArea[keyof typeof TalentoPerfilResponseDtoArea];
-
+export type TalentoPerfilResponseDtoArea =
+  (typeof TalentoPerfilResponseDtoArea)[keyof typeof TalentoPerfilResponseDtoArea];
 
 export const TalentoPerfilResponseDtoArea = {
-  MUSICA: 'MUSICA',
-  ARTES_PLASTICAS: 'ARTES_PLASTICAS',
-  DISENO: 'DISENO',
-  AUDIOVISUAL: 'AUDIOVISUAL',
-  ARTES_ESCENICAS: 'ARTES_ESCENICAS',
+  MUSICA: "MUSICA",
+  ARTES_PLASTICAS: "ARTES_PLASTICAS",
+  DISENO: "DISENO",
+  AUDIOVISUAL: "AUDIOVISUAL",
+  ARTES_ESCENICAS: "ARTES_ESCENICAS",
 } as const;

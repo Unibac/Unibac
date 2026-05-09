@@ -6,11 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 
-export type PostulacionConvocatoriaResponseDtoEstadoPostulacion = typeof PostulacionConvocatoriaResponseDtoEstadoPostulacion[keyof typeof PostulacionConvocatoriaResponseDtoEstadoPostulacion];
-
+export type PostulacionConvocatoriaResponseDtoEstadoPostulacion =
+  (typeof PostulacionConvocatoriaResponseDtoEstadoPostulacion)[keyof typeof PostulacionConvocatoriaResponseDtoEstadoPostulacion];
 
 export const PostulacionConvocatoriaResponseDtoEstadoPostulacion = {
-  POSTULADO: 'POSTULADO',
-  RECHAZADO: 'RECHAZADO',
-  APROBADO: 'APROBADO',
+  POSTULADO: "POSTULADO",
+  RECHAZADO: "RECHAZADO",
+  APROBADO: "APROBADO",
 } as const;

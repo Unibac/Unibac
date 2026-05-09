@@ -6,4 +6,6 @@
  * OpenAPI spec version: 1.0
  */
 
-export type EgresadoResponseDtoInformacionEmprendimiento = { [key: string]: unknown };
+export type EgresadoResponseDtoInformacionEmprendimiento = {
+  [key: string]: unknown;
+};

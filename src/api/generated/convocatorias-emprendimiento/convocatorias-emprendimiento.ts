@@ -11,138 +11,267 @@ import type {
   PostulacionConvocatoriaResponseDto,
   PublicacionEmprendimientoResponseDto,
   UpdateEstadoPostulacionDto,
-  UpdatePublicacionConvocatoriaDto
-} from '../models';
+  UpdatePublicacionConvocatoriaDto,
+} from "../models";
 
-import { customInstance } from '../../../lib/api/mutator';
-
+import { customInstance } from "../../../lib/api/mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-  export const getConvocatoriasEmprendimiento = () => {
-/**
- * Los usuarios no administrador solo ven convocatorias activas. El campo convocados es informativo en v1 (sin validación de elegibilidad).
- * @summary Listar convocatorias
- */
-const convocatoriasEmprendimientoControllerFindAllPublicaciones = (
+export const getConvocatoriasEmprendimiento = () => {
+  /**
+   * Los usuarios no administrador solo ven convocatorias activas. El campo convocados es informativo en v1 (sin validación de elegibilidad).
+   * @summary Listar convocatorias
+   */
+  const convocatoriasEmprendimientoControllerFindAllPublicaciones = (
     params?: ConvocatoriasEmprendimientoControllerFindAllPublicacionesParams,
- options?: SecondParameter<typeof customInstance<PublicacionEmprendimientoResponseDto[]>>,) => {
-      return customInstance<PublicacionEmprendimientoResponseDto[]>(
-      {url: `/convocatorias-emprendimiento`, method: 'GET',
-        params
-    },
-      options);
-    }
+    options?: SecondParameter<
+      typeof customInstance<PublicacionEmprendimientoResponseDto[]>
+    >,
+  ) => {
+    return customInstance<PublicacionEmprendimientoResponseDto[]>(
+      { url: `/convocatorias-emprendimiento`, method: "GET", params },
+      options,
+    );
+  };
   /**
- * Campo convocados solo informativo en v1; no hay validación por perfil o área.
- * @summary Crear convocatoria
- */
-const convocatoriasEmprendimientoControllerCreatePublicacion = (
+   * Campo convocados solo informativo en v1; no hay validación por perfil o área.
+   * @summary Crear convocatoria
+   */
+  const convocatoriasEmprendimientoControllerCreatePublicacion = (
     createPublicacionConvocatoriaDto: CreatePublicacionConvocatoriaDto,
- options?: SecondParameter<typeof customInstance<PublicacionEmprendimientoResponseDto>>,) => {
-      return customInstance<PublicacionEmprendimientoResponseDto>(
-      {url: `/convocatorias-emprendimiento`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createPublicacionConvocatoriaDto
-    },
-      options);
-    }
+    options?: SecondParameter<
+      typeof customInstance<PublicacionEmprendimientoResponseDto>
+    >,
+  ) => {
+    return customInstance<PublicacionEmprendimientoResponseDto>(
+      {
+        url: `/convocatorias-emprendimiento`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        data: createPublicacionConvocatoriaDto,
+      },
+      options,
+    );
+  };
   /**
- * Requiere usuario interno o administrador (misma regla que postular).
- * @summary Bandeja de mis postulaciones
- */
-const convocatoriasEmprendimientoControllerFindMisPostulaciones = (
-
- options?: SecondParameter<typeof customInstance<PostulacionConvocatoriaResponseDto[]>>,) => {
-      return customInstance<PostulacionConvocatoriaResponseDto[]>(
-      {url: `/convocatorias-emprendimiento/mis-postulaciones`, method: 'GET'
-    },
-      options);
-    }
+   * Requiere usuario interno o administrador (misma regla que postular).
+   * @summary Bandeja de mis postulaciones
+   */
+  const convocatoriasEmprendimientoControllerFindMisPostulaciones = (
+    options?: SecondParameter<
+      typeof customInstance<PostulacionConvocatoriaResponseDto[]>
+    >,
+  ) => {
+    return customInstance<PostulacionConvocatoriaResponseDto[]>(
+      { url: `/convocatorias-emprendimiento/mis-postulaciones`, method: "GET" },
+      options,
+    );
+  };
   /**
- * @summary Detalle de convocatoria
- */
-const convocatoriasEmprendimientoControllerFindOnePublicacion = (
+   * @summary Detalle de convocatoria
+   */
+  const convocatoriasEmprendimientoControllerFindOnePublicacion = (
     id: number,
- options?: SecondParameter<typeof customInstance<PublicacionEmprendimientoResponseDto>>,) => {
-      return customInstance<PublicacionEmprendimientoResponseDto>(
-      {url: `/convocatorias-emprendimiento/${id}`, method: 'GET'
-    },
-      options);
-    }
+    options?: SecondParameter<
+      typeof customInstance<PublicacionEmprendimientoResponseDto>
+    >,
+  ) => {
+    return customInstance<PublicacionEmprendimientoResponseDto>(
+      { url: `/convocatorias-emprendimiento/${id}`, method: "GET" },
+      options,
+    );
+  };
   /**
- * @summary Actualizar convocatoria
- */
-const convocatoriasEmprendimientoControllerUpdatePublicacion = (
+   * @summary Actualizar convocatoria
+   */
+  const convocatoriasEmprendimientoControllerUpdatePublicacion = (
     id: number,
     updatePublicacionConvocatoriaDto: UpdatePublicacionConvocatoriaDto,
- options?: SecondParameter<typeof customInstance<PublicacionEmprendimientoResponseDto>>,) => {
-      return customInstance<PublicacionEmprendimientoResponseDto>(
-      {url: `/convocatorias-emprendimiento/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updatePublicacionConvocatoriaDto
-    },
-      options);
-    }
+    options?: SecondParameter<
+      typeof customInstance<PublicacionEmprendimientoResponseDto>
+    >,
+  ) => {
+    return customInstance<PublicacionEmprendimientoResponseDto>(
+      {
+        url: `/convocatorias-emprendimiento/${id}`,
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        data: updatePublicacionConvocatoriaDto,
+      },
+      options,
+    );
+  };
   /**
- * Solo nivel ADMINISTRADOR puede eliminar.
- * @summary Eliminar convocatoria
- */
-const convocatoriasEmprendimientoControllerRemovePublicacion = (
+   * Solo nivel ADMINISTRADOR puede eliminar.
+   * @summary Eliminar convocatoria
+   */
+  const convocatoriasEmprendimientoControllerRemovePublicacion = (
     id: number,
- options?: SecondParameter<typeof customInstance<void>>,) => {
-      return customInstance<void>(
-      {url: `/convocatorias-emprendimiento/${id}`, method: 'DELETE'
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<void>>,
+  ) => {
+    return customInstance<void>(
+      { url: `/convocatorias-emprendimiento/${id}`, method: "DELETE" },
+      options,
+    );
+  };
   /**
- * Solo administrador en runtime. Solo si el estado actual es POSTULADO.
- * @summary Resolver postulación (aprobada / rechazada)
- */
-const convocatoriasEmprendimientoControllerUpdateEstadoPostulacion = (
+   * Solo administrador en runtime. Solo si el estado actual es POSTULADO.
+   * @summary Resolver postulación (aprobada / rechazada)
+   */
+  const convocatoriasEmprendimientoControllerUpdateEstadoPostulacion = (
     postulacionId: number,
     updateEstadoPostulacionDto: UpdateEstadoPostulacionDto,
- options?: SecondParameter<typeof customInstance<PostulacionConvocatoriaResponseDto>>,) => {
-      return customInstance<PostulacionConvocatoriaResponseDto>(
-      {url: `/convocatorias-emprendimiento/postulaciones/${postulacionId}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateEstadoPostulacionDto
-    },
-      options);
-    }
+    options?: SecondParameter<
+      typeof customInstance<PostulacionConvocatoriaResponseDto>
+    >,
+  ) => {
+    return customInstance<PostulacionConvocatoriaResponseDto>(
+      {
+        url: `/convocatorias-emprendimiento/postulaciones/${postulacionId}`,
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        data: updateEstadoPostulacionDto,
+      },
+      options,
+    );
+  };
   /**
- * Requiere usuario interno o administrador. Fecha límite comparada con Date.now() del servidor.
- * @summary Postular a convocatoria
- */
-const convocatoriasEmprendimientoControllerCreatePostulacion = (
+   * Requiere usuario interno o administrador. Fecha límite comparada con Date.now() del servidor.
+   * @summary Postular a convocatoria
+   */
+  const convocatoriasEmprendimientoControllerCreatePostulacion = (
     id: number,
- options?: SecondParameter<typeof customInstance<PostulacionConvocatoriaResponseDto>>,) => {
-      return customInstance<PostulacionConvocatoriaResponseDto>(
-      {url: `/convocatorias-emprendimiento/${id}/postulaciones`, method: 'POST'
-    },
-      options);
-    }
+    options?: SecondParameter<
+      typeof customInstance<PostulacionConvocatoriaResponseDto>
+    >,
+  ) => {
+    return customInstance<PostulacionConvocatoriaResponseDto>(
+      {
+        url: `/convocatorias-emprendimiento/${id}/postulaciones`,
+        method: "POST",
+      },
+      options,
+    );
+  };
   /**
- * Solo administrador en runtime (el guard exige CONSULTA; el service filtra por nivel).
- * @summary Listar postulados de una convocatoria
- */
-const convocatoriasEmprendimientoControllerFindPostulacionesPorConvocatoria = (
-    id: number,
- options?: SecondParameter<typeof customInstance<PostulacionConvocatoriaResponseDto[]>>,) => {
+   * Solo administrador en runtime (el guard exige CONSULTA; el service filtra por nivel).
+   * @summary Listar postulados de una convocatoria
+   */
+  const convocatoriasEmprendimientoControllerFindPostulacionesPorConvocatoria =
+    (
+      id: number,
+      options?: SecondParameter<
+        typeof customInstance<PostulacionConvocatoriaResponseDto[]>
+      >,
+    ) => {
       return customInstance<PostulacionConvocatoriaResponseDto[]>(
-      {url: `/convocatorias-emprendimiento/${id}/postulaciones`, method: 'GET'
-    },
-      options);
-    }
-  return {convocatoriasEmprendimientoControllerFindAllPublicaciones,convocatoriasEmprendimientoControllerCreatePublicacion,convocatoriasEmprendimientoControllerFindMisPostulaciones,convocatoriasEmprendimientoControllerFindOnePublicacion,convocatoriasEmprendimientoControllerUpdatePublicacion,convocatoriasEmprendimientoControllerRemovePublicacion,convocatoriasEmprendimientoControllerUpdateEstadoPostulacion,convocatoriasEmprendimientoControllerCreatePostulacion,convocatoriasEmprendimientoControllerFindPostulacionesPorConvocatoria}};
-export type ConvocatoriasEmprendimientoControllerFindAllPublicacionesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getConvocatoriasEmprendimiento>['convocatoriasEmprendimientoControllerFindAllPublicaciones']>>>
-export type ConvocatoriasEmprendimientoControllerCreatePublicacionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getConvocatoriasEmprendimiento>['convocatoriasEmprendimientoControllerCreatePublicacion']>>>
-export type ConvocatoriasEmprendimientoControllerFindMisPostulacionesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getConvocatoriasEmprendimiento>['convocatoriasEmprendimientoControllerFindMisPostulaciones']>>>
-export type ConvocatoriasEmprendimientoControllerFindOnePublicacionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getConvocatoriasEmprendimiento>['convocatoriasEmprendimientoControllerFindOnePublicacion']>>>
-export type ConvocatoriasEmprendimientoControllerUpdatePublicacionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getConvocatoriasEmprendimiento>['convocatoriasEmprendimientoControllerUpdatePublicacion']>>>
-export type ConvocatoriasEmprendimientoControllerRemovePublicacionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getConvocatoriasEmprendimiento>['convocatoriasEmprendimientoControllerRemovePublicacion']>>>
-export type ConvocatoriasEmprendimientoControllerUpdateEstadoPostulacionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getConvocatoriasEmprendimiento>['convocatoriasEmprendimientoControllerUpdateEstadoPostulacion']>>>
-export type ConvocatoriasEmprendimientoControllerCreatePostulacionResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getConvocatoriasEmprendimiento>['convocatoriasEmprendimientoControllerCreatePostulacion']>>>
-export type ConvocatoriasEmprendimientoControllerFindPostulacionesPorConvocatoriaResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getConvocatoriasEmprendimiento>['convocatoriasEmprendimientoControllerFindPostulacionesPorConvocatoria']>>>
+        {
+          url: `/convocatorias-emprendimiento/${id}/postulaciones`,
+          method: "GET",
+        },
+        options,
+      );
+    };
+  return {
+    convocatoriasEmprendimientoControllerFindAllPublicaciones,
+    convocatoriasEmprendimientoControllerCreatePublicacion,
+    convocatoriasEmprendimientoControllerFindMisPostulaciones,
+    convocatoriasEmprendimientoControllerFindOnePublicacion,
+    convocatoriasEmprendimientoControllerUpdatePublicacion,
+    convocatoriasEmprendimientoControllerRemovePublicacion,
+    convocatoriasEmprendimientoControllerUpdateEstadoPostulacion,
+    convocatoriasEmprendimientoControllerCreatePostulacion,
+    convocatoriasEmprendimientoControllerFindPostulacionesPorConvocatoria,
+  };
+};
+export type ConvocatoriasEmprendimientoControllerFindAllPublicacionesResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        ReturnType<
+          typeof getConvocatoriasEmprendimiento
+        >["convocatoriasEmprendimientoControllerFindAllPublicaciones"]
+      >
+    >
+  >;
+export type ConvocatoriasEmprendimientoControllerCreatePublicacionResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        ReturnType<
+          typeof getConvocatoriasEmprendimiento
+        >["convocatoriasEmprendimientoControllerCreatePublicacion"]
+      >
+    >
+  >;
+export type ConvocatoriasEmprendimientoControllerFindMisPostulacionesResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        ReturnType<
+          typeof getConvocatoriasEmprendimiento
+        >["convocatoriasEmprendimientoControllerFindMisPostulaciones"]
+      >
+    >
+  >;
+export type ConvocatoriasEmprendimientoControllerFindOnePublicacionResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        ReturnType<
+          typeof getConvocatoriasEmprendimiento
+        >["convocatoriasEmprendimientoControllerFindOnePublicacion"]
+      >
+    >
+  >;
+export type ConvocatoriasEmprendimientoControllerUpdatePublicacionResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        ReturnType<
+          typeof getConvocatoriasEmprendimiento
+        >["convocatoriasEmprendimientoControllerUpdatePublicacion"]
+      >
+    >
+  >;
+export type ConvocatoriasEmprendimientoControllerRemovePublicacionResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        ReturnType<
+          typeof getConvocatoriasEmprendimiento
+        >["convocatoriasEmprendimientoControllerRemovePublicacion"]
+      >
+    >
+  >;
+export type ConvocatoriasEmprendimientoControllerUpdateEstadoPostulacionResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        ReturnType<
+          typeof getConvocatoriasEmprendimiento
+        >["convocatoriasEmprendimientoControllerUpdateEstadoPostulacion"]
+      >
+    >
+  >;
+export type ConvocatoriasEmprendimientoControllerCreatePostulacionResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        ReturnType<
+          typeof getConvocatoriasEmprendimiento
+        >["convocatoriasEmprendimientoControllerCreatePostulacion"]
+      >
+    >
+  >;
+export type ConvocatoriasEmprendimientoControllerFindPostulacionesPorConvocatoriaResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        ReturnType<
+          typeof getConvocatoriasEmprendimiento
+        >["convocatoriasEmprendimientoControllerFindPostulacionesPorConvocatoria"]
+      >
+    >
+  >;

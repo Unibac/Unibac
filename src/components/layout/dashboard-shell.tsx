@@ -2,11 +2,15 @@
 
 import { SignOutIcon } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { Spinner } from "@/components/ui/spinner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,8 +18,9 @@ import { useLogout } from "@/modules/auth/hooks/use-logout";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
 
 import { AppSidebar } from "./app-sidebar";
+import { ModeToggle } from "./mode-toggle";
 
-export function DashboardShell({ children }: { children: React.ReactNode }) {
+export function DashboardShell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const profile = useProfile();
   const logout = useLogout();
@@ -38,7 +43,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   if (profile.isPending) {
     return (
-      <div className="flex min-h-svh flex-col gap-4 bg-background p-6">
+      <div className="flex min-h-svh flex-col gap-6 bg-background px-4 py-6 lg:px-6">
         <Skeleton className="h-10 w-full max-w-md" />
         <Skeleton className="h-64 w-full flex-1" />
       </div>
@@ -54,7 +59,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset className="flex min-h-svh flex-col">
-          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
+          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4 lg:px-6">
             <SidebarTrigger />
             <Separator orientation="vertical" className="mr-1 h-6" />
             <div className="flex flex-1 flex-col gap-0 overflow-hidden">
@@ -65,6 +70,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 {profile.data.usuario}
               </span>
             </div>
+            <ModeToggle />
             <Button
               type="button"
               variant="outline"
@@ -80,7 +86,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               Salir
             </Button>
           </header>
-          <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">{children}</div>
+          <div className="layout-dashboard-main">{children}</div>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

@@ -5,11 +5,11 @@
  * Autenticación: POST /auth/login fija la cookie HttpOnly access_token. En Swagger UI, ejecuta login en este mismo origen y luego las rutas protegidas enviarán la cookie automáticamente. Desde el frontend usa fetch/axios con credentials: include. Registro público: POST /auth/register-public solo si PUBLIC_REGISTRATION_ENABLED=true.
  * OpenAPI spec version: 1.0
  */
-import type { DirectorioEmprendimientoResponseDtoAreaCreativa } from './directorioEmprendimientoResponseDtoAreaCreativa';
-import type { DirectorioEmprendimientoResponseDtoCorreo } from './directorioEmprendimientoResponseDtoCorreo';
-import type { DirectorioEmprendimientoResponseDtoImagenUrl } from './directorioEmprendimientoResponseDtoImagenUrl';
-import type { DirectorioEmprendimientoResponseDtoRedes } from './directorioEmprendimientoResponseDtoRedes';
-import type { DirectorioEmprendimientoResponseDtoSitioWeb } from './directorioEmprendimientoResponseDtoSitioWeb';
+import type { DirectorioEmprendimientoResponseDtoAreaCreativa } from "./directorioEmprendimientoResponseDtoAreaCreativa";
+import type { DirectorioEmprendimientoResponseDtoCorreo } from "./directorioEmprendimientoResponseDtoCorreo";
+import type { DirectorioEmprendimientoResponseDtoImagenUrl } from "./directorioEmprendimientoResponseDtoImagenUrl";
+import type { DirectorioEmprendimientoResponseDtoRedes } from "./directorioEmprendimientoResponseDtoRedes";
+import type { DirectorioEmprendimientoResponseDtoSitioWeb } from "./directorioEmprendimientoResponseDtoSitioWeb";
 
 export interface DirectorioEmprendimientoResponseDto {
   id: number;

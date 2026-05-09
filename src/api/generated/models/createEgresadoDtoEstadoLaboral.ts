@@ -6,12 +6,12 @@
  * OpenAPI spec version: 1.0
  */
 
-export type CreateEgresadoDtoEstadoLaboral = typeof CreateEgresadoDtoEstadoLaboral[keyof typeof CreateEgresadoDtoEstadoLaboral];
-
+export type CreateEgresadoDtoEstadoLaboral =
+  (typeof CreateEgresadoDtoEstadoLaboral)[keyof typeof CreateEgresadoDtoEstadoLaboral];
 
 export const CreateEgresadoDtoEstadoLaboral = {
-  EMPLEADO: 'EMPLEADO',
-  EMPRENDEDOR: 'EMPRENDEDOR',
-  DESEMPLEADO: 'DESEMPLEADO',
-  ESTUDIANDO: 'ESTUDIANDO',
+  EMPLEADO: "EMPLEADO",
+  EMPRENDEDOR: "EMPRENDEDOR",
+  DESEMPLEADO: "DESEMPLEADO",
+  ESTUDIANDO: "ESTUDIANDO",
 } as const;

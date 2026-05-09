@@ -6,10 +6,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export type AuthProfileResponseDtoNivel = typeof AuthProfileResponseDtoNivel[keyof typeof AuthProfileResponseDtoNivel];
-
+export type AuthProfileResponseDtoNivel =
+  (typeof AuthProfileResponseDtoNivel)[keyof typeof AuthProfileResponseDtoNivel];
 
 export const AuthProfileResponseDtoNivel = {
-  USUARIO: 'USUARIO',
-  ADMINISTRADOR: 'ADMINISTRADOR',
+  USUARIO: "USUARIO",
+  ADMINISTRADOR: "ADMINISTRADOR",
 } as const;

@@ -9,79 +9,118 @@ import type {
   CreateUsuarioDto,
   UpdateUsuarioDto,
   UsuarioResponseDto,
-  UsuarioWithPermisosResponseDto
-} from '../models';
+  UsuarioWithPermisosResponseDto,
+} from "../models";
 
-import { customInstance } from '../../../lib/api/mutator';
-
+import { customInstance } from "../../../lib/api/mutator";
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-
-  export const getUsuarios = () => {
-/**
- * @summary Listar usuarios
- */
-const usuariosControllerFindAll = (
-
- options?: SecondParameter<typeof customInstance<UsuarioWithPermisosResponseDto[]>>,) => {
-      return customInstance<UsuarioWithPermisosResponseDto[]>(
-      {url: `/usuarios`, method: 'GET'
-    },
-      options);
-    }
+export const getUsuarios = () => {
   /**
- * @summary Crear usuario
- */
-const usuariosControllerCreate = (
+   * @summary Listar usuarios
+   */
+  const usuariosControllerFindAll = (
+    options?: SecondParameter<
+      typeof customInstance<UsuarioWithPermisosResponseDto[]>
+    >,
+  ) => {
+    return customInstance<UsuarioWithPermisosResponseDto[]>(
+      { url: `/usuarios`, method: "GET" },
+      options,
+    );
+  };
+  /**
+   * @summary Crear usuario
+   */
+  const usuariosControllerCreate = (
     createUsuarioDto: CreateUsuarioDto,
- options?: SecondParameter<typeof customInstance<UsuarioResponseDto>>,) => {
-      return customInstance<UsuarioResponseDto>(
-      {url: `/usuarios`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createUsuarioDto
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<UsuarioResponseDto>>,
+  ) => {
+    return customInstance<UsuarioResponseDto>(
+      {
+        url: `/usuarios`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        data: createUsuarioDto,
+      },
+      options,
+    );
+  };
   /**
- * @summary Obtener usuario por id
- */
-const usuariosControllerFindOne = (
+   * @summary Obtener usuario por id
+   */
+  const usuariosControllerFindOne = (
     id: number,
- options?: SecondParameter<typeof customInstance<UsuarioWithPermisosResponseDto>>,) => {
-      return customInstance<UsuarioWithPermisosResponseDto>(
-      {url: `/usuarios/${id}`, method: 'GET'
-    },
-      options);
-    }
+    options?: SecondParameter<
+      typeof customInstance<UsuarioWithPermisosResponseDto>
+    >,
+  ) => {
+    return customInstance<UsuarioWithPermisosResponseDto>(
+      { url: `/usuarios/${id}`, method: "GET" },
+      options,
+    );
+  };
   /**
- * @summary Actualizar usuario
- */
-const usuariosControllerUpdate = (
+   * @summary Actualizar usuario
+   */
+  const usuariosControllerUpdate = (
     id: number,
     updateUsuarioDto: UpdateUsuarioDto,
- options?: SecondParameter<typeof customInstance<UsuarioResponseDto>>,) => {
-      return customInstance<UsuarioResponseDto>(
-      {url: `/usuarios/${id}`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: updateUsuarioDto
-    },
-      options);
-    }
+    options?: SecondParameter<typeof customInstance<UsuarioResponseDto>>,
+  ) => {
+    return customInstance<UsuarioResponseDto>(
+      {
+        url: `/usuarios/${id}`,
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        data: updateUsuarioDto,
+      },
+      options,
+    );
+  };
   /**
- * @summary Eliminar usuario
- */
-const usuariosControllerRemove = (
+   * @summary Eliminar usuario
+   */
+  const usuariosControllerRemove = (
     id: number,
- options?: SecondParameter<typeof customInstance<UsuarioResponseDto>>,) => {
-      return customInstance<UsuarioResponseDto>(
-      {url: `/usuarios/${id}`, method: 'DELETE'
-    },
-      options);
-    }
-  return {usuariosControllerFindAll,usuariosControllerCreate,usuariosControllerFindOne,usuariosControllerUpdate,usuariosControllerRemove}};
-export type UsuariosControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsuarios>['usuariosControllerFindAll']>>>
-export type UsuariosControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsuarios>['usuariosControllerCreate']>>>
-export type UsuariosControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsuarios>['usuariosControllerFindOne']>>>
-export type UsuariosControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsuarios>['usuariosControllerUpdate']>>>
-export type UsuariosControllerRemoveResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsuarios>['usuariosControllerRemove']>>>
+    options?: SecondParameter<typeof customInstance<UsuarioResponseDto>>,
+  ) => {
+    return customInstance<UsuarioResponseDto>(
+      { url: `/usuarios/${id}`, method: "DELETE" },
+      options,
+    );
+  };
+  return {
+    usuariosControllerFindAll,
+    usuariosControllerCreate,
+    usuariosControllerFindOne,
+    usuariosControllerUpdate,
+    usuariosControllerRemove,
+  };
+};
+export type UsuariosControllerFindAllResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getUsuarios>["usuariosControllerFindAll"]>
+  >
+>;
+export type UsuariosControllerCreateResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getUsuarios>["usuariosControllerCreate"]>
+  >
+>;
+export type UsuariosControllerFindOneResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getUsuarios>["usuariosControllerFindOne"]>
+  >
+>;
+export type UsuariosControllerUpdateResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getUsuarios>["usuariosControllerUpdate"]>
+  >
+>;
+export type UsuariosControllerRemoveResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof getUsuarios>["usuariosControllerRemove"]>
+  >
+>;

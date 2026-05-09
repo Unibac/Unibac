@@ -9,11 +9,11 @@
 /**
  * Derivado de fechaInicio/fechaFin respecto a la hora del servidor (ventana inclusiva para activa).
  */
-export type FeriaResponseDtoPeriodo = typeof FeriaResponseDtoPeriodo[keyof typeof FeriaResponseDtoPeriodo];
-
+export type FeriaResponseDtoPeriodo =
+  (typeof FeriaResponseDtoPeriodo)[keyof typeof FeriaResponseDtoPeriodo];
 
 export const FeriaResponseDtoPeriodo = {
-  proxima: 'proxima',
-  activa: 'activa',
-  finalizada: 'finalizada',
+  proxima: "proxima",
+  activa: "activa",
+  finalizada: "finalizada",
 } as const;

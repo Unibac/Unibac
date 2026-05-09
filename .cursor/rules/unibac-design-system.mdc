@@ -1,0 +1,43 @@
+---
+description: Design tokens, tipografía, motion, límites shared vs feature y checklist visual Unibac
+globs: "**/*.{ts,tsx,css}"
+alwaysApply: true
+---
+
+# Unibac — Design system y estilos (Tailwind v4 + shadcn)
+
+## Tipografía (política y checklist PR)
+
+- **Default**: `font-sans` (Geist) en `html`/`body` vía [`src/styles/base/elements.css`](src/styles/base/elements.css) y variables en [`src/app/layout.tsx`](src/app/layout.tsx).
+- **Mono**: solo para datos tabulares, IDs, código — clase utilitaria `tabular-nums-mono` en [`src/styles/utilities/layout.css`](src/styles/utilities/layout.css) o `font-mono` puntual en componentes.
+- **Títulos de página**: preferir [`PageHeader`](src/components/layout/page-header.tsx) con `font-heading` (misma familia que sans por defecto).
+- **Escala permitida en UI de panel**: `text-xs`, `text-sm`, `text-base`, `text-lg`; reservar `text-xl`+ para marketing o vistas excepcionales acordadas.
+- **Pesos**: `font-medium` para énfasis en filas/controles; `font-semibold` para títulos; evitar `font-bold` como default.
+- **Checklist PR**: ¿solo tamaños de la lista? ¿heading usa `PageHeader` o patrón equivalente? ¿hay `font-mono` solo donde aplica?
+
+## `components/shared` vs `modules/*/components`
+
+| Ubicación | Usar cuando |
+|-----------|-------------|
+| [`src/components/shared/`](src/components/shared/) | Piezas **neutras** reutilizables (copy genérico, sin dominio), composiciones shadcn repetidas entre features, estados vacío/carga/error **sin** texto de negocio específico. |
+| [`src/modules/<feature>/components/`](src/modules/) | Vistas del dominio, tablas con columnas de negocio, cards compuestas del feature, empty/loading con **mensajes o flujos propios del módulo**. |
+
+**No** colocar en `shared` hooks de datos, llamadas API ni copy que mencione un módulo concreto.
+
+## Motion y UX
+
+- **Duración**: transiciones de interfaz **120–200 ms** (`transition-colors`, `transition-shadow`, `transition-opacity`); evitar `duration-500+` salvo excepción accesible.
+- **`tw-animate-css`**: mantener para animaciones ya provistas por el preset shadcn (overlays, sheets); no añadir animaciones decorativas nuevas en globals sin revisión.
+- **Preferir utilities** sobre keyframes custom; keyframes compartidos solo en [`src/styles/`](src/styles/) si se repiten en ≥3 sitios.
+- **Skeleton vs spinner**: `Skeleton` para carga de página/sección; spinner solo en botones o acciones inline.
+- **Hover**: cambios suaves de fondo/borde usando tokens (`accent`, `muted`, `border`), no sombras agresivas en tablas densas.
+
+## Dark mode y charts/tablas
+
+- Tema **`.dark`** en ancestro + variables en [`src/styles/tokens/colors.css`](src/styles/tokens/colors.css); [`ThemeProvider`](src/providers/theme-provider.tsx) con `attribute="class"`.
+- **Prohibido** colores literales en UI productiva; usar tokens (`bg-card`, `text-muted-foreground`, `chart-*`, estados semánticos `success` / `warning` / `info`).
+- Al añadir charts o filas con estado, validar contraste en **claro y oscuro**; ajustar `--chart-*` o variantes si la lectura falla.
+
+## Antipatrones (recordatorio breve)
+
+- Spacing fuera de escala Tailwind sin justificar; globals con selectores por página; variants duplicadas entre features que podrían ser una variante en `ui/` o una pieza en `shared`.

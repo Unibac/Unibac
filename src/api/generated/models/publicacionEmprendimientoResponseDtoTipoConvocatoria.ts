@@ -6,11 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 
-export type PublicacionEmprendimientoResponseDtoTipoConvocatoria = typeof PublicacionEmprendimientoResponseDtoTipoConvocatoria[keyof typeof PublicacionEmprendimientoResponseDtoTipoConvocatoria];
-
+export type PublicacionEmprendimientoResponseDtoTipoConvocatoria =
+  (typeof PublicacionEmprendimientoResponseDtoTipoConvocatoria)[keyof typeof PublicacionEmprendimientoResponseDtoTipoConvocatoria];
 
 export const PublicacionEmprendimientoResponseDtoTipoConvocatoria = {
-  FINANCIAMIENTO: 'FINANCIAMIENTO',
-  FORMACION: 'FORMACION',
-  PRACTICAS: 'PRACTICAS',
+  FINANCIAMIENTO: "FINANCIAMIENTO",
+  FORMACION: "FORMACION",
+  PRACTICAS: "PRACTICAS",
 } as const;

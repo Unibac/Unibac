@@ -1,7 +1,4 @@
-import {
-  type UseQueryOptions,
-  useQuery,
-} from "@tanstack/react-query";
+import { type UseQueryOptions, useQuery } from "@tanstack/react-query";
 
 import { profileRequest } from "@/modules/auth/api/auth-api";
 import { authKeys } from "@/modules/auth/query-keys";

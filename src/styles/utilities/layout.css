@@ -1,0 +1,11 @@
+@layer utilities {
+  /* Área principal del dashboard: spacing único del plan (px / py / gap entre secciones). */
+  .layout-dashboard-main {
+    @apply flex flex-1 flex-col gap-6 px-4 py-6 lg:px-6;
+  }
+
+  /* Datos tabulares / IDs: usar junto a font-mono cuando el contenido lo requiera. */
+  .tabular-nums-mono {
+    @apply font-mono tabular-nums;
+  }
+}

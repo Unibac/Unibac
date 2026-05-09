@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { PageHeader } from "@/components/layout/page-header";
 import {
   Card,
   CardDescription,
@@ -26,14 +27,10 @@ export default function DashboardHomePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Hola, {data.usuario}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Nivel {data.nivel} · {data.tipo}
-        </p>
-      </div>
+      <PageHeader
+        title={`Hola, ${data.usuario}`}
+        description={`Nivel ${data.nivel} · ${data.tipo}`}
+      />
       <div className="grid gap-4 sm:grid-cols-2">
         {quickLinks.map((link) => (
           <Link key={link.href} href={link.href}>
