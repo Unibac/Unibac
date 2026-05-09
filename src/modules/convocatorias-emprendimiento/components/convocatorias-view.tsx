@@ -232,10 +232,7 @@ export function ConvocatoriasView() {
                 onValueChange={(v) =>
                   setFilters((f) => ({
                     ...f,
-                    activo:
-                      v === FILTER_ALL
-                        ? undefined
-                        : v === "true",
+                    activo: v === FILTER_ALL ? undefined : v === "true",
                   }))
                 }
               >

@@ -22,7 +22,12 @@ export function useUsuariosListQuery() {
 export function useUsuarioDetailQuery(id: number | null, enabled: boolean) {
   return useQuery({
     queryKey: usuariosKeys.detail(id ?? 0),
-    queryFn: () => getUsuario(id!),
+    queryFn: () => {
+      if (id == null || id <= 0) {
+        return Promise.reject(new Error("ID de usuario inválido"));
+      }
+      return getUsuario(id);
+    },
     enabled: Boolean(enabled && id != null && id > 0),
   });
 }
