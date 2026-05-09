@@ -15,6 +15,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { UnibacLogo } from "@/components/shared/unibac-logo";
 import {
   Sidebar,
   SidebarContent,
@@ -58,11 +59,19 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" variant="inset">
-      <SidebarHeader className="flex flex-col gap-2 border-b border-sidebar-border px-4 py-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/80">
-          Unibac
-        </p>
-        <p className="truncate text-xs text-sidebar-foreground/60">
+      <SidebarHeader className="flex flex-col gap-3 border-b border-sidebar-border px-4 py-3">
+        <Link
+          href="/dashboard"
+          className="flex justify-center rounded-md outline-none ring-sidebar-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          aria-label="Ir al inicio del panel"
+        >
+          <UnibacLogo
+            priority
+            className="group-data-[collapsible=icon]:p-1"
+            imgClassName="max-h-28 group-data-[collapsible=icon]:max-h-9 group-data-[collapsible=icon]:max-w-9"
+          />
+        </Link>
+        <p className="truncate text-center text-xs text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
           Panel administración
         </p>
       </SidebarHeader>
