@@ -118,7 +118,8 @@ export function EgresadosView() {
   const listQuery = useEgresadosListQuery(appliedFilters);
   const deleteMut = useDeleteEgresadoMutation();
 
-  const isAdmin = profile.data?.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR;
+  const isAdmin =
+    profile.data?.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR;
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMode, setSheetMode] = useState<"create" | "edit">("create");
@@ -349,7 +350,9 @@ export function EgresadosView() {
                     <TableCell className="font-medium">
                       {row.nombreCompleto}
                     </TableCell>
-                    <TableCell className="tabular-nums">{row.anioEgreso}</TableCell>
+                    <TableCell className="tabular-nums">
+                      {row.anioEgreso}
+                    </TableCell>
                     <TableCell className="max-w-[160px] truncate">
                       {row.programaCarrera}
                     </TableCell>
@@ -376,9 +379,7 @@ export function EgresadosView() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             {editable ? (
-                              <DropdownMenuItem
-                                onClick={() => openEdit(row)}
-                              >
+                              <DropdownMenuItem onClick={() => openEdit(row)}>
                                 Editar
                               </DropdownMenuItem>
                             ) : null}

@@ -37,9 +37,7 @@ export const egresadoFormSchema = z.object({
 
 export type EgresadoFormValues = z.infer<typeof egresadoFormSchema>;
 
-function telefonoFromResponse(
-  t: EgresadoResponseDto["telefono"],
-): string {
+function telefonoFromResponse(t: EgresadoResponseDto["telefono"]): string {
   if (t == null) {
     return "";
   }

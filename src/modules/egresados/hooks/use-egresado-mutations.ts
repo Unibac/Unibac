@@ -1,6 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import type { CreateEgresadoDto, UpdateEgresadoDto } from "@/api/generated/models";
+import type {
+  CreateEgresadoDto,
+  UpdateEgresadoDto,
+} from "@/api/generated/models";
 
 import {
   createEgresado,

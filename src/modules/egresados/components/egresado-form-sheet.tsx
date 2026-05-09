@@ -2,11 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import {
-  Controller,
-  useForm,
-  type Resolver,
-} from "react-hook-form";
+import { Controller, useForm, type Resolver } from "react-hook-form";
 
 import type { EgresadoResponseDto } from "@/api/generated/models";
 import { CreateEgresadoDtoEstadoLaboral } from "@/api/generated/models";
@@ -220,9 +216,7 @@ export function EgresadoFormSheet({
                   aria-invalid={!!form.formState.errors.programaCarrera}
                   {...form.register("programaCarrera")}
                 />
-                <FieldError
-                  errors={[form.formState.errors.programaCarrera]}
-                />
+                <FieldError errors={[form.formState.errors.programaCarrera]} />
               </Field>
 
               <Field data-invalid={!!form.formState.errors.estadoLaboral}>
