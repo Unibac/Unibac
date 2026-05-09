@@ -20,3 +20,13 @@ export const apiClient = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+/** Permitir boundary multipart; no sobrescribir con application/json del default. */
+apiClient.interceptors.request.use((config) => {
+  if (config.data instanceof FormData && config.headers) {
+    if (typeof config.headers.delete === "function") {
+      config.headers.delete("Content-Type");
+    }
+  }
+  return config;
+});
