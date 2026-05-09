@@ -137,7 +137,7 @@ export function EgresadoFormSheet({
         </SheetHeader>
 
         <form
-          className="flex flex-1 flex-col gap-4 py-4"
+          className="flex flex-1 flex-col gap-4 px-4 py-4"
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
         >
           {apiError ? (
