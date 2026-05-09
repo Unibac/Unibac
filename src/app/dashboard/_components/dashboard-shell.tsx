@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Spinner } from "@/components/ui/spinner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLogout } from "@/modules/auth/hooks/use-logout";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
@@ -49,37 +50,39 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset className="flex min-h-svh flex-col">
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
-          <SidebarTrigger />
-          <Separator orientation="vertical" className="mr-1 h-6" />
-          <div className="flex flex-1 flex-col gap-0 overflow-hidden">
-            <span className="truncate text-xs text-muted-foreground">
-              Sesión iniciada
-            </span>
-            <span className="truncate text-sm font-medium">
-              {profile.data.usuario}
-            </span>
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => void handleLogout()}
-            disabled={logout.isPending}
-          >
-            {logout.isPending ? (
-              <Spinner data-icon="inline-start" />
-            ) : (
-              <SignOutIcon data-icon="inline-start" />
-            )}
-            Salir
-          </Button>
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">{children}</div>
-      </SidebarInset>
-    </SidebarProvider>
+    <TooltipProvider>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset className="flex min-h-svh flex-col">
+          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
+            <SidebarTrigger />
+            <Separator orientation="vertical" className="mr-1 h-6" />
+            <div className="flex flex-1 flex-col gap-0 overflow-hidden">
+              <span className="truncate text-xs text-muted-foreground">
+                Sesión iniciada
+              </span>
+              <span className="truncate text-sm font-medium">
+                {profile.data.usuario}
+              </span>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => void handleLogout()}
+              disabled={logout.isPending}
+            >
+              {logout.isPending ? (
+                <Spinner data-icon="inline-start" />
+              ) : (
+                <SignOutIcon data-icon="inline-start" />
+              )}
+              Salir
+            </Button>
+          </header>
+          <div className="flex flex-1 flex-col gap-4 p-4 md:p-6">{children}</div>
+        </SidebarInset>
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }
