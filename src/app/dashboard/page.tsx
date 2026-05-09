@@ -13,7 +13,6 @@ import { useProfile } from "@/modules/auth/hooks/use-profile";
 
 const quickLinks = [
   { href: "/dashboard/usuarios", label: "Usuarios" },
-  { href: "/dashboard/permisos", label: "Permisos" },
   { href: "/dashboard/egresados", label: "Egresados" },
   { href: "/dashboard/convocatorias", label: "Convocatorias" },
 ] as const;

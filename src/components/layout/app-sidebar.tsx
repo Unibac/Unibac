@@ -6,9 +6,6 @@ import {
   CalendarDotsIcon,
   HouseIcon,
   MegaphoneIcon,
-  ShieldCheckIcon,
-  SquaresFourIcon,
-  TreeStructureIcon,
   UsersIcon,
   UserSquareIcon,
 } from "@phosphor-icons/react";
@@ -32,9 +29,6 @@ import {
 const navItems = [
   { href: "/dashboard", label: "Inicio", icon: HouseIcon },
   { href: "/dashboard/usuarios", label: "Usuarios", icon: UsersIcon },
-  { href: "/dashboard/permisos", label: "Permisos", icon: ShieldCheckIcon },
-  { href: "/dashboard/acciones", label: "Acciones", icon: SquaresFourIcon },
-  { href: "/dashboard/modulos", label: "Módulos", icon: TreeStructureIcon },
   { href: "/dashboard/egresados", label: "Egresados", icon: UserSquareIcon },
   {
     href: "/dashboard/directorio-emprendimientos",
