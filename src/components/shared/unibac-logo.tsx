@@ -1,7 +1,6 @@
 import Image from "next/image";
-
-import logoUnibac from "@/public/logo_unibac.png";
 import { cn } from "@/lib/utils";
+import logoUnibac from "@/public/logo_unibac.png";
 
 const ALT =
   "Logo de la Institución Universitaria Bellas Artes y Ciencias de Bolívar";

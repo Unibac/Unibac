@@ -1,6 +1,6 @@
 "use client";
 
-import { MoonIcon, SunIcon } from "@phosphor-icons/react";
+import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -19,12 +19,12 @@ export function ModeToggle() {
       <Button
         type="button"
         variant="ghost"
-        size="icon-sm"
+        size="icon"
         className="shrink-0"
         disabled
         aria-hidden
       >
-        <SunIcon className="opacity-0" />
+        <SunIcon className="size-4 opacity-0" />
       </Button>
     );
   }
@@ -35,12 +35,16 @@ export function ModeToggle() {
     <Button
       type="button"
       variant="ghost"
-      size="icon-sm"
+      size="icon"
       className="shrink-0"
       aria-label={isDark ? "Activar tema claro" : "Activar tema oscuro"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
-      {isDark ? <SunIcon /> : <MoonIcon />}
+      {isDark ? (
+        <SunIcon className="size-4" />
+      ) : (
+        <MoonIcon className="size-4" />
+      )}
     </Button>
   );
 }

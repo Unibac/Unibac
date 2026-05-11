@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SignInIcon } from "@phosphor-icons/react";
+import { Loader2Icon, LogInIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -18,18 +18,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { useLogin } from "@/modules/auth/hooks/use-login";
 import {
-  loginSchema,
   type LoginFormValues,
+  loginSchema,
 } from "@/modules/auth/schemas/login-schema";
 
 export function LoginForm() {
@@ -64,56 +65,70 @@ export function LoginForm() {
           Introduce tu usuario y contraseña para acceder al panel Unibac.
         </CardDescription>
       </CardHeader>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <CardContent className="flex flex-col gap-4">
-          {apiError ? (
-            <p
-              role="alert"
-              className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive"
-            >
-              {apiError}
+      <Form {...form}>
+        <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
+          <CardContent className="flex flex-col gap-4">
+            {apiError ? (
+              <p
+                role="alert"
+                className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive"
+              >
+                {apiError}
+              </p>
+            ) : null}
+            <div className="flex flex-col gap-4">
+              <FormField
+                control={form.control}
+                name="usuario"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Usuario</FormLabel>
+                    <FormControl>
+                      <Input autoComplete="username" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="clave"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contraseña</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        autoComplete="current-password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4 border-t border-border pt-6">
+            <Button type="submit" className="w-full" disabled={login.isPending}>
+              {login.isPending ? (
+                <Loader2Icon
+                  className="size-4 animate-spin"
+                  data-icon="inline-start"
+                />
+              ) : (
+                <LogInIcon className="size-4" data-icon="inline-start" />
+              )}
+              Entrar
+            </Button>
+            <p className="text-center text-xs text-muted-foreground">
+              <Link href="/" className="underline underline-offset-4">
+                Volver al inicio
+              </Link>
             </p>
-          ) : null}
-          <FieldGroup>
-            <Field data-invalid={!!form.formState.errors.usuario}>
-              <FieldLabel htmlFor="login-usuario">Usuario</FieldLabel>
-              <Input
-                id="login-usuario"
-                autoComplete="username"
-                aria-invalid={!!form.formState.errors.usuario}
-                {...form.register("usuario")}
-              />
-              <FieldError errors={[form.formState.errors.usuario]} />
-            </Field>
-            <Field data-invalid={!!form.formState.errors.clave}>
-              <FieldLabel htmlFor="login-clave">Contraseña</FieldLabel>
-              <Input
-                id="login-clave"
-                type="password"
-                autoComplete="current-password"
-                aria-invalid={!!form.formState.errors.clave}
-                {...form.register("clave")}
-              />
-              <FieldError errors={[form.formState.errors.clave]} />
-            </Field>
-          </FieldGroup>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4 border-t border-border pt-6">
-          <Button type="submit" className="w-full" disabled={login.isPending}>
-            {login.isPending ? (
-              <Spinner data-icon="inline-start" />
-            ) : (
-              <SignInIcon data-icon="inline-start" />
-            )}
-            Entrar
-          </Button>
-          <p className="text-center text-xs text-muted-foreground">
-            <Link href="/" className="underline underline-offset-4">
-              Volver al inicio
-            </Link>
-          </p>
-        </CardFooter>
-      </form>
+          </CardFooter>
+        </form>
+      </Form>
     </Card>
   );
 }

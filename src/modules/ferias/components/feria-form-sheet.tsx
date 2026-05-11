@@ -1,20 +1,22 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2Icon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 
 import type { FeriaResponseDto } from "@/api/generated/models";
 import { Button } from "@/components/ui/button";
 import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/field";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetContent,
@@ -23,7 +25,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Spinner } from "@/components/ui/spinner";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { cn } from "@/lib/utils";
 import {
@@ -41,7 +42,7 @@ import {
 } from "@/modules/ferias/schemas/feria-schema";
 
 const textareaClassName = cn(
-  "min-h-[88px] w-full min-w-0 rounded-none border border-input bg-transparent px-2.5 py-2 text-xs transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-1 aria-invalid:ring-destructive/20 md:text-xs dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
+  "flex min-h-[88px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:bg-input/30 dark:aria-invalid:ring-destructive/40 md:text-sm",
 );
 
 export type FeriaFormSheetProps = {
@@ -131,117 +132,135 @@ export function FeriaFormSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <form
-          className="flex flex-1 flex-col gap-4 px-4 py-4"
-          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-        >
-          {apiError ? (
-            <p
-              role="alert"
-              className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive"
-            >
-              {apiError}
-            </p>
-          ) : null}
+        <Form {...form}>
+          <form
+            className="flex flex-1 flex-col gap-4 px-4 py-4"
+            onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+          >
+            {apiError ? (
+              <p
+                role="alert"
+                className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive"
+              >
+                {apiError}
+              </p>
+            ) : null}
 
-          <FieldSet className="space-y-4 border-none p-0">
-            <FieldLegend variant="label">Datos generales</FieldLegend>
-            <FieldGroup className="gap-4">
-              <Field data-invalid={!!form.formState.errors.nombre}>
-                <FieldLabel htmlFor="feria-nombre">Nombre</FieldLabel>
-                <Input
-                  id="feria-nombre"
-                  aria-invalid={!!form.formState.errors.nombre}
-                  {...form.register("nombre")}
+            <div className="flex flex-col gap-4">
+              <p className="text-sm font-medium text-foreground">
+                Datos generales
+              </p>
+              <div className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name="nombre"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nombre</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <FieldError errors={[form.formState.errors.nombre]} />
-              </Field>
+                <FormField
+                  control={form.control}
+                  name="descripcion"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descripción</FormLabel>
+                      <FormControl>
+                        <textarea className={textareaClassName} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="fechaInicioLocal"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Inicio (fecha y hora local)</FormLabel>
+                      <FormControl>
+                        <Input type="datetime-local" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="fechaFinLocal"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Fin (fecha y hora local)</FormLabel>
+                      <FormControl>
+                        <Input type="datetime-local" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid gap-2">
+                  <Label htmlFor="feria-banner-file">
+                    Banner (archivo, opcional)
+                  </Label>
+                  <Input
+                    ref={bannerInputRef}
+                    id="feria-banner-file"
+                    type="file"
+                    accept="image/*"
+                    disabled={uploadBannerMut.isPending}
+                    className="text-xs"
+                    onChange={(e) => void onBannerSelected(e.target.files)}
+                  />
+                  {uploadBannerMut.isPending ? (
+                    <p className="text-xs text-muted-foreground">Subiendo…</p>
+                  ) : null}
+                </div>
+                <FormField
+                  control={form.control}
+                  name="imagenBannerUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>URL del banner (opcional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="url"
+                          placeholder="https://..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
 
-              <Field data-invalid={!!form.formState.errors.descripcion}>
-                <FieldLabel htmlFor="feria-desc">Descripción</FieldLabel>
-                <textarea
-                  id="feria-desc"
-                  className={textareaClassName}
-                  aria-invalid={!!form.formState.errors.descripcion}
-                  {...form.register("descripcion")}
-                />
-                <FieldError errors={[form.formState.errors.descripcion]} />
-              </Field>
-
-              <Field data-invalid={!!form.formState.errors.fechaInicioLocal}>
-                <FieldLabel htmlFor="feria-inicio">
-                  Inicio (fecha y hora local)
-                </FieldLabel>
-                <Input
-                  id="feria-inicio"
-                  type="datetime-local"
-                  aria-invalid={!!form.formState.errors.fechaInicioLocal}
-                  {...form.register("fechaInicioLocal")}
-                />
-                <FieldError errors={[form.formState.errors.fechaInicioLocal]} />
-              </Field>
-
-              <Field data-invalid={!!form.formState.errors.fechaFinLocal}>
-                <FieldLabel htmlFor="feria-fin">
-                  Fin (fecha y hora local)
-                </FieldLabel>
-                <Input
-                  id="feria-fin"
-                  type="datetime-local"
-                  aria-invalid={!!form.formState.errors.fechaFinLocal}
-                  {...form.register("fechaFinLocal")}
-                />
-                <FieldError errors={[form.formState.errors.fechaFinLocal]} />
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="feria-banner-file">
-                  Banner (archivo, opcional)
-                </FieldLabel>
-                <Input
-                  ref={bannerInputRef}
-                  id="feria-banner-file"
-                  type="file"
-                  accept="image/*"
-                  disabled={uploadBannerMut.isPending}
-                  className="text-xs"
-                  onChange={(e) => void onBannerSelected(e.target.files)}
-                />
-                {uploadBannerMut.isPending ? (
-                  <p className="text-xs text-muted-foreground">Subiendo…</p>
+            <SheetFooter className="mt-auto flex-row justify-end gap-2 border-t border-border bg-popover p-4">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={pending}
+                onClick={() => onOpenChange(false)}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={pending}>
+                {pending ? (
+                  <Loader2Icon
+                    className="size-4 animate-spin"
+                    data-icon="inline-start"
+                  />
                 ) : null}
-              </Field>
-
-              <Field data-invalid={!!form.formState.errors.imagenBannerUrl}>
-                <FieldLabel htmlFor="feria-banner-url">
-                  URL del banner (opcional)
-                </FieldLabel>
-                <Input
-                  id="feria-banner-url"
-                  type="url"
-                  placeholder="https://"
-                  {...form.register("imagenBannerUrl")}
-                />
-                <FieldError errors={[form.formState.errors.imagenBannerUrl]} />
-              </Field>
-            </FieldGroup>
-          </FieldSet>
-
-          <SheetFooter className="mt-auto flex-row justify-end gap-2 border-t border-border bg-popover p-4">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={pending}
-              onClick={() => onOpenChange(false)}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={pending}>
-              {pending ? <Spinner data-icon="inline-start" /> : null}
-              {mode === "create" ? "Crear" : "Guardar"}
-            </Button>
-          </SheetFooter>
-        </form>
+                {mode === "create" ? "Crear" : "Guardar"}
+              </Button>
+            </SheetFooter>
+          </form>
+        </Form>
       </SheetContent>
     </Sheet>
   );

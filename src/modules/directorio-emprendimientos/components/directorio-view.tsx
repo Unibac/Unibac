@@ -1,6 +1,6 @@
 "use client";
 
-import { DotsThreeVerticalIcon } from "@phosphor-icons/react";
+import { MoreVerticalIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -224,10 +224,10 @@ export function DirectorioView() {
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
-                            size="icon-sm"
+                            size="icon"
                             aria-label={`Acciones para ${row.nombreProyecto}`}
                           >
-                            <DotsThreeVerticalIcon />
+                            <MoreVerticalIcon className="size-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">

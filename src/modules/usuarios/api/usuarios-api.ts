@@ -1,8 +1,8 @@
-import { getUsuarios } from "@/api/generated/usuarios/usuarios";
 import type {
   CreateUsuarioDto,
   UpdateUsuarioDto,
 } from "@/api/generated/models";
+import { getUsuarios } from "@/api/generated/usuarios/usuarios";
 
 const usuarios = getUsuarios();
 

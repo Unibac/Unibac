@@ -96,15 +96,11 @@ export function useResolverPostulacionMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      postulacionId,
-      body,
-      publicacionId,
-    }: {
+    mutationFn: (vars: {
       postulacionId: number;
       body: UpdateEstadoPostulacionDto;
       publicacionId: number;
-    }) => resolverPostulacion(postulacionId, body),
+    }) => resolverPostulacion(vars.postulacionId, vars.body),
     onSuccess: (_data, variables) => {
       void queryClient.invalidateQueries({
         queryKey: postulacionesKeys.byConvocatoria(variables.publicacionId),

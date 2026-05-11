@@ -3,9 +3,9 @@
 import { useState } from "react";
 
 import {
+  type PostulacionConvocatoriaResponseDto,
   PostulacionConvocatoriaResponseDtoEstadoPostulacion,
   UpdateEstadoPostulacionDtoEstado,
-  type PostulacionConvocatoriaResponseDto,
 } from "@/api/generated/models";
 import { Button } from "@/components/ui/button";
 import {

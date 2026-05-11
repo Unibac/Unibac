@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 import {
-  CreateEgresadoDtoEstadoLaboral,
   type CreateEgresadoDto,
+  CreateEgresadoDtoEstadoLaboral,
   type EgresadoResponseDto,
   type UpdateEgresadoDto,
 } from "@/api/generated/models";

@@ -7,9 +7,9 @@ import {
   listEgresados,
 } from "@/modules/egresados/api/egresados-api";
 import {
+  type EgresadosListFilters,
   egresadosKeys,
   toFindAllParams,
-  type EgresadosListFilters,
 } from "@/modules/egresados/query-keys";
 
 export function useEgresadosListQuery(filters: EgresadosListFilters) {

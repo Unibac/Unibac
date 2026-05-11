@@ -1,6 +1,6 @@
 "use client";
 
-import { DotsThreeVerticalIcon } from "@phosphor-icons/react";
+import { MoreVerticalIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import {
@@ -25,13 +25,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -183,11 +177,11 @@ export function ConvocatoriasView() {
         </div>
       ) : null}
 
-      <FieldSet className="rounded-none border border-border p-4">
-        <FieldLegend variant="label">Filtros</FieldLegend>
-        <FieldGroup className="gap-4 @md/field-group:grid @md/field-group:grid-cols-2">
-          <Field>
-            <FieldLabel>Tipo</FieldLabel>
+      <div className="rounded-md border border-border p-4">
+        <p className="text-sm font-medium text-foreground">Filtros</p>
+        <div className="mt-3 grid gap-4 md:grid-cols-2">
+          <div className="grid gap-2">
+            <Label>Tipo</Label>
             <Select
               value={filters.tipoConvocatoria ?? FILTER_ALL}
               onValueChange={(v) =>
@@ -200,7 +194,7 @@ export function ConvocatoriasView() {
                 }))
               }
             >
-              <SelectTrigger size="default" className="w-full">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>
               <SelectContent>
@@ -216,11 +210,11 @@ export function ConvocatoriasView() {
                 ))}
               </SelectContent>
             </Select>
-          </Field>
+          </div>
 
           {isAdmin ? (
-            <Field>
-              <FieldLabel>Activo</FieldLabel>
+            <div className="grid gap-2">
+              <Label>Activo</Label>
               <Select
                 value={
                   filters.activo === undefined
@@ -236,7 +230,7 @@ export function ConvocatoriasView() {
                   }))
                 }
               >
-                <SelectTrigger size="default" className="w-full">
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Todos" />
                 </SelectTrigger>
                 <SelectContent>
@@ -245,10 +239,10 @@ export function ConvocatoriasView() {
                   <SelectItem value="false">Inactivas</SelectItem>
                 </SelectContent>
               </Select>
-            </Field>
+            </div>
           ) : null}
-        </FieldGroup>
-      </FieldSet>
+        </div>
+      </div>
 
       {convocatoriasQuery.isPending ? (
         <div className="flex flex-col gap-4">
@@ -312,10 +306,10 @@ export function ConvocatoriasView() {
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
-                            size="icon-sm"
+                            size="icon"
                             aria-label={`Acciones para ${row.titulo}`}
                           >
-                            <DotsThreeVerticalIcon />
+                            <MoreVerticalIcon className="size-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">

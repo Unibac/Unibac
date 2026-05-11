@@ -1,6 +1,6 @@
 "use client";
 
-import { DotsThreeVerticalIcon } from "@phosphor-icons/react";
+import { MoreVerticalIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -266,10 +266,10 @@ export function FeriasView() {
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              size="icon-sm"
+                              size="icon"
                               aria-label={`Acciones para ${row.nombre}`}
                             >
-                              <DotsThreeVerticalIcon />
+                              <MoreVerticalIcon className="size-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">

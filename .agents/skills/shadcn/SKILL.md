@@ -42,12 +42,13 @@ These rules are **always enforced**. Each links to a file with Incorrect/Correct
 
 ### Forms & Inputs → [forms.md](./rules/forms.md)
 
-- **Forms use `FieldGroup` + `Field`.** Never use raw `div` with `space-y-*` or `grid gap-*` for form layout.
+- **RHF forms use `Form` + `FormField` + `FormItem` + `FormLabel` + `FormControl` + `FormMessage`.** (Registry Starter `form` + `react-hook-form`.)
+- **Filtros u otros bloques sin RHF:** `Label` + control (`Input`, `Select`, …) en `grid`/`flex` con `gap-*`, sin `space-y-*`.
 - **`InputGroup` uses `InputGroupInput`/`InputGroupTextarea`.** Never raw `Input`/`Textarea` inside `InputGroup`.
 - **Buttons inside inputs use `InputGroup` + `InputGroupAddon`.**
 - **Option sets (2–7 choices) use `ToggleGroup`.** Don't loop `Button` with manual active state.
-- **`FieldSet` + `FieldLegend` for grouping related checkboxes/radios.** Don't use a `div` with a heading.
-- **Field validation uses `data-invalid` + `aria-invalid`.** `data-invalid` on `Field`, `aria-invalid` on the control. For disabled: `data-disabled` on `Field`, `disabled` on the control.
+- **Grupos de checkboxes/radios:** `fieldset` + `legend` accesible, o composición con `Label` según el caso.
+- **Errores de campo:** `FormMessage` / `aria-invalid` en el control según el patrón del `form` instalado.
 
 ### Component Structure → [composition.md](./rules/composition.md)
 
@@ -55,7 +56,7 @@ These rules are **always enforced**. Each links to a file with Incorrect/Correct
 - **Use `asChild` (radix) or `render` (base) for custom triggers.** Check `base` field from `npx shadcn@latest info`. → [base-vs-radix.md](./rules/base-vs-radix.md)
 - **Dialog, Sheet, and Drawer always need a Title.** `DialogTitle`, `SheetTitle`, `DrawerTitle` required for accessibility. Use `className="sr-only"` if visually hidden.
 - **Use full Card composition.** `CardHeader`/`CardTitle`/`CardDescription`/`CardContent`/`CardFooter`. Don't dump everything in `CardContent`.
-- **Button has no `isPending`/`isLoading`.** Compose with `Spinner` + `data-icon` + `disabled`.
+- **Button has no `isPending`/`isLoading`.** Compose with `Loader2Icon` (lucide, `animate-spin`) + `data-icon` + `disabled`.
 - **`TabsTrigger` must be inside `TabsList`.** Never render triggers directly in `Tabs`.
 - **`Avatar` always needs `AvatarFallback`.** For when the image fails to load.
 
@@ -85,20 +86,20 @@ These rules are **always enforced**. Each links to a file with Incorrect/Correct
 These are the most common patterns that differentiate correct shadcn/ui code. For edge cases, see the linked rule files above.
 
 ```tsx
-// Form layout: FieldGroup + Field, not div + Label.
-<FieldGroup>
-  <Field>
-    <FieldLabel htmlFor="email">Email</FieldLabel>
-    <Input id="email" />
-  </Field>
-</FieldGroup>
-
-// Validation: data-invalid on Field, aria-invalid on the control.
-<Field data-invalid>
-  <FieldLabel>Email</FieldLabel>
-  <Input aria-invalid />
-  <FieldDescription>Invalid email.</FieldDescription>
-</Field>
+// Form layout (RHF): FormField + FormItem + FormLabel + FormControl.
+<FormField
+  control={form.control}
+  name="email"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Email</FormLabel>
+      <FormControl>
+        <Input {...field} />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
 
 // Icons in buttons: data-icon, no sizing classes.
 <Button>
@@ -129,7 +130,7 @@ These are the most common patterns that differentiate correct shadcn/ui code. Fo
 | Data display               | `Table`, `Card`, `Badge`, `Avatar`                                                                  |
 | Navigation                 | `Sidebar`, `NavigationMenu`, `Breadcrumb`, `Tabs`, `Pagination`                                     |
 | Overlays                   | `Dialog` (modal), `Sheet` (side panel), `Drawer` (bottom sheet), `AlertDialog` (confirmation)       |
-| Feedback                   | `sonner` (toast), `Alert`, `Progress`, `Skeleton`, `Spinner`                                        |
+| Feedback                   | `sonner` (toast), `Alert`, `Progress`, `Skeleton`, icono de carga (`Loader2Icon` + `animate-spin`) |
 | Command palette            | `Command` inside `Dialog`                                                                           |
 | Charts                     | `Chart` (wraps Recharts)                                                                            |
 | Layout                     | `Card`, `Separator`, `Resizable`, `ScrollArea`, `Accordion`, `Collapsible`                          |

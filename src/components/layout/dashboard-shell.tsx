@@ -1,8 +1,8 @@
 "use client";
 
-import { SignOutIcon } from "@phosphor-icons/react";
+import { Loader2Icon, LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -11,9 +11,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Spinner } from "@/components/ui/spinner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useLogout } from "@/modules/auth/hooks/use-logout";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
 
@@ -79,9 +78,16 @@ export function DashboardShell({ children }: { children: ReactNode }) {
               disabled={logout.isPending}
             >
               {logout.isPending ? (
-                <Spinner data-icon="inline-start" />
+                <Loader2Icon
+                  className="size-4 shrink-0 animate-spin"
+                  data-icon="inline-start"
+                  aria-hidden
+                />
               ) : (
-                <SignOutIcon data-icon="inline-start" />
+                <LogOutIcon
+                  className="size-4 shrink-0"
+                  data-icon="inline-start"
+                />
               )}
               Salir
             </Button>

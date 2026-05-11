@@ -1,13 +1,13 @@
 "use client";
 
-import { DotsThreeVerticalIcon } from "@phosphor-icons/react";
+import { MoreVerticalIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import {
   AuthProfileResponseDtoNivel,
   CreateEgresadoDtoEstadoLaboral,
-  EgresadosControllerFindAllEstadoLaboral,
   type EgresadoResponseDto,
+  EgresadosControllerFindAllEstadoLaboral,
 } from "@/api/generated/models";
 import {
   AlertDialog,
@@ -25,14 +25,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -219,11 +213,11 @@ export function EgresadosView() {
         ) : null}
       </div>
 
-      <FieldSet className="rounded-none border border-border p-4">
-        <FieldLegend variant="label">Filtros</FieldLegend>
-        <FieldGroup className="gap-4 @md/field-group:grid @md/field-group:grid-cols-2 @lg/field-group:grid-cols-4">
-          <Field>
-            <FieldLabel htmlFor="flt-nombre">Nombre</FieldLabel>
+      <div className="rounded-md border border-border p-4">
+        <p className="text-sm font-medium text-foreground">Filtros</p>
+        <div className="mt-3 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-2">
+            <Label htmlFor="flt-nombre">Nombre</Label>
             <Input
               id="flt-nombre"
               value={draft.nombre}
@@ -232,9 +226,9 @@ export function EgresadosView() {
               }
               placeholder="Buscar…"
             />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="flt-anio">Año de egreso</FieldLabel>
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="flt-anio">Año de egreso</Label>
             <Input
               id="flt-anio"
               type="number"
@@ -243,9 +237,9 @@ export function EgresadosView() {
                 setDraft((d) => ({ ...d, anioEgreso: e.target.value }))
               }
             />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="flt-carrera">Programa / carrera</FieldLabel>
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="flt-carrera">Programa / carrera</Label>
             <Input
               id="flt-carrera"
               value={draft.programaCarrera}
@@ -253,9 +247,9 @@ export function EgresadosView() {
                 setDraft((d) => ({ ...d, programaCarrera: e.target.value }))
               }
             />
-          </Field>
-          <Field>
-            <FieldLabel>Estado laboral</FieldLabel>
+          </div>
+          <div className="grid gap-2">
+            <Label>Estado laboral</Label>
             <Select
               value={
                 draft.estadoLaboral === "" ? FILTER_ALL : draft.estadoLaboral
@@ -270,7 +264,7 @@ export function EgresadosView() {
                 }))
               }
             >
-              <SelectTrigger size="default" className="w-full">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>
               <SelectContent>
@@ -286,8 +280,8 @@ export function EgresadosView() {
                 ))}
               </SelectContent>
             </Select>
-          </Field>
-        </FieldGroup>
+          </div>
+        </div>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button type="button" size="sm" onClick={() => applyFilters()}>
             Aplicar filtros
@@ -301,7 +295,7 @@ export function EgresadosView() {
             Limpiar
           </Button>
         </div>
-      </FieldSet>
+      </div>
 
       {listQuery.isPending ? (
         <div className="flex flex-col gap-4">
@@ -371,10 +365,10 @@ export function EgresadosView() {
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              size="icon-sm"
+                              size="icon"
                               aria-label={`Acciones para ${row.nombreCompleto}`}
                             >
-                              <DotsThreeVerticalIcon />
+                              <MoreVerticalIcon className="size-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">

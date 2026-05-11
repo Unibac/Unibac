@@ -1,20 +1,21 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Controller, useForm, type Resolver } from "react-hook-form";
+import { type Resolver, useForm } from "react-hook-form";
 
 import type { PublicacionEmprendimientoResponseDto } from "@/api/generated/models";
 import { CreatePublicacionConvocatoriaDtoTipoConvocatoria } from "@/api/generated/models";
 import { Button } from "@/components/ui/button";
 import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/field";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -31,7 +32,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Spinner } from "@/components/ui/spinner";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { cn } from "@/lib/utils";
 import {
@@ -41,14 +41,14 @@ import {
 import {
   buildCreateConvocatoriaDto,
   buildUpdateConvocatoriaDto,
+  type ConvocatoriaFormValues,
   convocatoriaFormSchema,
   convocatoriaResponseToFormValues,
   emptyConvocatoriaFormValues,
-  type ConvocatoriaFormValues,
 } from "@/modules/convocatorias-emprendimiento/schemas/convocatoria-schema";
 
 const textareaClassName = cn(
-  "min-h-[88px] w-full min-w-0 rounded-none border border-input bg-transparent px-2.5 py-2 text-xs transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-1 aria-invalid:ring-destructive/20 md:text-xs dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
+  "flex min-h-[88px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:bg-input/30 dark:aria-invalid:ring-destructive/40 md:text-sm",
 );
 
 const TIPO_LABELS: Record<
@@ -133,149 +133,185 @@ export function ConvocatoriaFormSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <form
-          className="flex flex-1 flex-col gap-4 px-4 py-4"
-          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-        >
-          {apiError ? (
-            <p
-              role="alert"
-              className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive"
-            >
-              {apiError}
-            </p>
-          ) : null}
+        <Form {...form}>
+          <form
+            className="flex flex-1 flex-col gap-4 px-4 py-4"
+            onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+          >
+            {apiError ? (
+              <p
+                role="alert"
+                className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive"
+              >
+                {apiError}
+              </p>
+            ) : null}
 
-          <FieldSet className="space-y-4 border-none p-0">
-            <FieldLegend variant="label">Contenido</FieldLegend>
-            <FieldGroup className="gap-4">
-              <Field data-invalid={!!form.formState.errors.titulo}>
-                <FieldLabel htmlFor="cv-titulo">Título</FieldLabel>
-                <Input
-                  id="cv-titulo"
-                  aria-invalid={!!form.formState.errors.titulo}
-                  {...form.register("titulo")}
+            <div className="flex flex-col gap-4">
+              <p className="text-sm font-medium text-foreground">Contenido</p>
+              <div className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name="titulo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Título</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <FieldError errors={[form.formState.errors.titulo]} />
-              </Field>
-
-              <Field data-invalid={!!form.formState.errors.tipoConvocatoria}>
-                <FieldLabel>Tipo de convocatoria</FieldLabel>
-                <Controller
+                <FormField
                   control={form.control}
                   name="tipoConvocatoria"
                   render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger size="default" className="w-full">
-                        <SelectValue placeholder="Tipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(
-                          Object.values(
-                            CreatePublicacionConvocatoriaDtoTipoConvocatoria,
-                          ) as CreatePublicacionConvocatoriaDtoTipoConvocatoria[]
-                        ).map((v) => (
-                          <SelectItem key={v} value={v}>
-                            {TIPO_LABELS[v]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormItem>
+                      <FormLabel>Tipo de convocatoria</FormLabel>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Tipo" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {(
+                            Object.values(
+                              CreatePublicacionConvocatoriaDtoTipoConvocatoria,
+                            ) as CreatePublicacionConvocatoriaDtoTipoConvocatoria[]
+                          ).map((v) => (
+                            <SelectItem key={v} value={v}>
+                              {TIPO_LABELS[v]}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
                   )}
                 />
-                <FieldError errors={[form.formState.errors.tipoConvocatoria]} />
-              </Field>
-
-              <Field data-invalid={!!form.formState.errors.descripcion}>
-                <FieldLabel htmlFor="cv-desc">Descripción</FieldLabel>
-                <textarea
-                  id="cv-desc"
-                  className={textareaClassName}
-                  aria-invalid={!!form.formState.errors.descripcion}
-                  {...form.register("descripcion")}
+                <FormField
+                  control={form.control}
+                  name="descripcion"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descripción</FormLabel>
+                      <FormControl>
+                        <textarea className={textareaClassName} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <FieldError errors={[form.formState.errors.descripcion]} />
-              </Field>
-
-              <Field data-invalid={!!form.formState.errors.convocados}>
-                <FieldLabel htmlFor="cv-convocados">
-                  Convocados (texto)
-                </FieldLabel>
-                <textarea
-                  id="cv-convocados"
-                  className={textareaClassName}
-                  aria-invalid={!!form.formState.errors.convocados}
-                  {...form.register("convocados")}
+                <FormField
+                  control={form.control}
+                  name="convocados"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Convocados (texto)</FormLabel>
+                      <FormControl>
+                        <textarea className={textareaClassName} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <FieldError errors={[form.formState.errors.convocados]} />
-              </Field>
-            </FieldGroup>
-          </FieldSet>
+              </div>
+            </div>
 
-          <FieldSet className="space-y-4 border-none p-0">
-            <FieldLegend variant="label">Publicación</FieldLegend>
-            <FieldGroup className="gap-4">
-              <Field data-invalid={!!form.formState.errors.fechaLimite}>
-                <FieldLabel htmlFor="cv-fecha">Fecha límite (ISO)</FieldLabel>
-                <Input
-                  id="cv-fecha"
-                  placeholder="2026-05-08T00:00:00.000Z"
-                  aria-invalid={!!form.formState.errors.fechaLimite}
-                  {...form.register("fechaLimite")}
+            <div className="flex flex-col gap-4">
+              <p className="text-sm font-medium text-foreground">Publicación</p>
+              <div className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name="fechaLimite"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Fecha límite (ISO)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="2026-05-08T00:00:00.000Z"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <FieldError errors={[form.formState.errors.fechaLimite]} />
-              </Field>
+                <FormField
+                  control={form.control}
+                  name="montoTipoApoyo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Monto / tipo de apoyo (opcional)</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="linkExterno"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Link externo (opcional)</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="activo"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center gap-2">
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          className="size-4 accent-primary"
+                          checked={field.value}
+                          onChange={(e) => field.onChange(e.target.checked)}
+                        />
+                      </FormControl>
+                      <FormLabel className="!mt-0 font-normal">
+                        Activa
+                      </FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
 
-              <Field data-invalid={!!form.formState.errors.montoTipoApoyo}>
-                <FieldLabel htmlFor="cv-monto">
-                  Monto / tipo de apoyo (opcional)
-                </FieldLabel>
-                <Input id="cv-monto" {...form.register("montoTipoApoyo")} />
-                <FieldError errors={[form.formState.errors.montoTipoApoyo]} />
-              </Field>
-
-              <Field data-invalid={!!form.formState.errors.linkExterno}>
-                <FieldLabel htmlFor="cv-link">
-                  Link externo (opcional)
-                </FieldLabel>
-                <Input id="cv-link" {...form.register("linkExterno")} />
-                <FieldError errors={[form.formState.errors.linkExterno]} />
-              </Field>
-
-              <Controller
-                control={form.control}
-                name="activo"
-                render={({ field }) => (
-                  <Field orientation="horizontal">
-                    <FieldLabel htmlFor="cv-activo">Activa</FieldLabel>
-                    <input
-                      id="cv-activo"
-                      type="checkbox"
-                      className="size-4 accent-primary"
-                      checked={field.value}
-                      onChange={(e) => field.onChange(e.target.checked)}
-                    />
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-          </FieldSet>
-
-          <SheetFooter className="mt-auto flex-row justify-end gap-2 border-t border-border bg-popover p-4">
-            <Button
-              type="button"
-              variant="outline"
-              disabled={pending}
-              onClick={() => onOpenChange(false)}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={pending}>
-              {pending ? <Spinner data-icon="inline-start" /> : null}
-              {mode === "create" ? "Crear" : "Guardar"}
-            </Button>
-          </SheetFooter>
-        </form>
+            <SheetFooter className="mt-auto flex-row justify-end gap-2 border-t border-border bg-popover p-4">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={pending}
+                onClick={() => onOpenChange(false)}
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={pending}>
+                {pending ? (
+                  <Loader2Icon
+                    className="size-4 animate-spin"
+                    data-icon="inline-start"
+                  />
+                ) : null}
+                {mode === "create" ? "Crear" : "Guardar"}
+              </Button>
+            </SheetFooter>
+          </form>
+        </Form>
       </SheetContent>
     </Sheet>
   );

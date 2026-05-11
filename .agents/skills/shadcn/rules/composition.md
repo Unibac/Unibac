@@ -146,11 +146,11 @@ Use full composition — don't dump everything into `CardContent`:
 
 ## Button has no isPending or isLoading prop
 
-Compose with `Spinner` + `data-icon` + `disabled`:
+Compose with `Loader2Icon` (lucide) + `animate-spin` + `data-icon` + `disabled`:
 
 ```tsx
 <Button disabled>
-  <Spinner data-icon="inline-start" />
+  <Loader2Icon className="size-4 animate-spin" data-icon="inline-start" />
   Saving...
 </Button>
 ```

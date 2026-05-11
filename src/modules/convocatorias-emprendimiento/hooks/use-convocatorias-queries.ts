@@ -7,10 +7,10 @@ import {
   listPublicaciones,
 } from "@/modules/convocatorias-emprendimiento/api/convocatorias-api";
 import {
+  type ConvocatoriasListFilters,
   convocatoriasKeys,
   postulacionesKeys,
   toListParams,
-  type ConvocatoriasListFilters,
 } from "@/modules/convocatorias-emprendimiento/query-keys";
 
 export function useConvocatoriasListQuery(filters: ConvocatoriasListFilters) {

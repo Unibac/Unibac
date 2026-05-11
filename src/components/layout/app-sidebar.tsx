@@ -2,13 +2,13 @@
 
 import {
   BriefcaseIcon,
-  BuildingsIcon,
-  CalendarDotsIcon,
-  HouseIcon,
+  Building2Icon,
+  CalendarDaysIcon,
+  HomeIcon,
   MegaphoneIcon,
-  UsersIcon,
   UserSquareIcon,
-} from "@phosphor-icons/react";
+  UsersIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -27,13 +27,13 @@ import {
 } from "@/components/ui/sidebar";
 
 const navItems = [
-  { href: "/dashboard", label: "Inicio", icon: HouseIcon },
+  { href: "/dashboard", label: "Inicio", icon: HomeIcon },
   { href: "/dashboard/usuarios", label: "Usuarios", icon: UsersIcon },
   { href: "/dashboard/egresados", label: "Egresados", icon: UserSquareIcon },
   {
     href: "/dashboard/directorio-emprendimientos",
     label: "Directorio emprendimientos",
-    icon: BuildingsIcon,
+    icon: Building2Icon,
   },
   {
     href: "/dashboard/convocatorias",
@@ -45,7 +45,7 @@ const navItems = [
     label: "Talento",
     icon: BriefcaseIcon,
   },
-  { href: "/dashboard/ferias", label: "Ferias", icon: CalendarDotsIcon },
+  { href: "/dashboard/ferias", label: "Ferias", icon: CalendarDaysIcon },
 ] as const;
 
 export function AppSidebar() {
@@ -89,7 +89,7 @@ export function AppSidebar() {
                       tooltip={item.label}
                     >
                       <Link href={item.href}>
-                        <Icon />
+                        <Icon className="size-4 shrink-0" />
                         <span>{item.label}</span>
                       </Link>
                     </SidebarMenuButton>

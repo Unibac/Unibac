@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 import {
-  CreatePublicacionConvocatoriaDtoTipoConvocatoria,
   type CreatePublicacionConvocatoriaDto,
+  CreatePublicacionConvocatoriaDtoTipoConvocatoria,
   type PublicacionEmprendimientoResponseDto,
   type UpdatePublicacionConvocatoriaDto,
 } from "@/api/generated/models";

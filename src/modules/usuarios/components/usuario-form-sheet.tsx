@@ -1,14 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon, TrashIcon } from "@phosphor-icons/react";
+import { Loader2Icon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Controller,
-  useFieldArray,
-  useForm,
-  type Resolver,
-} from "react-hook-form";
+import { type Resolver, useFieldArray, useForm } from "react-hook-form";
 
 import {
   CreateUsuarioDtoNivel,
@@ -16,13 +11,13 @@ import {
 } from "@/api/generated/models";
 import { Button } from "@/components/ui/button";
 import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "@/components/ui/field";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -40,21 +35,20 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Spinner } from "@/components/ui/spinner";
 import { getApiErrorMessage } from "@/lib/api/error-message";
+import {
+  useCreateUsuarioWithPermisosMutation,
+  useUpdateUsuarioMutation,
+} from "@/modules/usuarios/hooks/use-usuario-mutations";
 import {
   useAccionesCatalogQuery,
   useModulosCatalogQuery,
   useUsuarioDetailQuery,
 } from "@/modules/usuarios/hooks/use-usuarios-queries";
 import {
-  useCreateUsuarioWithPermisosMutation,
-  useUpdateUsuarioMutation,
-} from "@/modules/usuarios/hooks/use-usuario-mutations";
-import {
+  type CreateUsuarioFormValues,
   createUsuarioFormSchema,
   updateUsuarioFormSchema,
-  type CreateUsuarioFormValues,
 } from "@/modules/usuarios/schemas/usuario-schema";
 
 function emptyCreateValues(): CreateUsuarioFormValues {
@@ -235,292 +229,340 @@ export function UsuarioFormSheet({
             </p>
           </div>
         ) : (
-          <form
-            className="flex min-h-0 flex-1 flex-col overflow-hidden"
-            onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-          >
-            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
-              {apiError ? (
-                <p
-                  role="alert"
-                  className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive"
-                >
-                  {apiError}
-                </p>
-              ) : null}
-              {permisoWarn ? (
-                <p
-                  role="status"
-                  className="rounded-none border border-warning/40 bg-warning/15 px-3 py-2 text-xs text-warning-foreground"
-                >
-                  {permisoWarn}
-                </p>
-              ) : null}
-
-              <FieldSet className="space-y-4 border-none p-0">
-                <FieldLegend variant="label">Datos de cuenta</FieldLegend>
-                <FieldGroup className="gap-4">
-                  <Field data-invalid={!!form.formState.errors.usuario}>
-                    <FieldLabel htmlFor="usuario-name">Usuario</FieldLabel>
-                    <Input
-                      id="usuario-name"
-                      autoComplete="off"
-                      disabled={mode === "edit"}
-                      aria-invalid={!!form.formState.errors.usuario}
-                      {...form.register("usuario")}
-                    />
-                    <FieldError errors={[form.formState.errors.usuario]} />
-                  </Field>
-
-                  <Field data-invalid={!!form.formState.errors.clave}>
-                    <FieldLabel htmlFor="usuario-clave">
-                      {mode === "create"
-                        ? "Contraseña"
-                        : "Nueva contraseña (opcional)"}
-                    </FieldLabel>
-                    <Input
-                      id="usuario-clave"
-                      type="password"
-                      autoComplete="new-password"
-                      aria-invalid={!!form.formState.errors.clave}
-                      {...form.register("clave")}
-                    />
-                    <FieldError errors={[form.formState.errors.clave]} />
-                  </Field>
-
-                  <Field data-invalid={!!form.formState.errors.descripcion}>
-                    <FieldLabel htmlFor="usuario-desc">
-                      Descripción (opcional)
-                    </FieldLabel>
-                    <Input
-                      id="usuario-desc"
-                      {...form.register("descripcion")}
-                    />
-                    <FieldError errors={[form.formState.errors.descripcion]} />
-                  </Field>
-
-                  <Controller
-                    control={form.control}
-                    name="activo"
-                    render={({ field }) => (
-                      <Field orientation="horizontal">
-                        <FieldLabel htmlFor="usuario-activo">Activo</FieldLabel>
-                        <input
-                          id="usuario-activo"
-                          type="checkbox"
-                          className="size-4 accent-primary"
-                          checked={field.value}
-                          onChange={(e) => field.onChange(e.target.checked)}
-                        />
-                      </Field>
-                    )}
-                  />
-
-                  <Field data-invalid={!!form.formState.errors.nivel}>
-                    <FieldLabel>Nivel</FieldLabel>
-                    <Controller
-                      control={form.control}
-                      name="nivel"
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger size="default" className="w-full">
-                            <SelectValue placeholder="Nivel" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value={CreateUsuarioDtoNivel.USUARIO}>
-                              Usuario
-                            </SelectItem>
-                            <SelectItem
-                              value={CreateUsuarioDtoNivel.ADMINISTRADOR}
-                            >
-                              Administrador
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    <FieldError errors={[form.formState.errors.nivel]} />
-                  </Field>
-
-                  <Field data-invalid={!!form.formState.errors.tipo}>
-                    <FieldLabel>Tipo</FieldLabel>
-                    <Controller
-                      control={form.control}
-                      name="tipo"
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger size="default" className="w-full">
-                            <SelectValue placeholder="Tipo" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value={CreateUsuarioDtoTipo.INTERNO}>
-                              Interno
-                            </SelectItem>
-                            <SelectItem value={CreateUsuarioDtoTipo.EXTERNO}>
-                              Externo
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    <FieldError errors={[form.formState.errors.tipo]} />
-                  </Field>
-
-                  <Field data-invalid={!!form.formState.errors.correo}>
-                    <FieldLabel htmlFor="usuario-correo">
-                      Correo (opcional)
-                    </FieldLabel>
-                    <Input
-                      id="usuario-correo"
-                      type="email"
-                      autoComplete="email"
-                      {...form.register("correo")}
-                    />
-                    <FieldError errors={[form.formState.errors.correo]} />
-                  </Field>
-
-                  <Field data-invalid={!!form.formState.errors.celular}>
-                    <FieldLabel htmlFor="usuario-cel">
-                      Celular (opcional)
-                    </FieldLabel>
-                    <Input id="usuario-cel" {...form.register("celular")} />
-                    <FieldError errors={[form.formState.errors.celular]} />
-                  </Field>
-                </FieldGroup>
-              </FieldSet>
-
-              <FieldSet className="space-y-3 border-none p-0">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <FieldLegend variant="label">Permisos</FieldLegend>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    disabled={
-                      modulosActivos.length === 0 || acciones.length === 0
-                    }
-                    onClick={() => handleAppendPermiso()}
-                  >
-                    <PlusIcon data-icon="inline-start" />
-                    Añadir permiso
-                  </Button>
-                </div>
-
-                <div className="flex max-h-52 flex-col gap-3 overflow-y-auto pr-1">
-                  {fields.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">
-                      Sin permisos adicionales (solo cuenta base).
+          <Form {...form}>
+            <form
+              className="flex min-h-0 flex-1 flex-col overflow-hidden"
+              onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
+            >
+              <div className="min-h-0 flex-1 overflow-y-auto p-4">
+                <div className="flex flex-col gap-4">
+                  {apiError ? (
+                    <p
+                      role="alert"
+                      className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive"
+                    >
+                      {apiError}
                     </p>
                   ) : null}
-                  {fields.map((row, index) => (
-                    <div
-                      key={row.id}
-                      className="flex flex-col gap-2 border border-border p-2 sm:flex-row sm:items-end"
+                  {permisoWarn ? (
+                    <p
+                      role="status"
+                      className="rounded-md border border-warning/40 bg-warning/15 px-3 py-2 text-xs text-warning-foreground"
                     >
-                      <Field className="min-w-0 flex-1">
-                        <FieldLabel>Módulo</FieldLabel>
-                        <Controller
-                          control={form.control}
-                          name={`permisos.${index}.moduloId`}
-                          render={({ field }) => (
+                      {permisoWarn}
+                    </p>
+                  ) : null}
+
+                  <div className="flex flex-col gap-4">
+                    <p className="text-sm font-medium text-foreground">
+                      Datos de cuenta
+                    </p>
+                    <div className="flex flex-col gap-4">
+                      <FormField
+                        control={form.control}
+                        name="usuario"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Usuario</FormLabel>
+                            <FormControl>
+                              <Input
+                                autoComplete="off"
+                                disabled={mode === "edit"}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="clave"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              {mode === "create"
+                                ? "Contraseña"
+                                : "Nueva contraseña (opcional)"}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="password"
+                                autoComplete="new-password"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="descripcion"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Descripción (opcional)</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="activo"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center gap-2">
+                            <FormControl>
+                              <input
+                                type="checkbox"
+                                className="size-4 accent-primary"
+                                checked={field.value}
+                                onChange={(e) =>
+                                  field.onChange(e.target.checked)
+                                }
+                              />
+                            </FormControl>
+                            <FormLabel className="!mt-0 font-normal">
+                              Activo
+                            </FormLabel>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="nivel"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Nivel</FormLabel>
                             <Select
-                              value={
-                                field.value > 0
-                                  ? String(field.value)
-                                  : undefined
-                              }
-                              onValueChange={(v) => field.onChange(Number(v))}
+                              value={field.value}
+                              onValueChange={field.onChange}
                             >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Módulo" />
-                              </SelectTrigger>
+                              <FormControl>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Nivel" />
+                                </SelectTrigger>
+                              </FormControl>
                               <SelectContent>
-                                {modulosActivos.map((m) => (
-                                  <SelectItem key={m.id} value={String(m.id)}>
-                                    {m.nombre}
-                                  </SelectItem>
-                                ))}
+                                <SelectItem
+                                  value={CreateUsuarioDtoNivel.USUARIO}
+                                >
+                                  Usuario
+                                </SelectItem>
+                                <SelectItem
+                                  value={CreateUsuarioDtoNivel.ADMINISTRADOR}
+                                >
+                                  Administrador
+                                </SelectItem>
                               </SelectContent>
                             </Select>
-                          )}
-                        />
-                        <FieldError
-                          errors={[
-                            form.formState.errors.permisos?.[index]?.moduloId,
-                          ]}
-                        />
-                      </Field>
-
-                      <Field className="min-w-0 flex-1">
-                        <FieldLabel>Acción</FieldLabel>
-                        <Controller
-                          control={form.control}
-                          name={`permisos.${index}.accionId`}
-                          render={({ field }) => (
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="tipo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tipo</FormLabel>
                             <Select
-                              value={
-                                field.value > 0
-                                  ? String(field.value)
-                                  : undefined
-                              }
-                              onValueChange={(v) => field.onChange(Number(v))}
+                              value={field.value}
+                              onValueChange={field.onChange}
                             >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Acción" />
-                              </SelectTrigger>
+                              <FormControl>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Tipo" />
+                                </SelectTrigger>
+                              </FormControl>
                               <SelectContent>
-                                {acciones.map((a) => (
-                                  <SelectItem key={a.id} value={String(a.id)}>
-                                    {a.nombre}
-                                  </SelectItem>
-                                ))}
+                                <SelectItem
+                                  value={CreateUsuarioDtoTipo.INTERNO}
+                                >
+                                  Interno
+                                </SelectItem>
+                                <SelectItem
+                                  value={CreateUsuarioDtoTipo.EXTERNO}
+                                >
+                                  Externo
+                                </SelectItem>
                               </SelectContent>
                             </Select>
-                          )}
-                        />
-                        <FieldError
-                          errors={[
-                            form.formState.errors.permisos?.[index]?.accionId,
-                          ]}
-                        />
-                      </Field>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="correo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Correo (opcional)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="email"
+                                autoComplete="email"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="celular"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Celular (opcional)</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
 
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-medium text-foreground">
+                        Permisos
+                      </p>
                       <Button
                         type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        className="shrink-0 self-end sm:self-auto"
-                        aria-label="Quitar permiso"
-                        onClick={() => remove(index)}
+                        variant="outline"
+                        size="sm"
+                        disabled={
+                          modulosActivos.length === 0 || acciones.length === 0
+                        }
+                        onClick={() => handleAppendPermiso()}
                       >
-                        <TrashIcon />
+                        <PlusIcon className="size-4" />
+                        Añadir permiso
                       </Button>
                     </div>
-                  ))}
-                </div>
-              </FieldSet>
-            </div>
 
-            <SheetFooter className="flex-row justify-end gap-2 border-t border-border bg-popover p-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={submitting}>
-                {submitting ? <Spinner data-icon="inline-start" /> : null}
-                Guardar
-              </Button>
-            </SheetFooter>
-          </form>
+                    <div className="flex max-h-52 flex-col gap-3 overflow-y-auto pr-1">
+                      {fields.length === 0 ? (
+                        <p className="text-xs text-muted-foreground">
+                          Sin permisos adicionales (solo cuenta base).
+                        </p>
+                      ) : null}
+                      {fields.map((row, index) => (
+                        <div
+                          key={row.id}
+                          className="flex flex-col gap-2 border border-border p-2 sm:flex-row sm:items-end"
+                        >
+                          <FormField
+                            control={form.control}
+                            name={`permisos.${index}.moduloId`}
+                            render={({ field }) => (
+                              <FormItem className="min-w-0 flex-1">
+                                <FormLabel>Módulo</FormLabel>
+                                <Select
+                                  value={
+                                    field.value > 0 ? String(field.value) : ""
+                                  }
+                                  onValueChange={(v) =>
+                                    field.onChange(Number(v))
+                                  }
+                                >
+                                  <FormControl>
+                                    <SelectTrigger className="w-full">
+                                      <SelectValue placeholder="Módulo" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {modulosActivos.map((m) => (
+                                      <SelectItem
+                                        key={m.id}
+                                        value={String(m.id)}
+                                      >
+                                        {m.nombre}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name={`permisos.${index}.accionId`}
+                            render={({ field }) => (
+                              <FormItem className="min-w-0 flex-1">
+                                <FormLabel>Acción</FormLabel>
+                                <Select
+                                  value={
+                                    field.value > 0 ? String(field.value) : ""
+                                  }
+                                  onValueChange={(v) =>
+                                    field.onChange(Number(v))
+                                  }
+                                >
+                                  <FormControl>
+                                    <SelectTrigger className="w-full">
+                                      <SelectValue placeholder="Acción" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {acciones.map((a) => (
+                                      <SelectItem
+                                        key={a.id}
+                                        value={String(a.id)}
+                                      >
+                                        {a.nombre}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="shrink-0 self-end sm:self-auto"
+                            aria-label="Quitar permiso"
+                            onClick={() => remove(index)}
+                          >
+                            <Trash2Icon className="size-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <SheetFooter className="flex-row justify-end gap-2 border-t border-border bg-popover p-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={submitting}>
+                  {submitting ? (
+                    <Loader2Icon
+                      className="size-4 animate-spin"
+                      data-icon="inline-start"
+                    />
+                  ) : null}
+                  Guardar
+                </Button>
+              </SheetFooter>
+            </form>
+          </Form>
         )}
       </SheetContent>
     </Sheet>

@@ -1,5 +1,5 @@
-import { getPermisos } from "@/api/generated/permisos/permisos";
 import type { CreatePermisoDto } from "@/api/generated/models";
+import { getPermisos } from "@/api/generated/permisos/permisos";
 
 const permisos = getPermisos();
 
