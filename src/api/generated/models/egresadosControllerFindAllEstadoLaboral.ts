@@ -6,12 +6,12 @@
  * OpenAPI spec version: 1.0
  */
 
-export type EgresadosControllerFindAllEstadoLaboral =
-  (typeof EgresadosControllerFindAllEstadoLaboral)[keyof typeof EgresadosControllerFindAllEstadoLaboral];
+export type EgresadosControllerFindAllEstadoLaboral = typeof EgresadosControllerFindAllEstadoLaboral[keyof typeof EgresadosControllerFindAllEstadoLaboral];
+
 
 export const EgresadosControllerFindAllEstadoLaboral = {
-  EMPLEADO: "EMPLEADO",
-  EMPRENDEDOR: "EMPRENDEDOR",
-  DESEMPLEADO: "DESEMPLEADO",
-  ESTUDIANDO: "ESTUDIANDO",
+  EMPLEADO: 'EMPLEADO',
+  EMPRENDEDOR: 'EMPRENDEDOR',
+  DESEMPLEADO: 'DESEMPLEADO',
+  ESTUDIANDO: 'ESTUDIANDO',
 } as const;

@@ -8,128 +8,81 @@
 import type {
   CreateTalentoPerfilDto,
   TalentoPerfilResponseDto,
-  UpdateTalentoPerfilDto,
-} from "../models";
+  UpdateTalentoPerfilDto
+} from '../models';
 
-import { customInstance } from "../../../lib/api/mutator";
+import { customInstance } from '../../../lib/api/mutator';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-export const getTalentoPerfiles = () => {
+
+  export const getTalentoPerfiles = () => {
+/**
+ * @summary Listar perfiles del banco de talentos
+ */
+const talentoPerfilesControllerFindAll = (
+
+ options?: SecondParameter<typeof customInstance<TalentoPerfilResponseDto[]>>,) => {
+      return customInstance<TalentoPerfilResponseDto[]>(
+      {url: `/talento-perfiles`, method: 'GET'
+    },
+      options);
+    }
   /**
-   * @summary Listar perfiles del banco de talentos
-   */
-  const talentoPerfilesControllerFindAll = (
-    options?: SecondParameter<
-      typeof customInstance<TalentoPerfilResponseDto[]>
-    >,
-  ) => {
-    return customInstance<TalentoPerfilResponseDto[]>(
-      { url: `/talento-perfiles`, method: "GET" },
-      options,
-    );
-  };
-  /**
-   * El perfil queda asociado al usuario de la sesión.
-   * @summary Crear perfil (usuario autenticado)
-   */
-  const talentoPerfilesControllerCreate = (
+ * El perfil queda asociado al usuario de la sesión.
+ * @summary Crear perfil (usuario autenticado)
+ */
+const talentoPerfilesControllerCreate = (
     createTalentoPerfilDto: CreateTalentoPerfilDto,
-    options?: SecondParameter<typeof customInstance<TalentoPerfilResponseDto>>,
-  ) => {
-    return customInstance<TalentoPerfilResponseDto>(
-      {
-        url: `/talento-perfiles`,
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        data: createTalentoPerfilDto,
-      },
-      options,
-    );
-  };
+ options?: SecondParameter<typeof customInstance<TalentoPerfilResponseDto>>,) => {
+      return customInstance<TalentoPerfilResponseDto>(
+      {url: `/talento-perfiles`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createTalentoPerfilDto
+    },
+      options);
+    }
   /**
-   * @summary Obtener perfil por id
-   */
-  const talentoPerfilesControllerFindOne = (
+ * @summary Obtener perfil por id
+ */
+const talentoPerfilesControllerFindOne = (
     id: number,
-    options?: SecondParameter<typeof customInstance<TalentoPerfilResponseDto>>,
-  ) => {
-    return customInstance<TalentoPerfilResponseDto>(
-      { url: `/talento-perfiles/${id}`, method: "GET" },
-      options,
-    );
-  };
+ options?: SecondParameter<typeof customInstance<TalentoPerfilResponseDto>>,) => {
+      return customInstance<TalentoPerfilResponseDto>(
+      {url: `/talento-perfiles/${id}`, method: 'GET'
+    },
+      options);
+    }
   /**
-   * @summary Actualizar perfil (dueño o administrador)
-   */
-  const talentoPerfilesControllerUpdate = (
+ * @summary Actualizar perfil (dueño o administrador)
+ */
+const talentoPerfilesControllerUpdate = (
     id: number,
     updateTalentoPerfilDto: UpdateTalentoPerfilDto,
-    options?: SecondParameter<typeof customInstance<TalentoPerfilResponseDto>>,
-  ) => {
-    return customInstance<TalentoPerfilResponseDto>(
-      {
-        url: `/talento-perfiles/${id}`,
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        data: updateTalentoPerfilDto,
-      },
-      options,
-    );
-  };
+ options?: SecondParameter<typeof customInstance<TalentoPerfilResponseDto>>,) => {
+      return customInstance<TalentoPerfilResponseDto>(
+      {url: `/talento-perfiles/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateTalentoPerfilDto
+    },
+      options);
+    }
   /**
-   * Solo nivel ADMINISTRADOR puede eliminar (aunque exista permiso ELIMINACION).
-   * @summary Eliminar perfil
-   */
-  const talentoPerfilesControllerRemove = (
+ * Solo nivel ADMINISTRADOR puede eliminar (aunque exista permiso ELIMINACION).
+ * @summary Eliminar perfil
+ */
+const talentoPerfilesControllerRemove = (
     id: number,
-    options?: SecondParameter<typeof customInstance<void>>,
-  ) => {
-    return customInstance<void>(
-      { url: `/talento-perfiles/${id}`, method: "DELETE" },
-      options,
-    );
-  };
-  return {
-    talentoPerfilesControllerFindAll,
-    talentoPerfilesControllerCreate,
-    talentoPerfilesControllerFindOne,
-    talentoPerfilesControllerUpdate,
-    talentoPerfilesControllerRemove,
-  };
-};
-export type TalentoPerfilesControllerFindAllResult = NonNullable<
-  Awaited<
-    ReturnType<
-      ReturnType<typeof getTalentoPerfiles>["talentoPerfilesControllerFindAll"]
-    >
-  >
->;
-export type TalentoPerfilesControllerCreateResult = NonNullable<
-  Awaited<
-    ReturnType<
-      ReturnType<typeof getTalentoPerfiles>["talentoPerfilesControllerCreate"]
-    >
-  >
->;
-export type TalentoPerfilesControllerFindOneResult = NonNullable<
-  Awaited<
-    ReturnType<
-      ReturnType<typeof getTalentoPerfiles>["talentoPerfilesControllerFindOne"]
-    >
-  >
->;
-export type TalentoPerfilesControllerUpdateResult = NonNullable<
-  Awaited<
-    ReturnType<
-      ReturnType<typeof getTalentoPerfiles>["talentoPerfilesControllerUpdate"]
-    >
-  >
->;
-export type TalentoPerfilesControllerRemoveResult = NonNullable<
-  Awaited<
-    ReturnType<
-      ReturnType<typeof getTalentoPerfiles>["talentoPerfilesControllerRemove"]
-    >
-  >
->;
+ options?: SecondParameter<typeof customInstance<void>>,) => {
+      return customInstance<void>(
+      {url: `/talento-perfiles/${id}`, method: 'DELETE'
+    },
+      options);
+    }
+  return {talentoPerfilesControllerFindAll,talentoPerfilesControllerCreate,talentoPerfilesControllerFindOne,talentoPerfilesControllerUpdate,talentoPerfilesControllerRemove}};
+export type TalentoPerfilesControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getTalentoPerfiles>['talentoPerfilesControllerFindAll']>>>
+export type TalentoPerfilesControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getTalentoPerfiles>['talentoPerfilesControllerCreate']>>>
+export type TalentoPerfilesControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getTalentoPerfiles>['talentoPerfilesControllerFindOne']>>>
+export type TalentoPerfilesControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getTalentoPerfiles>['talentoPerfilesControllerUpdate']>>>
+export type TalentoPerfilesControllerRemoveResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getTalentoPerfiles>['talentoPerfilesControllerRemove']>>>

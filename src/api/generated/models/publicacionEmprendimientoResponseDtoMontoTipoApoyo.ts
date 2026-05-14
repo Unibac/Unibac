@@ -6,6 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export type PublicacionEmprendimientoResponseDtoMontoTipoApoyo = {
-  [key: string]: unknown;
-};
+export type PublicacionEmprendimientoResponseDtoMontoTipoApoyo = { [key: string]: unknown };

@@ -6,8 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface CreatePermisoDto {
-  usuarioId: number;
-  moduloId: number;
-  accionId: number;
-}
+export type AuthProfileResponseDtoCategoria = typeof AuthProfileResponseDtoCategoria[keyof typeof AuthProfileResponseDtoCategoria];
+
+
+export const AuthProfileResponseDtoCategoria = {
+  ESTUDIANTE: 'ESTUDIANTE',
+  EGRESADO: 'EGRESADO',
+  EMPRESA: 'EMPRESA',
+} as const;

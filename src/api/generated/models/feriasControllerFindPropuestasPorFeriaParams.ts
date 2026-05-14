@@ -5,11 +5,11 @@
  * Autenticación: POST /auth/login fija la cookie HttpOnly access_token. En Swagger UI, ejecuta login en este mismo origen y luego las rutas protegidas enviarán la cookie automáticamente. Desde el frontend usa fetch/axios con credentials: include. Registro público: POST /auth/register-public solo si PUBLIC_REGISTRATION_ENABLED=true.
  * OpenAPI spec version: 1.0
  */
-import type { FeriasControllerFindPropuestasPorFeriaEstado } from "./feriasControllerFindPropuestasPorFeriaEstado";
+import type { FeriasControllerFindPropuestasPorFeriaEstado } from './feriasControllerFindPropuestasPorFeriaEstado';
 
 export type FeriasControllerFindPropuestasPorFeriaParams = {
-  /**
-   * Solo tiene efecto para administradores; usuarios no administradores solo ven propuestas ACEPTADO (se ignora este parámetro).
-   */
-  estado?: FeriasControllerFindPropuestasPorFeriaEstado;
+/**
+ * Solo tiene efecto para administradores; usuarios no administradores solo ven propuestas ACEPTADO (se ignora este parámetro).
+ */
+estado?: FeriasControllerFindPropuestasPorFeriaEstado;
 };

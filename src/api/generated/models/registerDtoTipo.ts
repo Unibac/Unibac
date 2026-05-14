@@ -6,10 +6,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export type RegisterDtoTipo =
-  (typeof RegisterDtoTipo)[keyof typeof RegisterDtoTipo];
+export type RegisterDtoTipo = typeof RegisterDtoTipo[keyof typeof RegisterDtoTipo];
+
 
 export const RegisterDtoTipo = {
-  INTERNO: "INTERNO",
-  EXTERNO: "EXTERNO",
+  INTERNO: 'INTERNO',
+  EXTERNO: 'EXTERNO',
 } as const;

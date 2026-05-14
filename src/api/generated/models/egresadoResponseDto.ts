@@ -5,10 +5,10 @@
  * Autenticación: POST /auth/login fija la cookie HttpOnly access_token. En Swagger UI, ejecuta login en este mismo origen y luego las rutas protegidas enviarán la cookie automáticamente. Desde el frontend usa fetch/axios con credentials: include. Registro público: POST /auth/register-public solo si PUBLIC_REGISTRATION_ENABLED=true.
  * OpenAPI spec version: 1.0
  */
-import type { EgresadoResponseDtoEstadoLaboral } from "./egresadoResponseDtoEstadoLaboral";
-import type { EgresadoResponseDtoInformacionEmprendimiento } from "./egresadoResponseDtoInformacionEmprendimiento";
-import type { EgresadoResponseDtoTelefono } from "./egresadoResponseDtoTelefono";
-import type { EgresadoVinculosDto } from "./egresadoVinculosDto";
+import type { EgresadoResponseDtoEstadoLaboral } from './egresadoResponseDtoEstadoLaboral';
+import type { EgresadoResponseDtoInformacionEmprendimiento } from './egresadoResponseDtoInformacionEmprendimiento';
+import type { EgresadoResponseDtoTelefono } from './egresadoResponseDtoTelefono';
+import type { EgresadoVinculosDto } from './egresadoVinculosDto';
 
 export interface EgresadoResponseDto {
   id: number;

@@ -9,10 +9,10 @@
 /**
  * Nuevo estado (solo APROBADO o RECHAZADO).
  */
-export type UpdateEstadoPostulacionDtoEstado =
-  (typeof UpdateEstadoPostulacionDtoEstado)[keyof typeof UpdateEstadoPostulacionDtoEstado];
+export type UpdateEstadoPostulacionDtoEstado = typeof UpdateEstadoPostulacionDtoEstado[keyof typeof UpdateEstadoPostulacionDtoEstado];
+
 
 export const UpdateEstadoPostulacionDtoEstado = {
-  APROBADO: "APROBADO",
-  RECHAZADO: "RECHAZADO",
+  APROBADO: 'APROBADO',
+  RECHAZADO: 'RECHAZADO',
 } as const;

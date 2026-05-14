@@ -9,6 +9,4 @@
 /**
  * Registro en directorio de emprendimientos del mismo usuario, si existe
  */
-export type EgresadoVinculosDtoDirectorioEmprendimientoId = {
-  [key: string]: unknown;
-};
+export type EgresadoVinculosDtoDirectorioEmprendimientoId = { [key: string]: unknown };

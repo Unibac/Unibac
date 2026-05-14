@@ -6,10 +6,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export type UpdateUsuarioDtoNivel =
-  (typeof UpdateUsuarioDtoNivel)[keyof typeof UpdateUsuarioDtoNivel];
+export type UpdateUsuarioDtoNivel = typeof UpdateUsuarioDtoNivel[keyof typeof UpdateUsuarioDtoNivel];
+
 
 export const UpdateUsuarioDtoNivel = {
-  USUARIO: "USUARIO",
-  ADMINISTRADOR: "ADMINISTRADOR",
+  USUARIO: 'USUARIO',
+  ADMINISTRADOR: 'ADMINISTRADOR',
 } as const;

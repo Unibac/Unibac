@@ -9,105 +9,80 @@ import type {
   CreateModuloDto,
   ModuloResponseDto,
   ModulosControllerFindAllParams,
-  UpdateModuloDto,
-} from "../models";
+  UpdateModuloDto
+} from '../models';
 
-import { customInstance } from "../../../lib/api/mutator";
+import { customInstance } from '../../../lib/api/mutator';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-export const getModulos = () => {
-  /**
-   * @summary Listar módulos
-   */
-  const modulosControllerFindAll = (
+
+  export const getModulos = () => {
+/**
+ * @summary Listar módulos
+ */
+const modulosControllerFindAll = (
     params?: ModulosControllerFindAllParams,
-    options?: SecondParameter<typeof customInstance<ModuloResponseDto[]>>,
-  ) => {
-    return customInstance<ModuloResponseDto[]>(
-      { url: `/modulos`, method: "GET", params },
-      options,
-    );
-  };
+ options?: SecondParameter<typeof customInstance<ModuloResponseDto[]>>,) => {
+      return customInstance<ModuloResponseDto[]>(
+      {url: `/modulos`, method: 'GET',
+        params
+    },
+      options);
+    }
   /**
-   * @summary Crear módulo
-   */
-  const modulosControllerCreate = (
+ * @summary Crear módulo
+ */
+const modulosControllerCreate = (
     createModuloDto: CreateModuloDto,
-    options?: SecondParameter<typeof customInstance<ModuloResponseDto>>,
-  ) => {
-    return customInstance<ModuloResponseDto>(
-      {
-        url: `/modulos`,
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        data: createModuloDto,
-      },
-      options,
-    );
-  };
+ options?: SecondParameter<typeof customInstance<ModuloResponseDto>>,) => {
+      return customInstance<ModuloResponseDto>(
+      {url: `/modulos`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createModuloDto
+    },
+      options);
+    }
   /**
-   * @summary Obtener módulo por id
-   */
-  const modulosControllerFindOne = (
+ * @summary Obtener módulo por id
+ */
+const modulosControllerFindOne = (
     id: number,
-    options?: SecondParameter<typeof customInstance<ModuloResponseDto>>,
-  ) => {
-    return customInstance<ModuloResponseDto>(
-      { url: `/modulos/${id}`, method: "GET" },
-      options,
-    );
-  };
+ options?: SecondParameter<typeof customInstance<ModuloResponseDto>>,) => {
+      return customInstance<ModuloResponseDto>(
+      {url: `/modulos/${id}`, method: 'GET'
+    },
+      options);
+    }
   /**
-   * @summary Actualizar módulo
-   */
-  const modulosControllerUpdate = (
+ * @summary Actualizar módulo
+ */
+const modulosControllerUpdate = (
     id: number,
     updateModuloDto: UpdateModuloDto,
-    options?: SecondParameter<typeof customInstance<ModuloResponseDto>>,
-  ) => {
-    return customInstance<ModuloResponseDto>(
-      {
-        url: `/modulos/${id}`,
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        data: updateModuloDto,
-      },
-      options,
-    );
-  };
+ options?: SecondParameter<typeof customInstance<ModuloResponseDto>>,) => {
+      return customInstance<ModuloResponseDto>(
+      {url: `/modulos/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateModuloDto
+    },
+      options);
+    }
   /**
-   * @summary Eliminar módulo
-   */
-  const modulosControllerRemove = (
+ * @summary Eliminar módulo
+ */
+const modulosControllerRemove = (
     id: number,
-    options?: SecondParameter<typeof customInstance<ModuloResponseDto>>,
-  ) => {
-    return customInstance<ModuloResponseDto>(
-      { url: `/modulos/${id}`, method: "DELETE" },
-      options,
-    );
-  };
-  return {
-    modulosControllerFindAll,
-    modulosControllerCreate,
-    modulosControllerFindOne,
-    modulosControllerUpdate,
-    modulosControllerRemove,
-  };
-};
-export type ModulosControllerFindAllResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getModulos>["modulosControllerFindAll"]>>
->;
-export type ModulosControllerCreateResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getModulos>["modulosControllerCreate"]>>
->;
-export type ModulosControllerFindOneResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getModulos>["modulosControllerFindOne"]>>
->;
-export type ModulosControllerUpdateResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getModulos>["modulosControllerUpdate"]>>
->;
-export type ModulosControllerRemoveResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getModulos>["modulosControllerRemove"]>>
->;
+ options?: SecondParameter<typeof customInstance<ModuloResponseDto>>,) => {
+      return customInstance<ModuloResponseDto>(
+      {url: `/modulos/${id}`, method: 'DELETE'
+    },
+      options);
+    }
+  return {modulosControllerFindAll,modulosControllerCreate,modulosControllerFindOne,modulosControllerUpdate,modulosControllerRemove}};
+export type ModulosControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getModulos>['modulosControllerFindAll']>>>
+export type ModulosControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getModulos>['modulosControllerCreate']>>>
+export type ModulosControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getModulos>['modulosControllerFindOne']>>>
+export type ModulosControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getModulos>['modulosControllerUpdate']>>>
+export type ModulosControllerRemoveResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getModulos>['modulosControllerRemove']>>>

@@ -6,10 +6,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export type AuthProfileResponseDtoTipo =
-  (typeof AuthProfileResponseDtoTipo)[keyof typeof AuthProfileResponseDtoTipo];
+export type AuthProfileResponseDtoTipo = typeof AuthProfileResponseDtoTipo[keyof typeof AuthProfileResponseDtoTipo];
+
 
 export const AuthProfileResponseDtoTipo = {
-  INTERNO: "INTERNO",
-  EXTERNO: "EXTERNO",
+  INTERNO: 'INTERNO',
+  EXTERNO: 'EXTERNO',
 } as const;

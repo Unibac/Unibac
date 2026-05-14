@@ -6,11 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 
-export type UpdateTalentoPerfilDtoTipoPerfil =
-  (typeof UpdateTalentoPerfilDtoTipoPerfil)[keyof typeof UpdateTalentoPerfilDtoTipoPerfil];
+export type UpdateTalentoPerfilDtoTipoPerfil = typeof UpdateTalentoPerfilDtoTipoPerfil[keyof typeof UpdateTalentoPerfilDtoTipoPerfil];
+
 
 export const UpdateTalentoPerfilDtoTipoPerfil = {
-  ESTUDIANTE: "ESTUDIANTE",
-  EGRESADO: "EGRESADO",
-  EMPRENDEDOR: "EMPRENDEDOR",
+  ESTUDIANTE: 'ESTUDIANTE',
+  EGRESADO: 'EGRESADO',
+  EMPRENDEDOR: 'EMPRENDEDOR',
 } as const;

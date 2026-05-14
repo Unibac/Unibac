@@ -9,10 +9,10 @@
 /**
  * Solo transiciones desde POSTULADO; no se envía POSTULADO desde la API.
  */
-export type ModerarPropuestaFeriaDtoEstado =
-  (typeof ModerarPropuestaFeriaDtoEstado)[keyof typeof ModerarPropuestaFeriaDtoEstado];
+export type ModerarPropuestaFeriaDtoEstado = typeof ModerarPropuestaFeriaDtoEstado[keyof typeof ModerarPropuestaFeriaDtoEstado];
+
 
 export const ModerarPropuestaFeriaDtoEstado = {
-  ACEPTADO: "ACEPTADO",
-  RECHAZADO: "RECHAZADO",
+  ACEPTADO: 'ACEPTADO',
+  RECHAZADO: 'RECHAZADO',
 } as const;

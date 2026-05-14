@@ -7,8 +7,8 @@
  */
 
 export type PermisosControllerFindAllParams = {
-  /**
-   * Filtrar por id de usuario
-   */
-  usuarioId?: number;
+/**
+ * Filtrar por id de usuario
+ */
+usuarioId?: number;
 };

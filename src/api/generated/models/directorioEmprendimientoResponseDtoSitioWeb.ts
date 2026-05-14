@@ -6,6 +6,4 @@
  * OpenAPI spec version: 1.0
  */
 
-export type DirectorioEmprendimientoResponseDtoSitioWeb = {
-  [key: string]: unknown;
-};
+export type DirectorioEmprendimientoResponseDtoSitioWeb = { [key: string]: unknown };

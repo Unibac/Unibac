@@ -5,8 +5,9 @@
  * Autenticación: POST /auth/login fija la cookie HttpOnly access_token. En Swagger UI, ejecuta login en este mismo origen y luego las rutas protegidas enviarán la cookie automáticamente. Desde el frontend usa fetch/axios con credentials: include. Registro público: POST /auth/register-public solo si PUBLIC_REGISTRATION_ENABLED=true.
  * OpenAPI spec version: 1.0
  */
-import type { UpdateUsuarioDtoNivel } from "./updateUsuarioDtoNivel";
-import type { UpdateUsuarioDtoTipo } from "./updateUsuarioDtoTipo";
+import type { UpdateUsuarioDtoCategoria } from './updateUsuarioDtoCategoria';
+import type { UpdateUsuarioDtoNivel } from './updateUsuarioDtoNivel';
+import type { UpdateUsuarioDtoTipo } from './updateUsuarioDtoTipo';
 
 export interface UpdateUsuarioDto {
   /** @minLength 3 */
@@ -19,4 +20,7 @@ export interface UpdateUsuarioDto {
   tipo?: UpdateUsuarioDtoTipo;
   correo?: string;
   celular?: string;
+  /** Rol RBAC (tabla ROLES) */
+  rolId?: number;
+  categoria?: UpdateUsuarioDtoCategoria;
 }

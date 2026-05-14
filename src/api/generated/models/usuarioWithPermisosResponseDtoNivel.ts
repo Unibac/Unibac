@@ -6,10 +6,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export type UsuarioWithPermisosResponseDtoNivel =
-  (typeof UsuarioWithPermisosResponseDtoNivel)[keyof typeof UsuarioWithPermisosResponseDtoNivel];
+export type UsuarioWithPermisosResponseDtoNivel = typeof UsuarioWithPermisosResponseDtoNivel[keyof typeof UsuarioWithPermisosResponseDtoNivel];
+
 
 export const UsuarioWithPermisosResponseDtoNivel = {
-  USUARIO: "USUARIO",
-  ADMINISTRADOR: "ADMINISTRADOR",
+  USUARIO: 'USUARIO',
+  ADMINISTRADOR: 'ADMINISTRADOR',
 } as const;

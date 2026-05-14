@@ -5,8 +5,10 @@
  * Autenticación: POST /auth/login fija la cookie HttpOnly access_token. En Swagger UI, ejecuta login en este mismo origen y luego las rutas protegidas enviarán la cookie automáticamente. Desde el frontend usa fetch/axios con credentials: include. Registro público: POST /auth/register-public solo si PUBLIC_REGISTRATION_ENABLED=true.
  * OpenAPI spec version: 1.0
  */
+import type { RegisterPublicDtoCategoria } from './registerPublicDtoCategoria';
 
 export interface RegisterPublicDto {
+  categoria: RegisterPublicDtoCategoria;
   /** @minLength 3 */
   usuario: string;
   /** @minLength 6 */
@@ -14,4 +16,15 @@ export interface RegisterPublicDto {
   correo?: string;
   descripcion?: string;
   celular?: string;
+  /** Requerido si categoría es ESTUDIANTE o EGRESADO */
+  identificacion?: string;
+  /** Requerido si categoría es ESTUDIANTE */
+  codigoEstudiantil?: string;
+  /** EMPRESA */
+  nit?: string;
+  /** EMPRESA */
+  razonSocial?: string;
+  nombreContacto?: string;
+  correoContacto?: string;
+  telefono?: string;
 }

@@ -6,11 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 
-export type PropuestaFeriaResponseDtoEstado =
-  (typeof PropuestaFeriaResponseDtoEstado)[keyof typeof PropuestaFeriaResponseDtoEstado];
+export type PropuestaFeriaResponseDtoEstado = typeof PropuestaFeriaResponseDtoEstado[keyof typeof PropuestaFeriaResponseDtoEstado];
+
 
 export const PropuestaFeriaResponseDtoEstado = {
-  POSTULADO: "POSTULADO",
-  RECHAZADO: "RECHAZADO",
-  ACEPTADO: "ACEPTADO",
+  POSTULADO: 'POSTULADO',
+  RECHAZADO: 'RECHAZADO',
+  ACEPTADO: 'ACEPTADO',
 } as const;

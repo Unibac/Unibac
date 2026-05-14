@@ -6,11 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 
-export type FeriasControllerFindPropuestasPorFeriaEstado =
-  (typeof FeriasControllerFindPropuestasPorFeriaEstado)[keyof typeof FeriasControllerFindPropuestasPorFeriaEstado];
+export type FeriasControllerFindPropuestasPorFeriaEstado = typeof FeriasControllerFindPropuestasPorFeriaEstado[keyof typeof FeriasControllerFindPropuestasPorFeriaEstado];
+
 
 export const FeriasControllerFindPropuestasPorFeriaEstado = {
-  POSTULADO: "POSTULADO",
-  RECHAZADO: "RECHAZADO",
-  ACEPTADO: "ACEPTADO",
+  POSTULADO: 'POSTULADO',
+  RECHAZADO: 'RECHAZADO',
+  ACEPTADO: 'ACEPTADO',
 } as const;

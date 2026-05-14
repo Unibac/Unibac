@@ -9,138 +9,98 @@ import type {
   CreateEgresadoDto,
   EgresadoResponseDto,
   EgresadosControllerFindAllParams,
-  UpdateEgresadoDto,
-} from "../models";
+  UpdateEgresadoDto
+} from '../models';
 
-import { customInstance } from "../../../lib/api/mutator";
+import { customInstance } from '../../../lib/api/mutator';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
-export const getEgresados = () => {
-  /**
-   * Filtros opcionales por nombre, año, programa/carrera y estado laboral.
-   * @summary Listar egresados
-   */
-  const egresadosControllerFindAll = (
+
+  export const getEgresados = () => {
+/**
+ * Filtros opcionales por nombre, año, programa/carrera y estado laboral.
+ * @summary Listar egresados
+ */
+const egresadosControllerFindAll = (
     params?: EgresadosControllerFindAllParams,
-    options?: SecondParameter<typeof customInstance<EgresadoResponseDto[]>>,
-  ) => {
-    return customInstance<EgresadoResponseDto[]>(
-      { url: `/egresados`, method: "GET", params },
-      options,
-    );
-  };
+ options?: SecondParameter<typeof customInstance<EgresadoResponseDto[]>>,) => {
+      return customInstance<EgresadoResponseDto[]>(
+      {url: `/egresados`, method: 'GET',
+        params
+    },
+      options);
+    }
   /**
-   * El registro queda ligado al usuario de la sesión. Si la cuenta no tenía correo, se actualiza en la misma operación.
-   * @summary Registrar mi perfil de egresado
-   */
-  const egresadosControllerCreate = (
+ * El registro queda ligado al usuario de la sesión. Si la cuenta no tenía correo, se actualiza en la misma operación.
+ * @summary Registrar mi perfil de egresado
+ */
+const egresadosControllerCreate = (
     createEgresadoDto: CreateEgresadoDto,
-    options?: SecondParameter<typeof customInstance<EgresadoResponseDto>>,
-  ) => {
-    return customInstance<EgresadoResponseDto>(
-      {
-        url: `/egresados`,
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        data: createEgresadoDto,
-      },
-      options,
-    );
-  };
+ options?: SecondParameter<typeof customInstance<EgresadoResponseDto>>,) => {
+      return customInstance<EgresadoResponseDto>(
+      {url: `/egresados`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createEgresadoDto
+    },
+      options);
+    }
   /**
-   * Incluye vínculos opcionales con perfil de talento y directorio cuando existan.
-   * @summary Obtener mi registro de egresado
-   */
-  const egresadosControllerFindMe = (
-    options?: SecondParameter<typeof customInstance<EgresadoResponseDto>>,
-  ) => {
-    return customInstance<EgresadoResponseDto>(
-      { url: `/egresados/me`, method: "GET" },
-      options,
-    );
-  };
+ * Incluye vínculos opcionales con perfil de talento y directorio cuando existan.
+ * @summary Obtener mi registro de egresado
+ */
+const egresadosControllerFindMe = (
+
+ options?: SecondParameter<typeof customInstance<EgresadoResponseDto>>,) => {
+      return customInstance<EgresadoResponseDto>(
+      {url: `/egresados/me`, method: 'GET'
+    },
+      options);
+    }
   /**
-   * Incluye vínculos opcionales con perfil de talento y directorio cuando existan.
-   * @summary Obtener egresado por id
-   */
-  const egresadosControllerFindOne = (
+ * Incluye vínculos opcionales con perfil de talento y directorio cuando existan.
+ * @summary Obtener egresado por id
+ */
+const egresadosControllerFindOne = (
     id: number,
-    options?: SecondParameter<typeof customInstance<EgresadoResponseDto>>,
-  ) => {
-    return customInstance<EgresadoResponseDto>(
-      { url: `/egresados/${id}`, method: "GET" },
-      options,
-    );
-  };
+ options?: SecondParameter<typeof customInstance<EgresadoResponseDto>>,) => {
+      return customInstance<EgresadoResponseDto>(
+      {url: `/egresados/${id}`, method: 'GET'
+    },
+      options);
+    }
   /**
-   * Solo el dueño del registro o un administrador.
-   * @summary Actualizar egresado
-   */
-  const egresadosControllerUpdate = (
+ * Solo el dueño del registro o un administrador.
+ * @summary Actualizar egresado
+ */
+const egresadosControllerUpdate = (
     id: number,
     updateEgresadoDto: UpdateEgresadoDto,
-    options?: SecondParameter<typeof customInstance<EgresadoResponseDto>>,
-  ) => {
-    return customInstance<EgresadoResponseDto>(
-      {
-        url: `/egresados/${id}`,
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        data: updateEgresadoDto,
-      },
-      options,
-    );
-  };
+ options?: SecondParameter<typeof customInstance<EgresadoResponseDto>>,) => {
+      return customInstance<EgresadoResponseDto>(
+      {url: `/egresados/${id}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateEgresadoDto
+    },
+      options);
+    }
   /**
-   * Solo nivel ADMINISTRADOR puede eliminar (aunque exista permiso ELIMINACION).
-   * @summary Eliminar egresado
-   */
-  const egresadosControllerRemove = (
+ * Solo nivel ADMINISTRADOR puede eliminar (aunque exista permiso ELIMINACION).
+ * @summary Eliminar egresado
+ */
+const egresadosControllerRemove = (
     id: number,
-    options?: SecondParameter<typeof customInstance<void>>,
-  ) => {
-    return customInstance<void>(
-      { url: `/egresados/${id}`, method: "DELETE" },
-      options,
-    );
-  };
-  return {
-    egresadosControllerFindAll,
-    egresadosControllerCreate,
-    egresadosControllerFindMe,
-    egresadosControllerFindOne,
-    egresadosControllerUpdate,
-    egresadosControllerRemove,
-  };
-};
-export type EgresadosControllerFindAllResult = NonNullable<
-  Awaited<
-    ReturnType<ReturnType<typeof getEgresados>["egresadosControllerFindAll"]>
-  >
->;
-export type EgresadosControllerCreateResult = NonNullable<
-  Awaited<
-    ReturnType<ReturnType<typeof getEgresados>["egresadosControllerCreate"]>
-  >
->;
-export type EgresadosControllerFindMeResult = NonNullable<
-  Awaited<
-    ReturnType<ReturnType<typeof getEgresados>["egresadosControllerFindMe"]>
-  >
->;
-export type EgresadosControllerFindOneResult = NonNullable<
-  Awaited<
-    ReturnType<ReturnType<typeof getEgresados>["egresadosControllerFindOne"]>
-  >
->;
-export type EgresadosControllerUpdateResult = NonNullable<
-  Awaited<
-    ReturnType<ReturnType<typeof getEgresados>["egresadosControllerUpdate"]>
-  >
->;
-export type EgresadosControllerRemoveResult = NonNullable<
-  Awaited<
-    ReturnType<ReturnType<typeof getEgresados>["egresadosControllerRemove"]>
-  >
->;
+ options?: SecondParameter<typeof customInstance<void>>,) => {
+      return customInstance<void>(
+      {url: `/egresados/${id}`, method: 'DELETE'
+    },
+      options);
+    }
+  return {egresadosControllerFindAll,egresadosControllerCreate,egresadosControllerFindMe,egresadosControllerFindOne,egresadosControllerUpdate,egresadosControllerRemove}};
+export type EgresadosControllerFindAllResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEgresados>['egresadosControllerFindAll']>>>
+export type EgresadosControllerCreateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEgresados>['egresadosControllerCreate']>>>
+export type EgresadosControllerFindMeResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEgresados>['egresadosControllerFindMe']>>>
+export type EgresadosControllerFindOneResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEgresados>['egresadosControllerFindOne']>>>
+export type EgresadosControllerUpdateResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEgresados>['egresadosControllerUpdate']>>>
+export type EgresadosControllerRemoveResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEgresados>['egresadosControllerRemove']>>>

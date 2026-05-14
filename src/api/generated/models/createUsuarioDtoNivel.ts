@@ -6,10 +6,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export type CreateUsuarioDtoNivel =
-  (typeof CreateUsuarioDtoNivel)[keyof typeof CreateUsuarioDtoNivel];
+export type CreateUsuarioDtoNivel = typeof CreateUsuarioDtoNivel[keyof typeof CreateUsuarioDtoNivel];
+
 
 export const CreateUsuarioDtoNivel = {
-  USUARIO: "USUARIO",
-  ADMINISTRADOR: "ADMINISTRADOR",
+  USUARIO: 'USUARIO',
+  ADMINISTRADOR: 'ADMINISTRADOR',
 } as const;

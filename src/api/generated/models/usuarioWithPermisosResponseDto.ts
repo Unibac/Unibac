@@ -5,12 +5,14 @@
  * Autenticación: POST /auth/login fija la cookie HttpOnly access_token. En Swagger UI, ejecuta login en este mismo origen y luego las rutas protegidas enviarán la cookie automáticamente. Desde el frontend usa fetch/axios con credentials: include. Registro público: POST /auth/register-public solo si PUBLIC_REGISTRATION_ENABLED=true.
  * OpenAPI spec version: 1.0
  */
-import type { PermisoEnUsuarioResponseDto } from "./permisoEnUsuarioResponseDto";
-import type { UsuarioWithPermisosResponseDtoCelular } from "./usuarioWithPermisosResponseDtoCelular";
-import type { UsuarioWithPermisosResponseDtoCorreo } from "./usuarioWithPermisosResponseDtoCorreo";
-import type { UsuarioWithPermisosResponseDtoDescripcion } from "./usuarioWithPermisosResponseDtoDescripcion";
-import type { UsuarioWithPermisosResponseDtoNivel } from "./usuarioWithPermisosResponseDtoNivel";
-import type { UsuarioWithPermisosResponseDtoTipo } from "./usuarioWithPermisosResponseDtoTipo";
+import type { PermisoEnUsuarioResponseDto } from './permisoEnUsuarioResponseDto';
+import type { UsuarioWithPermisosResponseDtoCategoria } from './usuarioWithPermisosResponseDtoCategoria';
+import type { UsuarioWithPermisosResponseDtoCelular } from './usuarioWithPermisosResponseDtoCelular';
+import type { UsuarioWithPermisosResponseDtoCorreo } from './usuarioWithPermisosResponseDtoCorreo';
+import type { UsuarioWithPermisosResponseDtoDescripcion } from './usuarioWithPermisosResponseDtoDescripcion';
+import type { UsuarioWithPermisosResponseDtoNivel } from './usuarioWithPermisosResponseDtoNivel';
+import type { UsuarioWithPermisosResponseDtoRolId } from './usuarioWithPermisosResponseDtoRolId';
+import type { UsuarioWithPermisosResponseDtoTipo } from './usuarioWithPermisosResponseDtoTipo';
 
 export interface UsuarioWithPermisosResponseDto {
   id: number;
@@ -21,5 +23,8 @@ export interface UsuarioWithPermisosResponseDto {
   tipo: UsuarioWithPermisosResponseDtoTipo;
   correo?: UsuarioWithPermisosResponseDtoCorreo;
   celular?: UsuarioWithPermisosResponseDtoCelular;
+  rolId?: UsuarioWithPermisosResponseDtoRolId;
+  categoria?: UsuarioWithPermisosResponseDtoCategoria;
+  /** Permisos efectivos del rol (compatibilidad con el modelo antiguo por usuario). */
   permisos: PermisoEnUsuarioResponseDto[];
 }
