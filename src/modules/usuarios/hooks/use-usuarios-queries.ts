@@ -1,9 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import {
-  listAccionesCatalog,
-  listModulosCatalog,
-} from "@/modules/usuarios/api/catalog-api";
+import { listRolesCatalog } from "@/modules/usuarios/api/roles-api";
 import { getUsuario, listUsuarios } from "@/modules/usuarios/api/usuarios-api";
 import {
   usuariosCatalogKeys,
@@ -32,18 +29,10 @@ export function useUsuarioDetailQuery(id: number | null, enabled: boolean) {
   });
 }
 
-export function useModulosCatalogQuery() {
+export function useRolesCatalogQuery() {
   return useQuery({
-    queryKey: usuariosCatalogKeys.modulos(),
-    queryFn: listModulosCatalog,
-    staleTime: CATALOG_STALE_MS,
-  });
-}
-
-export function useAccionesCatalogQuery() {
-  return useQuery({
-    queryKey: usuariosCatalogKeys.acciones(),
-    queryFn: listAccionesCatalog,
+    queryKey: usuariosCatalogKeys.roles(),
+    queryFn: listRolesCatalog,
     staleTime: CATALOG_STALE_MS,
   });
 }

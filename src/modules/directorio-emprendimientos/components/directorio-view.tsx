@@ -8,6 +8,7 @@ import {
   CreateDirectorioEmprendimientoDtoAreaCreativa,
   type DirectorioEmprendimientoResponseDto,
 } from "@/api/generated/models";
+import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -18,6 +19,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +43,7 @@ import {
 } from "@/components/ui/table";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
+import { directorioCanAccessModule } from "@/modules/auth/lib/profile-capabilities";
 import { DirectorioFormSheet } from "@/modules/directorio-emprendimientos/components/directorio-form-sheet";
 import { useDeleteDirectorioMutation } from "@/modules/directorio-emprendimientos/hooks/use-directorio-mutations";
 import { useDirectorioListQuery } from "@/modules/directorio-emprendimientos/hooks/use-directorio-queries";
@@ -62,6 +71,7 @@ function toCellText(value: unknown): string {
 }
 
 export function DirectorioView() {
+  const { layout } = useDashboardListLayout();
   const profile = useProfile();
   const listQuery = useDirectorioListQuery();
   const deleteMut = useDeleteDirectorioMutation();
@@ -124,6 +134,18 @@ export function DirectorioView() {
     }
   }
 
+  if (!directorioCanAccessModule(profile.data)) {
+    return (
+      <p
+        role="alert"
+        className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
+      >
+        No tenés acceso al directorio de emprendimientos con tu tipo de cuenta.
+        Si necesitás permisos, contactá a administración.
+      </p>
+    );
+  }
+
   if (listQuery.isPending) {
     return (
       <div className="flex flex-col gap-4">
@@ -171,91 +193,169 @@ export function DirectorioView() {
         </div>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Proyecto</TableHead>
-            <TableHead>Área</TableHead>
-            <TableHead>Activo</TableHead>
-            <TableHead>Correo</TableHead>
-            <TableHead>Sitio</TableHead>
-            <TableHead className="w-[72px] text-end">
-              <span className="sr-only">Acciones</span>
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={6}
-                className="text-center text-muted-foreground"
-              >
-                No hay emprendimientos registrados.
-              </TableCell>
-            </TableRow>
-          ) : (
-            rows.map((row) => {
+      {layout === "cards" ? (
+        rows.length === 0 ? (
+          <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
+            No hay emprendimientos registrados.
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {rows.map((row) => {
               const editable = canEditRow(row);
               const deletable = isAdmin === true;
               const showMenu = editable || deletable;
               return (
-                <TableRow key={row.id}>
-                  <TableCell className="font-medium">
-                    {row.nombreProyecto}
-                  </TableCell>
-                  <TableCell>
-                    {
-                      AREA_LABELS[
-                        row.areaCreativa as CreateDirectorioEmprendimientoDtoAreaCreativa
-                      ]
-                    }
-                  </TableCell>
-                  <TableCell>{row.perfilActivo ? "Sí" : "No"}</TableCell>
-                  <TableCell className="max-w-[160px] truncate text-muted-foreground">
-                    {toCellText(row.correo)}
-                  </TableCell>
-                  <TableCell className="max-w-[160px] truncate text-muted-foreground">
-                    {toCellText(row.sitioWeb)}
-                  </TableCell>
-                  <TableCell className="text-end">
-                    {showMenu ? (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={`Acciones para ${row.nombreProyecto}`}
-                          >
-                            <MoreVerticalIcon className="size-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {editable ? (
-                            <DropdownMenuItem onClick={() => openEdit(row)}>
-                              Editar
-                            </DropdownMenuItem>
-                          ) : null}
-                          {deletable ? (
-                            <DropdownMenuItem
-                              variant="destructive"
-                              onClick={() => setDeleteTargetId(row.id)}
-                            >
-                              Eliminar
-                            </DropdownMenuItem>
-                          ) : null}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </TableCell>
-                </TableRow>
+                <Card
+                  key={row.id}
+                  className="gap-0 py-0 transition-colors duration-150"
+                >
+                  <CardHeader className="gap-3 border-b border-border pb-4">
+                    <div className="flex min-w-0 flex-row items-start justify-between gap-2">
+                      <CardTitle className="truncate text-base leading-snug">
+                        {row.nombreProyecto}
+                      </CardTitle>
+                      {showMenu ? (
+                        <CardAction>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label={`Acciones para ${row.nombreProyecto}`}
+                              >
+                                <MoreVerticalIcon className="size-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {editable ? (
+                                <DropdownMenuItem onClick={() => openEdit(row)}>
+                                  Editar
+                                </DropdownMenuItem>
+                              ) : null}
+                              {deletable ? (
+                                <DropdownMenuItem
+                                  variant="destructive"
+                                  onClick={() => setDeleteTargetId(row.id)}
+                                >
+                                  Eliminar
+                                </DropdownMenuItem>
+                              ) : null}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </CardAction>
+                      ) : null}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-2 pt-4 pb-6 text-sm">
+                    <p className="text-xs text-muted-foreground">
+                      {
+                        AREA_LABELS[
+                          row.areaCreativa as CreateDirectorioEmprendimientoDtoAreaCreativa
+                        ]
+                      }
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {row.perfilActivo ? "Activo" : "Inactivo"}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {toCellText(row.correo)}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {toCellText(row.sitioWeb)}
+                    </p>
+                  </CardContent>
+                </Card>
               );
-            })
-          )}
-        </TableBody>
-      </Table>
+            })}
+          </div>
+        )
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Proyecto</TableHead>
+              <TableHead>Área</TableHead>
+              <TableHead>Activo</TableHead>
+              <TableHead>Correo</TableHead>
+              <TableHead>Sitio</TableHead>
+              <TableHead className="w-[72px] text-end">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rows.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="text-center text-muted-foreground"
+                >
+                  No hay emprendimientos registrados.
+                </TableCell>
+              </TableRow>
+            ) : (
+              rows.map((row) => {
+                const editable = canEditRow(row);
+                const deletable = isAdmin === true;
+                const showMenu = editable || deletable;
+                return (
+                  <TableRow key={row.id}>
+                    <TableCell className="font-medium">
+                      {row.nombreProyecto}
+                    </TableCell>
+                    <TableCell>
+                      {
+                        AREA_LABELS[
+                          row.areaCreativa as CreateDirectorioEmprendimientoDtoAreaCreativa
+                        ]
+                      }
+                    </TableCell>
+                    <TableCell>{row.perfilActivo ? "Sí" : "No"}</TableCell>
+                    <TableCell className="max-w-[160px] truncate text-muted-foreground">
+                      {toCellText(row.correo)}
+                    </TableCell>
+                    <TableCell className="max-w-[160px] truncate text-muted-foreground">
+                      {toCellText(row.sitioWeb)}
+                    </TableCell>
+                    <TableCell className="text-end">
+                      {showMenu ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={`Acciones para ${row.nombreProyecto}`}
+                            >
+                              <MoreVerticalIcon className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {editable ? (
+                              <DropdownMenuItem onClick={() => openEdit(row)}>
+                                Editar
+                              </DropdownMenuItem>
+                            ) : null}
+                            {deletable ? (
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => setDeleteTargetId(row.id)}
+                              >
+                                Eliminar
+                              </DropdownMenuItem>
+                            ) : null}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      )}
 
       <DirectorioFormSheet
         open={sheetOpen}

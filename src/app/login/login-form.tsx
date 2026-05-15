@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon, LogInIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { UnibacLogo } from "@/components/shared/unibac-logo";
@@ -28,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { useLogin } from "@/modules/auth/hooks/use-login";
+import { isPublicRegistrationEnabled } from "@/modules/auth/lib/public-registration-enabled";
 import {
   type LoginFormValues,
   loginSchema,
@@ -37,6 +38,21 @@ export function LoginForm() {
   const router = useRouter();
   const login = useLogin();
   const [apiError, setApiError] = useState<string | null>(null);
+  const [registeredHint, setRegisteredHint] = useState<string | null>(null);
+  const registrationEnabled = isPublicRegistrationEnabled();
+
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    if (sp.get("registrado") === "1") {
+      setRegisteredHint(
+        "Cuenta creada. Iniciá sesión con tu usuario y contraseña.",
+      );
+      sp.delete("registrado");
+      const qs = sp.toString();
+      const path = `${window.location.pathname}${qs ? `?${qs}` : ""}`;
+      window.history.replaceState(null, "", path);
+    }
+  }, []);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -68,6 +84,14 @@ export function LoginForm() {
       <Form {...form}>
         <form onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}>
           <CardContent className="flex flex-col gap-4">
+            {registeredHint ? (
+              <p
+                role="status"
+                className="rounded-md border border-success/40 bg-success/10 px-3 py-2 text-xs text-success-foreground"
+              >
+                {registeredHint}
+              </p>
+            ) : null}
             {apiError ? (
               <p
                 role="alert"
@@ -121,6 +145,16 @@ export function LoginForm() {
               )}
               Entrar
             </Button>
+            {registrationEnabled ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                asChild
+              >
+                <Link href="/register">Registrarse</Link>
+              </Button>
+            ) : null}
             <p className="text-center text-xs text-muted-foreground">
               <Link href="/" className="underline underline-offset-4">
                 Volver al inicio

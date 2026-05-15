@@ -9,6 +9,7 @@ import {
   CreateTalentoPerfilDtoTipoPerfil,
   type TalentoPerfilResponseDto,
 } from "@/api/generated/models";
+import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -19,6 +20,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +45,7 @@ import {
 } from "@/components/ui/table";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
+import { talentoCanAccessModule } from "@/modules/auth/lib/profile-capabilities";
 import { TalentoPerfilFormSheet } from "@/modules/talento-perfiles/components/talento-perfil-form-sheet";
 import { useDeleteTalentoMutation } from "@/modules/talento-perfiles/hooks/use-talento-mutations";
 import { useTalentoListQuery } from "@/modules/talento-perfiles/hooks/use-talento-queries";
@@ -68,6 +77,7 @@ function toCellText(value: unknown): string {
 
 export function TalentoPerfilesView() {
   const profile = useProfile();
+  const { layout } = useDashboardListLayout();
   const listQuery = useTalentoListQuery();
   const deleteMut = useDeleteTalentoMutation();
 
@@ -141,6 +151,19 @@ export function TalentoPerfilesView() {
     }
   }
 
+  if (!talentoCanAccessModule(profile.data)) {
+    return (
+      <p
+        role="alert"
+        className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
+      >
+        El banco de talento está disponible para personal institucional o
+        cuentas estudiante/egresado. Si necesitás acceso, contactá a
+        administración.
+      </p>
+    );
+  }
+
   if (listQuery.isPending) {
     return (
       <div className="flex flex-col gap-4">
@@ -199,34 +222,16 @@ export function TalentoPerfilesView() {
         />
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Área</TableHead>
-            <TableHead>Tipo</TableHead>
-            <TableHead>Activo</TableHead>
-            <TableHead>Contacto</TableHead>
-            <TableHead>Portafolio</TableHead>
-            <TableHead className="w-[72px] text-end">
-              <span className="sr-only">Acciones</span>
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredRows.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={7}
-                className="text-center text-muted-foreground"
-              >
-                {rows.length === 0
-                  ? "No hay perfiles registrados."
-                  : "Ningún perfil coincide con la búsqueda."}
-              </TableCell>
-            </TableRow>
-          ) : (
-            filteredRows.map((row) => {
+      {layout === "cards" ? (
+        filteredRows.length === 0 ? (
+          <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
+            {rows.length === 0
+              ? "No hay perfiles registrados."
+              : "Ningún perfil coincide con la búsqueda."}
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {filteredRows.map((row) => {
               const editable = canEditRow(row);
               const deletable = isAdmin === true;
               const showMenu = editable || deletable;
@@ -237,65 +242,174 @@ export function TalentoPerfilesView() {
                 .filter((t) => t !== "—")
                 .join(" · ");
               return (
-                <TableRow key={row.id}>
-                  <TableCell className="font-medium">
-                    {row.nombreCompleto}
-                  </TableCell>
-                  <TableCell>
-                    {AREA_LABELS[row.area as CreateTalentoPerfilDtoArea]}
-                  </TableCell>
-                  <TableCell>
-                    {
-                      TIPO_PERFIL_LABELS[
-                        row.tipoPerfil as CreateTalentoPerfilDtoTipoPerfil
-                      ]
-                    }
-                  </TableCell>
-                  <TableCell>{row.perfilActivo ? "Sí" : "No"}</TableCell>
-                  <TableCell className="max-w-[180px] truncate text-muted-foreground">
-                    {contacto || "—"}
-                  </TableCell>
-                  <TableCell className="max-w-[160px] truncate text-muted-foreground">
-                    {toCellText(row.portafolioUrl)}
-                  </TableCell>
-                  <TableCell className="text-end">
-                    {showMenu ? (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={`Acciones para ${row.nombreCompleto}`}
-                          >
-                            <MoreVerticalIcon className="size-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {editable ? (
-                            <DropdownMenuItem onClick={() => openEdit(row)}>
-                              Editar
-                            </DropdownMenuItem>
-                          ) : null}
-                          {deletable ? (
-                            <DropdownMenuItem
-                              variant="destructive"
-                              onClick={() => setDeleteTargetId(row.id)}
-                            >
-                              Eliminar
-                            </DropdownMenuItem>
-                          ) : null}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </TableCell>
-                </TableRow>
+                <Card
+                  key={row.id}
+                  className="gap-0 py-0 transition-colors duration-150"
+                >
+                  <CardHeader className="gap-3 border-b border-border pb-4">
+                    <div className="flex min-w-0 flex-row items-start justify-between gap-2">
+                      <CardTitle className="truncate text-base leading-snug">
+                        {row.nombreCompleto}
+                      </CardTitle>
+                      {showMenu ? (
+                        <CardAction>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label={`Acciones para ${row.nombreCompleto}`}
+                              >
+                                <MoreVerticalIcon className="size-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {editable ? (
+                                <DropdownMenuItem onClick={() => openEdit(row)}>
+                                  Editar
+                                </DropdownMenuItem>
+                              ) : null}
+                              {deletable ? (
+                                <DropdownMenuItem
+                                  variant="destructive"
+                                  onClick={() => setDeleteTargetId(row.id)}
+                                >
+                                  Eliminar
+                                </DropdownMenuItem>
+                              ) : null}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </CardAction>
+                      ) : null}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-2 pt-4 pb-6 text-sm">
+                    <div className="flex flex-wrap gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                      <span>
+                        {AREA_LABELS[row.area as CreateTalentoPerfilDtoArea]}
+                      </span>
+                      <span aria-hidden>·</span>
+                      <span>
+                        {
+                          TIPO_PERFIL_LABELS[
+                            row.tipoPerfil as CreateTalentoPerfilDtoTipoPerfil
+                          ]
+                        }
+                      </span>
+                      <span aria-hidden>·</span>
+                      <span>{row.perfilActivo ? "Activo" : "Inactivo"}</span>
+                    </div>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {contacto || "—"}
+                    </p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {toCellText(row.portafolioUrl)}
+                    </p>
+                  </CardContent>
+                </Card>
               );
-            })
-          )}
-        </TableBody>
-      </Table>
+            })}
+          </div>
+        )
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Área</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Activo</TableHead>
+              <TableHead>Contacto</TableHead>
+              <TableHead>Portafolio</TableHead>
+              <TableHead className="w-[72px] text-end">
+                <span className="sr-only">Acciones</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredRows.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={7}
+                  className="text-center text-muted-foreground"
+                >
+                  {rows.length === 0
+                    ? "No hay perfiles registrados."
+                    : "Ningún perfil coincide con la búsqueda."}
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredRows.map((row) => {
+                const editable = canEditRow(row);
+                const deletable = isAdmin === true;
+                const showMenu = editable || deletable;
+                const contacto = [
+                  toCellText(row.correoContacto),
+                  toCellText(row.telefono),
+                ]
+                  .filter((t) => t !== "—")
+                  .join(" · ");
+                return (
+                  <TableRow key={row.id}>
+                    <TableCell className="font-medium">
+                      {row.nombreCompleto}
+                    </TableCell>
+                    <TableCell>
+                      {AREA_LABELS[row.area as CreateTalentoPerfilDtoArea]}
+                    </TableCell>
+                    <TableCell>
+                      {
+                        TIPO_PERFIL_LABELS[
+                          row.tipoPerfil as CreateTalentoPerfilDtoTipoPerfil
+                        ]
+                      }
+                    </TableCell>
+                    <TableCell>{row.perfilActivo ? "Sí" : "No"}</TableCell>
+                    <TableCell className="max-w-[180px] truncate text-muted-foreground">
+                      {contacto || "—"}
+                    </TableCell>
+                    <TableCell className="max-w-[160px] truncate text-muted-foreground">
+                      {toCellText(row.portafolioUrl)}
+                    </TableCell>
+                    <TableCell className="text-end">
+                      {showMenu ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={`Acciones para ${row.nombreCompleto}`}
+                            >
+                              <MoreVerticalIcon className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {editable ? (
+                              <DropdownMenuItem onClick={() => openEdit(row)}>
+                                Editar
+                              </DropdownMenuItem>
+                            ) : null}
+                            {deletable ? (
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => setDeleteTargetId(row.id)}
+                              >
+                                Eliminar
+                              </DropdownMenuItem>
+                            ) : null}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      )}
 
       <TalentoPerfilFormSheet
         open={sheetOpen}

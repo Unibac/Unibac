@@ -1,14 +1,5 @@
 "use client";
 
-import {
-  BriefcaseIcon,
-  Building2Icon,
-  CalendarDaysIcon,
-  HomeIcon,
-  MegaphoneIcon,
-  UserSquareIcon,
-  UsersIcon,
-} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -25,31 +16,23 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-
-const navItems = [
-  { href: "/dashboard", label: "Inicio", icon: HomeIcon },
-  { href: "/dashboard/usuarios", label: "Usuarios", icon: UsersIcon },
-  { href: "/dashboard/egresados", label: "Egresados", icon: UserSquareIcon },
-  {
-    href: "/dashboard/directorio-emprendimientos",
-    label: "Directorio emprendimientos",
-    icon: Building2Icon,
-  },
-  {
-    href: "/dashboard/convocatorias",
-    label: "Convocatorias",
-    icon: MegaphoneIcon,
-  },
-  {
-    href: "/dashboard/talento-perfiles",
-    label: "Talento",
-    icon: BriefcaseIcon,
-  },
-  { href: "/dashboard/ferias", label: "Ferias", icon: CalendarDaysIcon },
-] as const;
+import { useProfile } from "@/modules/auth/hooks/use-profile";
+import { DASHBOARD_NAV_ITEM_DATA } from "@/modules/auth/lib/dashboard-nav-items";
+import { getVisibleDashboardNavHrefs } from "@/modules/auth/lib/dashboard-sidebar-policy";
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const profile = useProfile();
+
+  const visible =
+    profile.data != null
+      ? getVisibleDashboardNavHrefs(profile.data)
+      : (["/dashboard"] as const);
+
+  const visibleSet = new Set<string>(visible);
+  const navItems = DASHBOARD_NAV_ITEM_DATA.filter((item) =>
+    visibleSet.has(item.href),
+  );
 
   return (
     <Sidebar collapsible="icon" variant="inset">

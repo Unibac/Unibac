@@ -6,6 +6,5 @@ export const usuariosKeys = {
 
 export const usuariosCatalogKeys = {
   all: ["usuarios-catalog"] as const,
-  modulos: () => [...usuariosCatalogKeys.all, "modulos"] as const,
-  acciones: () => [...usuariosCatalogKeys.all, "acciones"] as const,
+  roles: () => [...usuariosCatalogKeys.all, "roles"] as const,
 };

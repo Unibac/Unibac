@@ -12,7 +12,15 @@ import {
   type PropuestaFeriaResponseDto,
   PropuestaFeriaResponseDtoEstado,
 } from "@/api/generated/models";
+import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +45,7 @@ import {
 } from "@/components/ui/table";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
+import { feriasCanAccessModule } from "@/modules/auth/lib/profile-capabilities";
 import {
   ModerarPropuestaDialog,
   type ModerarPropuestaTarget,
@@ -88,6 +97,7 @@ type EstadoFiltroUi =
 
 export function FeriaDetailView({ feriaId }: { feriaId: number }) {
   const profile = useProfile();
+  const { layout } = useDashboardListLayout();
   const feriaQuery = useFeriaDetailQuery(feriaId);
   const [estadoFiltro, setEstadoFiltro] = useState<EstadoFiltroUi>("todas");
   const isAdmin = feriasIsAdmin(profile.data);
@@ -172,6 +182,23 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
   }
 
   if (!feria) return null;
+
+  if (!feriasCanAccessModule(profile.data)) {
+    return (
+      <div className="flex flex-col gap-4">
+        <p
+          role="alert"
+          className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
+        >
+          No tenés acceso a ferias con tu tipo de cuenta. Si necesitás permisos,
+          contactá a administración.
+        </p>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/dashboard/ferias">Volver al listado</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -276,6 +303,105 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
           >
             {getApiErrorMessage(propuestasQuery.error)}
           </p>
+        ) : layout === "cards" ? (
+          rows.length === 0 ? (
+            <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
+              No hay propuestas para mostrar.
+            </p>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {rows.map((row) => {
+                const editable = canEditPropuesta(row);
+                const moderar =
+                  isAdmin &&
+                  row.estado === PropuestaFeriaResponseDtoEstado.POSTULADO;
+                const menu = editable || moderar;
+                return (
+                  <Card
+                    key={row.id}
+                    className="gap-0 py-0 transition-colors duration-150"
+                  >
+                    <CardHeader className="gap-3 border-b border-border pb-4">
+                      <div className="flex min-w-0 flex-row items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <CardTitle className="text-base leading-snug">
+                            {row.nombreEmprendimiento}
+                          </CardTitle>
+                          <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+                            {row.descripcionCorta}
+                          </p>
+                        </div>
+                        {menu ? (
+                          <CardAction>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  aria-label={`Acciones para ${row.nombreEmprendimiento}`}
+                                >
+                                  <MoreVerticalIcon className="size-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                {editable ? (
+                                  <DropdownMenuItem
+                                    onClick={() => openEditPropuesta(row)}
+                                  >
+                                    Editar mi propuesta
+                                  </DropdownMenuItem>
+                                ) : null}
+                                {moderar ? (
+                                  <>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        setModerarTarget({
+                                          propuesta: row,
+                                          accion: "aceptar",
+                                        })
+                                      }
+                                    >
+                                      Aceptar
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      variant="destructive"
+                                      onClick={() =>
+                                        setModerarTarget({
+                                          propuesta: row,
+                                          accion: "rechazar",
+                                        })
+                                      }
+                                    >
+                                      Rechazar
+                                    </DropdownMenuItem>
+                                  </>
+                                ) : null}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </CardAction>
+                        ) : null}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-2 pt-4 pb-6 text-sm">
+                      <p className="text-xs text-muted-foreground">
+                        {
+                          AREA_LABELS[
+                            row.areaCreativa as CreatePropuestaFeriaDtoAreaCreativa
+                          ]
+                        }
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {ESTADO_PROP_LABELS[row.estado]}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {row.correo}
+                      </p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )
         ) : (
           <Table>
             <TableHeader>

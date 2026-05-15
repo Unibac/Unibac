@@ -2,17 +2,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import type {
   CreateUsuarioDto,
-  PermisoEnUsuarioResponseDto,
   UpdateUsuarioDto,
 } from "@/api/generated/models";
 
-import { createPermiso } from "@/modules/usuarios/api/permisos-assign-api";
 import {
   createUsuario,
   deleteUsuario,
   updateUsuario,
 } from "@/modules/usuarios/api/usuarios-api";
-import { syncUsuarioPermisosDiff } from "@/modules/usuarios/lib/sync-usuario-permisos";
 import { usuariosKeys } from "@/modules/usuarios/query-keys";
 import type {
   CreateUsuarioFormValues,
@@ -29,6 +26,7 @@ function buildCreateDto(values: CreateUsuarioFormValues): CreateUsuarioDto {
     tipo: values.tipo,
     correo: values.correo,
     celular: values.celular,
+    rolId: values.rolId,
   };
 }
 
@@ -59,26 +57,18 @@ function buildUpdateDto(values: UpdateUsuarioFormValues): UpdateUsuarioDto {
   if (values.celular !== undefined) {
     dto.celular = values.celular;
   }
+  if (values.rolId !== undefined) {
+    dto.rolId = values.rolId;
+  }
   return dto;
 }
 
-export function useCreateUsuarioWithPermisosMutation() {
+export function useCreateUsuarioMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (values: CreateUsuarioFormValues) => {
-      const created = await createUsuario(buildCreateDto(values));
-      const settled = await Promise.allSettled(
-        values.permisos.map((p) =>
-          createPermiso({
-            usuarioId: created.id,
-            moduloId: p.moduloId,
-            accionId: p.accionId,
-          }),
-        ),
-      );
-      const failures = settled.filter((r) => r.status === "rejected").length;
-      return { created, failures };
+      return createUsuario(buildCreateDto(values));
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: usuariosKeys.list() });
@@ -93,17 +83,14 @@ export function useUpdateUsuarioMutation() {
     mutationFn: async ({
       id,
       values,
-      previousPermisos,
     }: {
       id: number;
       values: UpdateUsuarioFormValues;
-      previousPermisos: PermisoEnUsuarioResponseDto[];
     }) => {
       const dto = buildUpdateDto(values);
       if (Object.keys(dto).length > 0) {
         await updateUsuario(id, dto);
       }
-      await syncUsuarioPermisosDiff(id, values.permisos, previousPermisos);
     },
     onSuccess: (_data, variables) => {
       void queryClient.invalidateQueries({ queryKey: usuariosKeys.list() });

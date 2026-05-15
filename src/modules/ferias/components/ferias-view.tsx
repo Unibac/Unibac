@@ -9,6 +9,7 @@ import {
   FeriaResponseDtoPeriodo,
   PropuestaFeriaResponseDtoEstado,
 } from "@/api/generated/models";
+import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -19,6 +20,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +46,7 @@ import {
 } from "@/components/ui/table";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
+import { feriasCanAccessModule } from "@/modules/auth/lib/profile-capabilities";
 import { FeriaFormSheet } from "@/modules/ferias/components/feria-form-sheet";
 import { useDeleteFeriaMutation } from "@/modules/ferias/hooks/use-ferias-mutations";
 import {
@@ -62,6 +72,7 @@ const ESTADO_PROP_LABELS: Record<PropuestaFeriaResponseDtoEstado, string> = {
 
 export function FeriasView() {
   const profile = useProfile();
+  const { layout } = useDashboardListLayout();
   const listQuery = useFeriasListQuery();
   const misPropuestasQuery = useMisPropuestasQuery(
     Boolean(profile.data && feriasCanPostular(profile.data)),
@@ -119,6 +130,18 @@ export function FeriasView() {
 
   const misRows = misPropuestasQuery.data ?? [];
 
+  if (!feriasCanAccessModule(profile.data)) {
+    return (
+      <p
+        role="alert"
+        className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
+      >
+        No tenés acceso a ferias con tu tipo de cuenta. Si necesitás permisos,
+        contactá a administración.
+      </p>
+    );
+  }
+
   if (listQuery.isPending) {
     return (
       <div className="flex flex-col gap-4">
@@ -157,6 +180,36 @@ export function FeriasView() {
             <p className="text-sm text-muted-foreground">
               Todavía no registraste propuestas en ninguna feria.
             </p>
+          ) : layout === "cards" ? (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {misRows.map((p) => (
+                <Card
+                  key={p.id}
+                  className="gap-0 py-0 transition-colors duration-150"
+                >
+                  <CardHeader className="gap-2 border-b border-border pb-4">
+                    <CardTitle className="line-clamp-2 text-base leading-snug">
+                      {p.nombreEmprendimiento}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-2 pt-4 pb-4 text-sm">
+                    <p className="text-xs text-muted-foreground">
+                      {p.feria?.nombre ?? `Feria #${p.feriaId}`}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {ESTADO_PROP_LABELS[p.estado]}
+                    </p>
+                  </CardContent>
+                  <CardFooter className="border-t border-border pt-4 pb-6">
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={`/dashboard/ferias/${p.feriaId}`}>
+                        Ver feria
+                      </Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
           ) : (
             <Table>
               <TableHeader>
@@ -217,90 +270,183 @@ export function FeriasView() {
           />
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Período</TableHead>
-              <TableHead>Inicio</TableHead>
-              <TableHead>Fin</TableHead>
-              <TableHead className="w-[72px] text-end">
-                <span className="sr-only">Acciones</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredRows.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="text-center text-muted-foreground"
-                >
-                  {rows.length === 0
-                    ? "No hay ferias cargadas."
-                    : "Ninguna feria coincide con la búsqueda."}
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredRows.map((row) => {
+        {layout === "cards" ? (
+          filteredRows.length === 0 ? (
+            <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
+              {rows.length === 0
+                ? "No hay ferias cargadas."
+                : "Ninguna feria coincide con la búsqueda."}
+            </p>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {filteredRows.map((row) => {
                 const showAdminMenu = isAdmin;
                 return (
-                  <TableRow key={row.id}>
-                    <TableCell className="font-medium">{row.nombre}</TableCell>
-                    <TableCell className="text-xs">
-                      {PERIODO_LABELS[row.periodo]}
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      <time dateTime={row.fechaInicio}>
-                        {new Date(row.fechaInicio).toLocaleDateString()}
-                      </time>
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      <time dateTime={row.fechaFin}>
-                        {new Date(row.fechaFin).toLocaleDateString()}
-                      </time>
-                    </TableCell>
-                    <TableCell className="text-end">
-                      {showAdminMenu ? (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              aria-label={`Acciones para ${row.nombre}`}
-                            >
-                              <MoreVerticalIcon className="size-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                              <Link href={`/dashboard/ferias/${row.id}`}>
-                                Ver
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => openEdit(row)}>
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              variant="destructive"
-                              onClick={() => setDeleteTargetId(row.id)}
-                            >
-                              Eliminar
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      ) : (
+                  <Card
+                    key={row.id}
+                    className="gap-0 py-0 transition-colors duration-150"
+                  >
+                    <CardHeader className="gap-3 border-b border-border pb-4">
+                      <div className="flex min-w-0 flex-row items-start justify-between gap-2">
+                        <CardTitle className="line-clamp-2 text-base leading-snug">
+                          {row.nombre}
+                        </CardTitle>
+                        {showAdminMenu ? (
+                          <CardAction>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  aria-label={`Acciones para ${row.nombre}`}
+                                >
+                                  <MoreVerticalIcon className="size-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem asChild>
+                                  <Link href={`/dashboard/ferias/${row.id}`}>
+                                    Ver
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => openEdit(row)}>
+                                  Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  variant="destructive"
+                                  onClick={() => setDeleteTargetId(row.id)}
+                                >
+                                  Eliminar
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </CardAction>
+                        ) : null}
+                      </div>
+                    </CardHeader>
+                    <CardContent
+                      className={
+                        showAdminMenu
+                          ? "flex flex-col gap-2 pt-4 pb-6 text-xs text-muted-foreground"
+                          : "flex flex-col gap-2 pt-4 pb-4 text-xs text-muted-foreground"
+                      }
+                    >
+                      <p>{PERIODO_LABELS[row.periodo]}</p>
+                      <p>
+                        Inicio{" "}
+                        <time dateTime={row.fechaInicio}>
+                          {new Date(row.fechaInicio).toLocaleDateString()}
+                        </time>
+                      </p>
+                      <p>
+                        Fin{" "}
+                        <time dateTime={row.fechaFin}>
+                          {new Date(row.fechaFin).toLocaleDateString()}
+                        </time>
+                      </p>
+                    </CardContent>
+                    {!showAdminMenu ? (
+                      <CardFooter className="border-t border-border pt-4 pb-6">
                         <Button asChild variant="outline" size="sm">
                           <Link href={`/dashboard/ferias/${row.id}`}>Ver</Link>
                         </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
+                      </CardFooter>
+                    ) : null}
+                  </Card>
                 );
-              })
-            )}
-          </TableBody>
-        </Table>
+              })}
+            </div>
+          )
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nombre</TableHead>
+                <TableHead>Período</TableHead>
+                <TableHead>Inicio</TableHead>
+                <TableHead>Fin</TableHead>
+                <TableHead className="w-[72px] text-end">
+                  <span className="sr-only">Acciones</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredRows.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    className="text-center text-muted-foreground"
+                  >
+                    {rows.length === 0
+                      ? "No hay ferias cargadas."
+                      : "Ninguna feria coincide con la búsqueda."}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredRows.map((row) => {
+                  const showAdminMenu = isAdmin;
+                  return (
+                    <TableRow key={row.id}>
+                      <TableCell className="font-medium">
+                        {row.nombre}
+                      </TableCell>
+                      <TableCell className="text-xs">
+                        {PERIODO_LABELS[row.periodo]}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        <time dateTime={row.fechaInicio}>
+                          {new Date(row.fechaInicio).toLocaleDateString()}
+                        </time>
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        <time dateTime={row.fechaFin}>
+                          {new Date(row.fechaFin).toLocaleDateString()}
+                        </time>
+                      </TableCell>
+                      <TableCell className="text-end">
+                        {showAdminMenu ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label={`Acciones para ${row.nombre}`}
+                              >
+                                <MoreVerticalIcon className="size-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem asChild>
+                                <Link href={`/dashboard/ferias/${row.id}`}>
+                                  Ver
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => openEdit(row)}>
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => setDeleteTargetId(row.id)}
+                              >
+                                Eliminar
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : (
+                          <Button asChild variant="outline" size="sm">
+                            <Link href={`/dashboard/ferias/${row.id}`}>
+                              Ver
+                            </Link>
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        )}
       </section>
 
       <FeriaFormSheet

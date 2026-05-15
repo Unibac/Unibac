@@ -15,27 +15,10 @@ const tipoSchema = z.enum([
   CreateUsuarioDtoTipo.EXTERNO,
 ]);
 
-export const permisoParSchema = z.object({
-  moduloId: z.number().int().positive(),
-  accionId: z.number().int().positive(),
-});
-
-export const usuarioPermisosFormSchema = z
-  .array(permisoParSchema)
-  .superRefine((rows, ctx) => {
-    const seen = new Set<string>();
-    rows.forEach((row, index) => {
-      const key = `${row.moduloId}:${row.accionId}`;
-      if (seen.has(key)) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Este módulo y acción ya están en la lista",
-          path: [index],
-        });
-      }
-      seen.add(key);
-    });
-  });
+const rolIdSchema = z.coerce
+  .number()
+  .int()
+  .refine((n) => n > 0, { message: "Seleccioná un rol" });
 
 const optionalTrimmed = z
   .string()
@@ -59,7 +42,7 @@ export const createUsuarioFormSchema = z.object({
   tipo: tipoSchema,
   correo: optionalCorreo,
   celular: optionalTrimmed,
-  permisos: usuarioPermisosFormSchema,
+  rolId: rolIdSchema,
 });
 
 export type CreateUsuarioFormValues = z.infer<typeof createUsuarioFormSchema>;
@@ -74,7 +57,7 @@ export const updateUsuarioFormSchema = z
     tipo: tipoSchema.optional(),
     correo: optionalCorreo,
     celular: optionalTrimmed,
-    permisos: usuarioPermisosFormSchema,
+    rolId: rolIdSchema,
   })
   .superRefine((data, ctx) => {
     const c = data.clave?.trim() ?? "";

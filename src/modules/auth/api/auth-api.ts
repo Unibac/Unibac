@@ -1,5 +1,5 @@
 import { getAuth } from "@/api/generated/auth/auth";
-import type { LoginDto } from "@/api/generated/models";
+import type { LoginDto, RegisterPublicDto } from "@/api/generated/models";
 
 const auth = getAuth();
 
@@ -13,4 +13,8 @@ export async function logoutRequest() {
 
 export async function profileRequest() {
   return auth.authControllerGetProfile();
+}
+
+export async function registerPublicRequest(body: RegisterPublicDto) {
+  return auth.authControllerRegisterPublic(body);
 }

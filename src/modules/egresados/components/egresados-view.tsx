@@ -9,6 +9,7 @@ import {
   type EgresadoResponseDto,
   EgresadosControllerFindAllEstadoLaboral,
 } from "@/api/generated/models";
+import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -19,6 +20,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +53,7 @@ import {
 } from "@/components/ui/table";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
+import { egresadosCanAccessModule } from "@/modules/auth/lib/profile-capabilities";
 import { EgresadoFormSheet } from "@/modules/egresados/components/egresado-form-sheet";
 import { useDeleteEgresadoMutation } from "@/modules/egresados/hooks/use-egresado-mutations";
 import {
@@ -103,6 +112,7 @@ function vinculosLabel(e: EgresadoResponseDto): string {
 
 export function EgresadosView() {
   const profile = useProfile();
+  const { layout } = useDashboardListLayout();
   const meQuery = useEgresadoMeQuery();
   const [appliedFilters, setAppliedFilters] = useState<EgresadosListFilters>(
     {},
@@ -183,6 +193,19 @@ export function EgresadosView() {
     meQuery.isSuccess && !meQuery.isFetching && profile.data;
   const canRegisterSelf = showMeActions && meQuery.data === null;
   const myRecord = showMeActions ? meQuery.data : null;
+
+  if (!egresadosCanAccessModule(profile.data)) {
+    return (
+      <p
+        role="alert"
+        className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
+      >
+        El directorio de egresados está disponible solo para personal
+        institucional o cuentas de egresado. Si necesitás acceso, contactá a
+        administración.
+      </p>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -309,6 +332,77 @@ export function EgresadosView() {
         >
           {getApiErrorMessage(listQuery.error)}
         </p>
+      ) : layout === "cards" ? (
+        (listQuery.data ?? []).length === 0 ? (
+          <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
+            No hay egresados que coincidan con los filtros.
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {(listQuery.data ?? []).map((row) => {
+              const editable = canEditRow(row);
+              const deletable = isAdmin === true;
+              const showMenu = editable || deletable;
+              return (
+                <Card
+                  key={row.id}
+                  className="gap-0 py-0 transition-colors duration-150"
+                >
+                  <CardHeader className="gap-3 border-b border-border pb-4">
+                    <div className="flex min-w-0 flex-row items-start justify-between gap-2">
+                      <CardTitle className="truncate text-base leading-snug">
+                        {row.nombreCompleto}
+                      </CardTitle>
+                      {showMenu ? (
+                        <CardAction>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label={`Acciones para ${row.nombreCompleto}`}
+                              >
+                                <MoreVerticalIcon className="size-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {editable ? (
+                                <DropdownMenuItem onClick={() => openEdit(row)}>
+                                  Editar
+                                </DropdownMenuItem>
+                              ) : null}
+                              {deletable ? (
+                                <DropdownMenuItem
+                                  variant="destructive"
+                                  onClick={() => setDeleteTargetId(row.id)}
+                                >
+                                  Eliminar
+                                </DropdownMenuItem>
+                              ) : null}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </CardAction>
+                      ) : null}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-2 pt-4 pb-6 text-sm">
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                      <span className="tabular-nums">{row.anioEgreso}</span>
+                      <span>{ESTADO_TABLA_LABELS[row.estadoLaboral]}</span>
+                    </div>
+                    <p className="truncate text-xs">{row.programaCarrera}</p>
+                    <p className="truncate text-xs text-muted-foreground">
+                      {row.correo}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {vinculosLabel(row)}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )
       ) : (
         <Table>
           <TableHeader>

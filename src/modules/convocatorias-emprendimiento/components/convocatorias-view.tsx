@@ -5,10 +5,10 @@ import { useMemo, useState } from "react";
 
 import {
   AuthProfileResponseDtoNivel,
-  AuthProfileResponseDtoTipo,
   CreatePublicacionConvocatoriaDtoTipoConvocatoria,
   type PublicacionEmprendimientoResponseDto,
 } from "@/api/generated/models";
+import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -19,6 +19,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,6 +51,10 @@ import {
 } from "@/components/ui/table";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
+import {
+  convocatoriasCanAccessModule,
+  convocatoriasCanPostular,
+} from "@/modules/auth/lib/profile-capabilities";
 import { ConvocatoriaFormSheet } from "@/modules/convocatorias-emprendimiento/components/convocatoria-form-sheet";
 import { PostulacionesSheet } from "@/modules/convocatorias-emprendimiento/components/postulaciones-sheet";
 import {
@@ -81,11 +92,10 @@ function isPast(iso: string): boolean {
 
 export function ConvocatoriasView() {
   const profile = useProfile();
+  const { layout } = useDashboardListLayout();
   const isAdmin =
     profile.data?.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR;
-  const canPostular =
-    profile.data?.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR ||
-    profile.data?.tipo === AuthProfileResponseDtoTipo.INTERNO;
+  const canPostular = convocatoriasCanPostular(profile.data);
 
   const [filters, setFilters] = useState<ConvocatoriasListFilters>({});
   const convocatoriasQuery = useConvocatoriasListQuery(filters);
@@ -165,6 +175,18 @@ export function ConvocatoriasView() {
     } catch (err) {
       setDeleteError(getApiErrorMessage(err));
     }
+  }
+
+  if (!convocatoriasCanAccessModule(profile.data)) {
+    return (
+      <p
+        role="alert"
+        className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
+      >
+        No tenés acceso a convocatorias con tu tipo de cuenta. Si necesitás
+        permisos, contactá a administración.
+      </p>
+    );
   }
 
   return (
@@ -256,6 +278,95 @@ export function ConvocatoriasView() {
         >
           {getApiErrorMessage(convocatoriasQuery.error)}
         </p>
+      ) : layout === "cards" ? (
+        rows.length === 0 ? (
+          <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
+            No hay convocatorias.
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {rows.map((row) => {
+              const alreadyPostulado = myPostulacionByPublicacionId.has(row.id);
+              const canPostularRow =
+                canPostular &&
+                row.activo &&
+                !isPast(row.fechaLimite) &&
+                !alreadyPostulado;
+              return (
+                <Card
+                  key={row.id}
+                  className="gap-0 py-0 transition-colors duration-150"
+                >
+                  <CardHeader className="gap-3 border-b border-border pb-4">
+                    <div className="flex min-w-0 flex-row items-start justify-between gap-2">
+                      <CardTitle className="line-clamp-2 text-base leading-snug">
+                        {row.titulo}
+                      </CardTitle>
+                      <CardAction>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={`Acciones para ${row.titulo}`}
+                            >
+                              <MoreVerticalIcon className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => openDetail(row)}>
+                              Ver detalle
+                            </DropdownMenuItem>
+                            {canPostularRow ? (
+                              <DropdownMenuItem
+                                onClick={() => void doPostular(row.id)}
+                              >
+                                Postular
+                              </DropdownMenuItem>
+                            ) : null}
+                            {isAdmin ? (
+                              <>
+                                <DropdownMenuItem onClick={() => openEdit(row)}>
+                                  Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => openPostulaciones(row.id)}
+                                >
+                                  Ver postulaciones
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  variant="destructive"
+                                  onClick={() => setDeleteTargetId(row.id)}
+                                >
+                                  Eliminar
+                                </DropdownMenuItem>
+                              </>
+                            ) : null}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </CardAction>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-2 pt-4 pb-6 text-sm">
+                    <p className="text-xs text-muted-foreground">
+                      {
+                        TIPO_LABELS[
+                          row.tipoConvocatoria as CreatePublicacionConvocatoriaDtoTipoConvocatoria
+                        ]
+                      }
+                    </p>
+                    <p className="text-xs tabular-nums text-muted-foreground">
+                      Límite: {formatFecha(row.fechaLimite)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {row.activo ? "Activa" : "Inactiva"}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )
       ) : (
         <Table>
           <TableHeader>
@@ -368,6 +479,29 @@ export function ConvocatoriasView() {
             <p className="mt-2 text-sm text-muted-foreground">
               No tenés postulaciones registradas.
             </p>
+          ) : layout === "cards" ? (
+            <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {myPostulaciones.map((p) => (
+                <Card
+                  key={p.id}
+                  className="gap-0 py-0 transition-colors duration-150"
+                >
+                  <CardHeader className="gap-2 border-b border-border pb-4">
+                    <CardTitle className="line-clamp-2 text-base leading-snug">
+                      {p.publicacion?.titulo ?? `#${p.publicacionId}`}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-2 pt-4 pb-6">
+                    <p className="text-xs text-muted-foreground">
+                      {p.estadoPostulacion}
+                    </p>
+                    <p className="text-xs tabular-nums text-muted-foreground">
+                      {formatFecha(p.fechaPostulacion)}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           ) : (
             <div className="mt-3">
               <Table>

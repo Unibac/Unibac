@@ -1,9 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2Icon, PlusIcon, Trash2Icon } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { type Resolver, useFieldArray, useForm } from "react-hook-form";
+import { type Resolver, useForm } from "react-hook-form";
 
 import {
   CreateUsuarioDtoNivel,
@@ -37,14 +37,14 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import {
-  useCreateUsuarioWithPermisosMutation,
+  useCreateUsuarioMutation,
   useUpdateUsuarioMutation,
 } from "@/modules/usuarios/hooks/use-usuario-mutations";
 import {
-  useAccionesCatalogQuery,
-  useModulosCatalogQuery,
+  useRolesCatalogQuery,
   useUsuarioDetailQuery,
 } from "@/modules/usuarios/hooks/use-usuarios-queries";
+import { parseOptionalRolId } from "@/modules/usuarios/lib/parse-rol-id";
 import {
   type CreateUsuarioFormValues,
   createUsuarioFormSchema,
@@ -61,7 +61,7 @@ function emptyCreateValues(): CreateUsuarioFormValues {
     tipo: CreateUsuarioDtoTipo.INTERNO,
     correo: "",
     celular: "",
-    permisos: [],
+    rolId: 0,
   };
 }
 
@@ -79,7 +79,6 @@ export function UsuarioFormSheet({
   usuarioId,
 }: UsuarioFormSheetProps) {
   const [apiError, setApiError] = useState<string | null>(null);
-  const [permisoWarn, setPermisoWarn] = useState<string | null>(null);
 
   const resolver = useMemo(
     () =>
@@ -94,33 +93,25 @@ export function UsuarioFormSheet({
     defaultValues: emptyCreateValues(),
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "permisos",
-  });
-
-  const modulosQuery = useModulosCatalogQuery();
-  const accionesQuery = useAccionesCatalogQuery();
+  const rolesQuery = useRolesCatalogQuery();
   const usuarioQuery = useUsuarioDetailQuery(
     usuarioId,
     open && mode === "edit" && usuarioId != null,
   );
 
-  const createMut = useCreateUsuarioWithPermisosMutation();
+  const createMut = useCreateUsuarioMutation();
   const updateMut = useUpdateUsuarioMutation();
 
-  const modulosActivos = useMemo(
-    () => (modulosQuery.data ?? []).filter((m) => m.activo),
-    [modulosQuery.data],
+  const rolesActivos = useMemo(
+    () => (rolesQuery.data ?? []).filter((r) => r.activo),
+    [rolesQuery.data],
   );
-  const acciones = accionesQuery.data ?? [];
 
   useEffect(() => {
     if (!open) {
       return;
     }
     setApiError(null);
-    setPermisoWarn(null);
     if (mode === "create") {
       form.reset(emptyCreateValues());
     }
@@ -131,6 +122,7 @@ export function UsuarioFormSheet({
       return;
     }
     const u = usuarioQuery.data;
+    const rolId = parseOptionalRolId(u.rolId) ?? 0;
     form.reset({
       usuario: u.usuario,
       clave: "",
@@ -145,39 +137,20 @@ export function UsuarioFormSheet({
         u.correo !== undefined && u.correo !== null ? String(u.correo) : "",
       celular:
         u.celular !== undefined && u.celular !== null ? String(u.celular) : "",
-      permisos: u.permisos.map((p) => ({
-        moduloId: p.moduloId,
-        accionId: p.accionId,
-      })),
+      rolId,
     });
   }, [open, mode, usuarioQuery.data, form]);
 
   const catalogPending =
-    modulosQuery.isPending ||
-    accionesQuery.isPending ||
+    rolesQuery.isPending ||
     (mode === "edit" && usuarioQuery.isPending && !usuarioQuery.isError);
-
-  function handleAppendPermiso() {
-    const m = modulosActivos[0]?.id;
-    const a = acciones[0]?.id;
-    if (m != null && a != null) {
-      append({ moduloId: m, accionId: a });
-    }
-  }
 
   async function onSubmit(values: CreateUsuarioFormValues) {
     setApiError(null);
-    setPermisoWarn(null);
     try {
       if (mode === "create") {
         const parsed = createUsuarioFormSchema.parse(values);
-        const result = await createMut.mutateAsync(parsed);
-        if (result.failures > 0) {
-          setPermisoWarn(
-            `Usuario creado. No se pudieron crear ${result.failures} permiso(s). Podés editar el usuario para completarlos.`,
-          );
-          return;
-        }
+        await createMut.mutateAsync(parsed);
         onOpenChange(false);
         return;
       }
@@ -189,7 +162,6 @@ export function UsuarioFormSheet({
       await updateMut.mutateAsync({
         id: usuarioId,
         values: parsed,
-        previousPermisos: usuarioQuery.data.permisos,
       });
       onOpenChange(false);
     } catch (err) {
@@ -211,8 +183,8 @@ export function UsuarioFormSheet({
           </SheetTitle>
           <SheetDescription>
             {mode === "create"
-              ? "Credenciales, nivel y permisos por módulo y acción."
-              : "Actualizá los datos y los permisos del usuario."}
+              ? "Credenciales, nivel y rol RBAC (los permisos vienen del rol)."
+              : "Actualizá los datos y el rol; los permisos efectivos son los del rol."}
           </SheetDescription>
         </SheetHeader>
 
@@ -226,6 +198,13 @@ export function UsuarioFormSheet({
           <div className="p-4">
             <p role="alert" className="text-xs text-destructive">
               {getApiErrorMessage(usuarioQuery.error)}
+            </p>
+          </div>
+        ) : rolesActivos.length === 0 ? (
+          <div className="p-4">
+            <p role="alert" className="text-xs text-muted-foreground">
+              No hay roles activos en el sistema. Creá roles en el backend antes
+              de asignar usuarios.
             </p>
           </div>
         ) : (
@@ -242,14 +221,6 @@ export function UsuarioFormSheet({
                       className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive"
                     >
                       {apiError}
-                    </p>
-                  ) : null}
-                  {permisoWarn ? (
-                    <p
-                      role="status"
-                      className="rounded-md border border-warning/40 bg-warning/15 px-3 py-2 text-xs text-warning-foreground"
-                    >
-                      {permisoWarn}
                     </p>
                   ) : null}
 
@@ -397,6 +368,34 @@ export function UsuarioFormSheet({
                       />
                       <FormField
                         control={form.control}
+                        name="rolId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Rol</FormLabel>
+                            <Select
+                              value={field.value > 0 ? String(field.value) : ""}
+                              onValueChange={(v) => field.onChange(Number(v))}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="Seleccioná un rol" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {rolesActivos.map((r) => (
+                                  <SelectItem key={r.id} value={String(r.id)}>
+                                    {r.nombre}
+                                    {r.codigo ? ` (${r.codigo})` : ""}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
                         name="correo"
                         render={({ field }) => (
                           <FormItem>
@@ -428,118 +427,27 @@ export function UsuarioFormSheet({
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
+                  {mode === "edit" && usuarioQuery.data ? (
+                    <div className="flex flex-col gap-2 border border-border p-3">
                       <p className="text-sm font-medium text-foreground">
-                        Permisos
+                        Permisos efectivos del rol
                       </p>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={
-                          modulosActivos.length === 0 || acciones.length === 0
-                        }
-                        onClick={() => handleAppendPermiso()}
-                      >
-                        <PlusIcon className="size-4" />
-                        Añadir permiso
-                      </Button>
-                    </div>
-
-                    <div className="flex max-h-52 flex-col gap-3 overflow-y-auto pr-1">
-                      {fields.length === 0 ? (
+                      {usuarioQuery.data.permisos.length === 0 ? (
                         <p className="text-xs text-muted-foreground">
-                          Sin permisos adicionales (solo cuenta base).
+                          Este rol no tiene permisos configurados (o el usuario
+                          no tiene rol).
                         </p>
-                      ) : null}
-                      {fields.map((row, index) => (
-                        <div
-                          key={row.id}
-                          className="flex flex-col gap-2 border border-border p-2 sm:flex-row sm:items-end"
-                        >
-                          <FormField
-                            control={form.control}
-                            name={`permisos.${index}.moduloId`}
-                            render={({ field }) => (
-                              <FormItem className="min-w-0 flex-1">
-                                <FormLabel>Módulo</FormLabel>
-                                <Select
-                                  value={
-                                    field.value > 0 ? String(field.value) : ""
-                                  }
-                                  onValueChange={(v) =>
-                                    field.onChange(Number(v))
-                                  }
-                                >
-                                  <FormControl>
-                                    <SelectTrigger className="w-full">
-                                      <SelectValue placeholder="Módulo" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {modulosActivos.map((m) => (
-                                      <SelectItem
-                                        key={m.id}
-                                        value={String(m.id)}
-                                      >
-                                        {m.nombre}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={form.control}
-                            name={`permisos.${index}.accionId`}
-                            render={({ field }) => (
-                              <FormItem className="min-w-0 flex-1">
-                                <FormLabel>Acción</FormLabel>
-                                <Select
-                                  value={
-                                    field.value > 0 ? String(field.value) : ""
-                                  }
-                                  onValueChange={(v) =>
-                                    field.onChange(Number(v))
-                                  }
-                                >
-                                  <FormControl>
-                                    <SelectTrigger className="w-full">
-                                      <SelectValue placeholder="Acción" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    {acciones.map((a) => (
-                                      <SelectItem
-                                        key={a.id}
-                                        value={String(a.id)}
-                                      >
-                                        {a.nombre}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="shrink-0 self-end sm:self-auto"
-                            aria-label="Quitar permiso"
-                            onClick={() => remove(index)}
-                          >
-                            <Trash2Icon className="size-4" />
-                          </Button>
-                        </div>
-                      ))}
+                      ) : (
+                        <ul className="max-h-40 list-inside list-disc overflow-y-auto text-xs text-muted-foreground">
+                          {usuarioQuery.data.permisos.map((p) => (
+                            <li key={p.id}>
+                              {p.modulo.nombre} — {p.accion.nombre}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
-                  </div>
+                  ) : null}
                 </div>
               </div>
 
