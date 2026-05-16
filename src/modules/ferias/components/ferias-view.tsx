@@ -10,6 +10,7 @@ import {
   PropuestaFeriaResponseDtoEstado,
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
+import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -187,6 +188,10 @@ export function FeriasView() {
                   key={p.id}
                   className="gap-0 py-0 transition-colors duration-150"
                 >
+                  <ListCardThumbnail
+                    src={p.imagenUrl}
+                    alt={p.nombreEmprendimiento}
+                  />
                   <CardHeader className="gap-2 border-b border-border pb-4">
                     <CardTitle className="line-clamp-2 text-base leading-snug">
                       {p.nombreEmprendimiento}
@@ -286,6 +291,10 @@ export function FeriasView() {
                     key={row.id}
                     className="gap-0 py-0 transition-colors duration-150"
                   >
+                    <ListCardThumbnail
+                      src={row.imagenBannerUrl}
+                      alt={row.nombre}
+                    />
                     <CardHeader className="gap-3 border-b border-border pb-4">
                       <div className="flex min-w-0 flex-row items-start justify-between gap-2">
                         <CardTitle className="line-clamp-2 text-base leading-snug">

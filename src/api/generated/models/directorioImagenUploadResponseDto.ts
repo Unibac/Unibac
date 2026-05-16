@@ -7,6 +7,6 @@
  */
 
 export interface DirectorioImagenUploadResponseDto {
-  /** URL pública del objeto en Railway Bucket (S3-compatible). Incluir en create/update del directorio. */
+  /** URL pública devuelta por Traiker (almacenamiento detrás de la API). Incluir en create/update del directorio. */
   imagenUrl: string;
 }

@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 
 import type { DirectorioEmprendimientoResponseDto } from "@/api/generated/models";
@@ -17,6 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -37,6 +38,7 @@ import { cn } from "@/lib/utils";
 import {
   useCreateDirectorioMutation,
   useUpdateDirectorioMutation,
+  useUploadDirectorioImagenMutation,
 } from "@/modules/directorio-emprendimientos/hooks/use-directorio-mutations";
 import {
   buildCreateDirectorioDto,
@@ -76,8 +78,10 @@ export function DirectorioFormSheet({
   row,
 }: DirectorioFormSheetProps) {
   const [apiError, setApiError] = useState<string | null>(null);
+  const imagenInputRef = useRef<HTMLInputElement>(null);
   const createMut = useCreateDirectorioMutation();
   const updateMut = useUpdateDirectorioMutation();
+  const uploadImagenMut = useUploadDirectorioImagenMutation();
 
   const form = useForm<DirectorioFormValues>({
     resolver: zodResolver(
@@ -101,6 +105,19 @@ export function DirectorioFormSheet({
   }, [open, mode, row, form]);
 
   const pending = createMut.isPending || updateMut.isPending;
+
+  async function onImagenSelected(fileList: FileList | null) {
+    const file = fileList?.[0];
+    if (!file) return;
+    setApiError(null);
+    try {
+      const res = await uploadImagenMut.mutateAsync(file);
+      form.setValue("imagenUrl", res.imagenUrl, { shouldValidate: true });
+    } catch (err) {
+      setApiError(getApiErrorMessage(err));
+    }
+    if (imagenInputRef.current) imagenInputRef.current.value = "";
+  }
 
   async function onSubmit(values: DirectorioFormValues) {
     setApiError(null);
@@ -214,14 +231,38 @@ export function DirectorioFormSheet({
                     </FormItem>
                   )}
                 />
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="directorio-imagen-file">
+                    Imagen (archivo, opcional)
+                  </Label>
+                  <Input
+                    ref={imagenInputRef}
+                    id="directorio-imagen-file"
+                    type="file"
+                    accept="image/*"
+                    disabled={uploadImagenMut.isPending}
+                    className="text-xs"
+                    onChange={(e) => void onImagenSelected(e.target.files)}
+                  />
+                  {uploadImagenMut.isPending ? (
+                    <p className="text-xs text-muted-foreground">Subiendo…</p>
+                  ) : null}
+                </div>
                 <FormField
                   control={form.control}
                   name="imagenUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Imagen URL (opcional)</FormLabel>
+                      <FormLabel>
+                        URL de imagen (opcional, o pegar URL externa)
+                      </FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input
+                          type="url"
+                          placeholder="https://..."
+                          {...field}
+                          value={field.value ?? ""}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

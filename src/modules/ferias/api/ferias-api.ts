@@ -30,6 +30,7 @@ export async function deleteFeria(id: number) {
   return api.feriasControllerRemove(id);
 }
 
+/** Multipart al API Nest; Traiker es transparente para el cliente. */
 export async function uploadFeriaBanner(archivo: File) {
   return api.feriasControllerUploadBanner({ archivo });
 }
@@ -59,6 +60,7 @@ export async function updateMisPropuestaFeria(
   return api.feriasControllerUpdateMisPropuesta(propuestaId, body);
 }
 
+/** Multipart al API Nest; Traiker es transparente para el cliente. */
 export async function uploadPropuestaFeriaImagen(
   feriaId: number,
   archivo: File,

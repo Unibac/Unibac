@@ -556,43 +556,45 @@ export function ConvocatoriasView() {
             <AlertDialogTitle>
               {detailRow?.titulo ?? "Detalle"}
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              {detailRow ? (
-                <div className="mt-2 space-y-2 text-xs text-muted-foreground">
-                  <div>
+            {detailRow ? (
+              <AlertDialogDescription asChild>
+                <div className="flex flex-col gap-2 text-muted-foreground text-xs">
+                  <p>
                     <span className="text-foreground">Tipo:</span>{" "}
                     {
                       TIPO_LABELS[
                         detailRow.tipoConvocatoria as CreatePublicacionConvocatoriaDtoTipoConvocatoria
                       ]
                     }
-                  </div>
-                  <div>
+                  </p>
+                  <p>
                     <span className="text-foreground">Fecha límite:</span>{" "}
                     {formatFecha(detailRow.fechaLimite)}
-                  </div>
-                  <div className="whitespace-pre-wrap">
-                    {detailRow.descripcion}
-                  </div>
-                  <div className="whitespace-pre-wrap">
+                  </p>
+                  <p className="whitespace-pre-wrap">{detailRow.descripcion}</p>
+                  <p className="whitespace-pre-wrap">
                     <span className="text-foreground">Convocados:</span>{" "}
                     {detailRow.convocados}
-                  </div>
+                  </p>
                   {detailRow.montoTipoApoyo ? (
-                    <div>
+                    <p>
                       <span className="text-foreground">Apoyo:</span>{" "}
                       {String(detailRow.montoTipoApoyo)}
-                    </div>
+                    </p>
                   ) : null}
                   {detailRow.linkExterno ? (
-                    <div>
+                    <p>
                       <span className="text-foreground">Link:</span>{" "}
                       {String(detailRow.linkExterno)}
-                    </div>
+                    </p>
                   ) : null}
                 </div>
-              ) : null}
-            </AlertDialogDescription>
+              </AlertDialogDescription>
+            ) : (
+              <AlertDialogDescription>
+                Sin datos de la convocatoria.
+              </AlertDialogDescription>
+            )}
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cerrar</AlertDialogCancel>

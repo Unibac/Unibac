@@ -7,6 +7,6 @@
  */
 
 export interface FeriaPropuestaImagenUploadResponseDto {
-  /** URL para enviar como imagenUrl en POST /ferias/:feriaId/propuestas. Las subidas sin crear propuesta pueden dejar objetos huérfanos en el bucket (v1). */
+  /** URL para enviar como imagenUrl en POST /ferias/:feriaId/propuestas (devuelta por Traiker tras la subida). */
   imagenUrl: string;
 }

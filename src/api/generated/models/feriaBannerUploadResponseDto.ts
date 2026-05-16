@@ -7,6 +7,6 @@
  */
 
 export interface FeriaBannerUploadResponseDto {
-  /** URL pública del banner para usar en POST/PATCH de feria. */
+  /** URL pública del banner (Traiker) para usar en POST/PATCH de feria. */
   imagenBannerUrl: string;
 }

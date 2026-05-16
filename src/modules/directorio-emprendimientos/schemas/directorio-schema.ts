@@ -6,6 +6,7 @@ import {
   type DirectorioEmprendimientoResponseDto,
   type UpdateDirectorioEmprendimientoDto,
 } from "@/api/generated/models";
+import { parsePublicImageUrl } from "@/lib/media/parse-public-image-url";
 
 const areaCreativaSchema = z.enum([
   CreateDirectorioEmprendimientoDtoAreaCreativa.ARTES_PLASTICAS,
@@ -14,11 +15,24 @@ const areaCreativaSchema = z.enum([
   CreateDirectorioEmprendimientoDtoAreaCreativa.AUDIOVISUAL,
 ]);
 
+function preprocessOptionalText(val: unknown): string {
+  if (val === undefined || val === null) return "";
+  return String(val);
+}
+
 const optionalTrimmed = z
   .string()
   .transform((v) => v.trim())
   .optional()
   .or(z.literal("").transform(() => undefined));
+
+/** URL manual; la subida por archivo rellena el mismo campo vía POST /directorio-emprendimientos/imagen. */
+const optionalImagenUrl = z
+  .preprocess(
+    preprocessOptionalText,
+    z.union([z.literal(""), z.string().trim().url("URL inválida")]),
+  )
+  .transform((v) => (v === "" ? undefined : v));
 
 export const directorioFormSchema = z.object({
   nombreProyecto: z.string().min(1, "Requerido"),
@@ -26,7 +40,7 @@ export const directorioFormSchema = z.object({
     .string()
     .min(1, "Requerido")
     .max(500, "Máximo 500 caracteres"),
-  imagenUrl: optionalTrimmed,
+  imagenUrl: optionalImagenUrl,
   correo: optionalTrimmed,
   redes: optionalTrimmed,
   sitioWeb: optionalTrimmed,
@@ -52,7 +66,7 @@ export function directorioResponseToFormValues(
   return {
     nombreProyecto: row.nombreProyecto,
     descripcionCorta: row.descripcionCorta,
-    imagenUrl: toText(row.imagenUrl) || undefined,
+    imagenUrl: parsePublicImageUrl(row.imagenUrl) ?? undefined,
     correo: toText(row.correo) || undefined,
     redes: toText(row.redes) || undefined,
     sitioWeb: toText(row.sitioWeb) || undefined,

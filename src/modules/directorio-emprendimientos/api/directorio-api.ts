@@ -6,6 +6,11 @@ import type {
 
 const api = getDirectorioEmprendimientos();
 
+/** Multipart al API Nest; Traiker es transparente para el cliente. */
+export async function uploadDirectorioImagen(archivo: File) {
+  return api.directorioEmprendimientosControllerUploadImagen({ archivo });
+}
+
 export async function listDirectorioEmprendimientos() {
   return api.directorioEmprendimientosControllerFindAll();
 }

@@ -13,6 +13,7 @@ import {
   PropuestaFeriaResponseDtoEstado,
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
+import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -44,6 +45,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getApiErrorMessage } from "@/lib/api/error-message";
+import { parsePublicImageUrl } from "@/lib/media/parse-public-image-url";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
 import { feriasCanAccessModule } from "@/modules/auth/lib/profile-capabilities";
 import {
@@ -79,17 +81,6 @@ const AREA_LABELS: Record<CreatePropuestaFeriaDtoAreaCreativa, string> = {
   [CreatePropuestaFeriaDtoAreaCreativa.DISENO]: "Diseño",
   [CreatePropuestaFeriaDtoAreaCreativa.AUDIOVISUAL]: "Audiovisual",
 };
-
-function toCellText(value: unknown): string {
-  if (value == null) return "—";
-  if (typeof value === "string") return value || "—";
-  try {
-    const s = JSON.stringify(value);
-    return s === "{}" ? "—" : s;
-  } catch {
-    return String(value);
-  }
-}
 
 type EstadoFiltroUi =
   | "todas"
@@ -152,9 +143,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
     return profile.data.id === row.usuarioId;
   }
 
-  const bannerUrl = feria ? toCellText(feria.imagenBannerUrl) : "—";
-  const bannerSrc =
-    bannerUrl !== "—" && /^https?:\/\//i.test(bannerUrl) ? bannerUrl : null;
+  const bannerSrc = feria ? parsePublicImageUrl(feria.imagenBannerUrl) : null;
 
   if (feriaQuery.isPending) {
     return (
@@ -321,6 +310,10 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
                     key={row.id}
                     className="gap-0 py-0 transition-colors duration-150"
                   >
+                    <ListCardThumbnail
+                      src={row.imagenUrl}
+                      alt={row.nombreEmprendimiento}
+                    />
                     <CardHeader className="gap-3 border-b border-border pb-4">
                       <div className="flex min-w-0 flex-row items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">

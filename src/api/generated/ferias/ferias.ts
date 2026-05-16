@@ -53,7 +53,7 @@ const feriasControllerCreate = (
       options);
     }
   /**
- * Requiere variables S3_* configuradas. Devuelve imagenBannerUrl para usar en POST/PATCH de feria.
+ * Requiere TRAIKER_API_BASE_URL, TRAIKER_USR y TRAIKER_PSW. Devuelve imagenBannerUrl para usar en POST/PATCH de feria.
  * @summary Subir banner de feria
  */
 const feriasControllerUploadBanner = (
@@ -139,7 +139,7 @@ const feriasControllerCreatePropuesta = (
       options);
     }
   /**
- * Valida feria existente, permiso en módulo Ferias y feria en vigencia inclusiva. Subidas sin confirmar la propuesta pueden dejar objetos huérfanos en el bucket (v1).
+ * Requiere TRAIKER_API_BASE_URL, TRAIKER_USR y TRAIKER_PSW. Valida feria existente, permiso en módulo Ferias y feria en vigencia inclusiva.
  * @summary Subir imagen para propuesta de feria
  */
 const feriasControllerUploadImagenPropuesta = (

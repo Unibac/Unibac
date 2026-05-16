@@ -128,7 +128,8 @@ export function FeriaFormSheet({
             {mode === "create" ? "Nueva feria virtual" : "Editar feria"}
           </SheetTitle>
           <SheetDescription>
-            Definí fechas inclusivas, descripción y opcionalmente un banner.
+            Definí fechas inclusivas, descripción y opcionalmente un banner
+            (subí un archivo o pegá una URL externa).
           </SheetDescription>
         </SheetHeader>
 
@@ -225,7 +226,9 @@ export function FeriaFormSheet({
                   name="imagenBannerUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>URL del banner (opcional)</FormLabel>
+                      <FormLabel>
+                        URL del banner (opcional, o pegar URL externa)
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="url"

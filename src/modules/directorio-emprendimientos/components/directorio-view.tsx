@@ -9,6 +9,7 @@ import {
   type DirectorioEmprendimientoResponseDto,
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
+import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -209,6 +210,10 @@ export function DirectorioView() {
                   key={row.id}
                   className="gap-0 py-0 transition-colors duration-150"
                 >
+                  <ListCardThumbnail
+                    src={row.imagenUrl}
+                    alt={row.nombreProyecto}
+                  />
                   <CardHeader className="gap-3 border-b border-border pb-4">
                     <div className="flex min-w-0 flex-row items-start justify-between gap-2">
                       <CardTitle className="truncate text-base leading-snug">

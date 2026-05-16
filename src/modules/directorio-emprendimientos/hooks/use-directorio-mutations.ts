@@ -9,8 +9,15 @@ import {
   createDirectorioEmprendimiento,
   deleteDirectorioEmprendimiento,
   updateDirectorioEmprendimiento,
+  uploadDirectorioImagen,
 } from "@/modules/directorio-emprendimientos/api/directorio-api";
 import { directorioKeys } from "@/modules/directorio-emprendimientos/query-keys";
+
+export function useUploadDirectorioImagenMutation() {
+  return useMutation({
+    mutationFn: (archivo: File) => uploadDirectorioImagen(archivo),
+  });
+}
 
 export function useCreateDirectorioMutation() {
   const queryClient = useQueryClient();

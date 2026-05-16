@@ -253,12 +253,15 @@ export function PropuestaFeriaFormSheet({
                   name="imagenUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>URL de imagen (opcional)</FormLabel>
+                      <FormLabel>
+                        URL de imagen (opcional, o pegar URL externa)
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="url"
                           placeholder="https://..."
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />

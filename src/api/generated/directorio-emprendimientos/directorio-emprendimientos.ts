@@ -46,8 +46,8 @@ const directorioEmprendimientosControllerCreate = (
       options);
     }
   /**
- * Requiere variables S3_* configuradas. Devuelve imagenUrl para usar en POST/PATCH del directorio. Quienes solo tengan CREACION pueden pegar una URL externa en el DTO sin usar este endpoint.
- * @summary Subir imagen del emprendimiento al bucket S3/Railway
+ * Requiere TRAIKER_API_BASE_URL, TRAIKER_USR y TRAIKER_PSW. Devuelve imagenUrl para usar en POST/PATCH del directorio. Quienes solo tengan CREACION pueden pegar una URL externa en el DTO sin usar este endpoint.
+ * @summary Subir imagen del emprendimiento (Traiker)
  */
 const directorioEmprendimientosControllerUploadImagen = (
     directorioEmprendimientosControllerUploadImagenBody: DirectorioEmprendimientosControllerUploadImagenBody,
