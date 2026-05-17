@@ -201,8 +201,8 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
       ) : null}
       {!canPostular && !canManageEventos ? (
         <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          Podés explorar ferias y proyectos publicados. El registro de propuestas
-          no está disponible para tu tipo de cuenta.
+          Podés explorar ferias y proyectos publicados. El registro de
+          propuestas no está disponible para tu tipo de cuenta.
         </p>
       ) : null}
       <div className="flex flex-col gap-4 rounded-none border border-border bg-card p-4">

@@ -17,22 +17,14 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
-import { DASHBOARD_NAV_ITEM_DATA } from "@/modules/auth/lib/dashboard-nav-items";
-import { getVisibleDashboardNavHrefs } from "@/modules/auth/lib/dashboard-sidebar-policy";
+import { getDashboardNavItemsForProfile } from "@/modules/auth/lib/dashboard-nav-items";
 
 export function AppSidebar() {
   const pathname = usePathname();
   const profile = useProfile();
 
-  const visible =
-    profile.data != null
-      ? getVisibleDashboardNavHrefs(profile.data)
-      : (["/dashboard"] as const);
-
-  const visibleSet = new Set<string>(visible);
-  const navItems = DASHBOARD_NAV_ITEM_DATA.filter((item) =>
-    visibleSet.has(item.href),
-  );
+  const navItems =
+    profile.data != null ? getDashboardNavItemsForProfile(profile.data) : [];
 
   return (
     <Sidebar collapsible="icon" variant="inset">

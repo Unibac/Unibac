@@ -1,25 +1,16 @@
 "use client";
 
-import { Loader2Icon, LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect } from "react";
 
-import { DashboardListLayoutToggle } from "@/components/shared/dashboard-list-layout-toggle";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { DashboardListLayoutProvider } from "@/components/layout/dashboard-list-layout";
+import { PortalDashboardShell } from "@/components/layout/portal/portal-dashboard-shell";
+import { StaffDashboardShell } from "@/components/layout/staff-dashboard-shell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useLogout } from "@/modules/auth/hooks/use-logout";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
-
-import { AppSidebar } from "./app-sidebar";
-import { DashboardListLayoutProvider } from "./dashboard-list-layout";
-import { ModeToggle } from "./mode-toggle";
+import { isPortalExternoUx } from "@/modules/auth/lib/portal-ux";
 
 export function DashboardShell({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -32,14 +23,16 @@ export function DashboardShell({ children }: { children: ReactNode }) {
     }
   }, [profile.isError, router]);
 
-  async function handleLogout() {
-    try {
-      await logout.mutateAsync();
-    } catch {
-      /* cookie puede estar ya inválida; seguir saliendo */
-    }
-    router.replace("/login");
-    router.refresh();
+  function handleLogout() {
+    void (async () => {
+      try {
+        await logout.mutateAsync();
+      } catch {
+        /* cookie puede estar ya inválida; seguir saliendo */
+      }
+      router.replace("/login");
+      router.refresh();
+    })();
   }
 
   if (profile.isPending) {
@@ -55,51 +48,33 @@ export function DashboardShell({ children }: { children: ReactNode }) {
     return null;
   }
 
+  const logoutPending = logout.isPending;
+  const onLogout = handleLogout;
+
+  if (isPortalExternoUx(profile.data)) {
+    return (
+      <TooltipProvider>
+        <DashboardListLayoutProvider>
+          <PortalDashboardShell
+            onLogout={onLogout}
+            logoutPending={logoutPending}
+          >
+            {children}
+          </PortalDashboardShell>
+        </DashboardListLayoutProvider>
+      </TooltipProvider>
+    );
+  }
+
   return (
     <TooltipProvider>
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset className="flex min-h-svh flex-col">
-          <DashboardListLayoutProvider>
-            <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4 lg:px-6">
-              <SidebarTrigger />
-              <Separator orientation="vertical" className="mr-1 h-6" />
-              <div className="flex flex-1 flex-col gap-0 overflow-hidden">
-                <span className="truncate text-xs text-muted-foreground">
-                  Sesión iniciada
-                </span>
-                <span className="truncate text-sm font-medium">
-                  {profile.data.usuario}
-                </span>
-              </div>
-              <DashboardListLayoutToggle />
-              <ModeToggle />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => void handleLogout()}
-                disabled={logout.isPending}
-              >
-                {logout.isPending ? (
-                  <Loader2Icon
-                    className="size-4 shrink-0 animate-spin"
-                    data-icon="inline-start"
-                    aria-hidden
-                  />
-                ) : (
-                  <LogOutIcon
-                    className="size-4 shrink-0"
-                    data-icon="inline-start"
-                  />
-                )}
-                Salir
-              </Button>
-            </header>
-            <div className="layout-dashboard-main">{children}</div>
-          </DashboardListLayoutProvider>
-        </SidebarInset>
-      </SidebarProvider>
+      <StaffDashboardShell
+        usuario={profile.data.usuario}
+        onLogout={onLogout}
+        logoutPending={logoutPending}
+      >
+        {children}
+      </StaffDashboardShell>
     </TooltipProvider>
   );
 }

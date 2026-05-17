@@ -8,4 +8,12 @@
   .tabular-nums-mono {
     @apply font-mono tabular-nums;
   }
+
+  .layout-portal-hero {
+    @apply min-h-[240px] sm:min-h-[280px];
+  }
+
+  .layout-portal-home {
+    @apply flex flex-1 flex-col gap-8 px-4 py-8 lg:px-8 lg:py-10;
+  }
 }

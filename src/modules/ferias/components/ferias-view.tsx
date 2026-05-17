@@ -173,8 +173,8 @@ export function FeriasView() {
       ) : null}
       {!canPostular && !canManageEventos ? (
         <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          Podés explorar ferias y proyectos publicados. El registro de propuestas
-          no está disponible para tu tipo de cuenta.
+          Podés explorar ferias y proyectos publicados. El registro de
+          propuestas no está disponible para tu tipo de cuenta.
         </p>
       ) : null}
       {canPostular ? (

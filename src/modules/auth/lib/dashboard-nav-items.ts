@@ -9,6 +9,10 @@ import {
   UsersIcon,
 } from "lucide-react";
 
+import type { AuthProfileResponseDto } from "@/api/generated/models";
+
+import { getVisibleDashboardNavHrefs } from "@/modules/auth/lib/dashboard-sidebar-policy";
+
 /** Rutas registradas en `app/dashboard/...`. */
 export type DashboardNavHref =
   | "/dashboard"
@@ -46,3 +50,10 @@ export const DASHBOARD_NAV_ITEM_DATA = [
   },
   { href: "/dashboard/ferias", label: "Ferias", icon: CalendarDaysIcon },
 ] as const satisfies readonly DashboardNavItemData[];
+
+export function getDashboardNavItemsForProfile(
+  profile: AuthProfileResponseDto,
+): DashboardNavItemData[] {
+  const visible = new Set(getVisibleDashboardNavHrefs(profile));
+  return DASHBOARD_NAV_ITEM_DATA.filter((item) => visible.has(item.href));
+}
