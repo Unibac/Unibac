@@ -55,8 +55,8 @@ import {
   useMisPropuestasQuery,
 } from "@/modules/ferias/hooks/use-ferias-queries";
 import {
+  feriasCanManageEventos,
   feriasCanPostular,
-  feriasIsAdmin,
 } from "@/modules/ferias/utils/ferias-permissions";
 
 const PERIODO_LABELS: Record<FeriaResponseDtoPeriodo, string> = {
@@ -80,7 +80,7 @@ export function FeriasView() {
   );
   const deleteMut = useDeleteFeriaMutation();
 
-  const isAdmin = feriasIsAdmin(profile.data);
+  const canManageEventos = feriasCanManageEventos(profile.data);
   const canPostular = feriasCanPostular(profile.data);
 
   const [search, setSearch] = useState("");
@@ -165,6 +165,18 @@ export function FeriasView() {
 
   return (
     <div className="flex flex-col gap-8">
+      {canManageEventos && !canPostular ? (
+        <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          La postulación de emprendimientos en ferias está reservada a
+          estudiantes registrados en la plataforma.
+        </p>
+      ) : null}
+      {!canPostular && !canManageEventos ? (
+        <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          Podés explorar ferias y proyectos publicados. El registro de propuestas
+          no está disponible para tu tipo de cuenta.
+        </p>
+      ) : null}
       {canPostular ? (
         <section className="flex flex-col gap-3">
           <h2 className="text-sm font-medium">Mis propuestas</h2>
@@ -257,7 +269,7 @@ export function FeriasView() {
           <p className="text-sm text-muted-foreground">
             Ferias virtuales próximas, en curso y finalizadas.
           </p>
-          {isAdmin ? (
+          {canManageEventos ? (
             <Button type="button" size="sm" onClick={openCreate}>
               Nueva feria
             </Button>
@@ -285,7 +297,7 @@ export function FeriasView() {
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {filteredRows.map((row) => {
-                const showAdminMenu = isAdmin;
+                const showAdminMenu = canManageEventos;
                 return (
                   <Card
                     key={row.id}
@@ -393,7 +405,7 @@ export function FeriasView() {
                 </TableRow>
               ) : (
                 filteredRows.map((row) => {
-                  const showAdminMenu = isAdmin;
+                  const showAdminMenu = canManageEventos;
                   return (
                     <TableRow key={row.id}>
                       <TableCell className="font-medium">

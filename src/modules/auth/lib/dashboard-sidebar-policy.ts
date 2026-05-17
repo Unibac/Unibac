@@ -42,6 +42,7 @@ export const SIDEBAR_HREFS_BY_CATEGORIA: Record<
     "/dashboard",
     "/dashboard/directorio-emprendimientos",
     "/dashboard/convocatorias",
+    "/dashboard/ferias",
   ],
 };
 

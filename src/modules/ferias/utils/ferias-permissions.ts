@@ -1,9 +1,12 @@
 import type { AuthProfileResponseDto } from "@/api/generated/models";
-import { AuthProfileResponseDtoNivel } from "@/api/generated/models";
+import {
+  AuthProfileResponseDtoNivel,
+  AuthProfileResponseDtoTipo,
+} from "@/api/generated/models";
 
 import {
-  feriasCanAccessModule,
-  isStaffFullUx,
+  feriasCanPostular as feriasCanPostularFromProfile,
+  isAdministrador,
 } from "@/modules/auth/lib/profile-capabilities";
 
 export function feriasIsAdmin(
@@ -12,11 +15,20 @@ export function feriasIsAdmin(
   return profile?.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR;
 }
 
-/** Propuestas en ferias activas: staff institucional o externos estudiante/egresado (alineado con sidebar). */
+/** Registrar/editar propuesta propia: delega a política de dominio (externo estudiante). */
 export function feriasCanPostular(
   profile: AuthProfileResponseDto | undefined,
 ): boolean {
+  return feriasCanPostularFromProfile(profile);
+}
+
+/** CRUD del evento feria: administrador o personal interno (INTERNO_BASE). */
+export function feriasCanManageEventos(
+  profile: AuthProfileResponseDto | undefined,
+): boolean {
   if (!profile) return false;
-  if (isStaffFullUx(profile)) return true;
-  return feriasCanAccessModule(profile);
+  return (
+    isAdministrador(profile) ||
+    profile.tipo === AuthProfileResponseDtoTipo.INTERNO
+  );
 }

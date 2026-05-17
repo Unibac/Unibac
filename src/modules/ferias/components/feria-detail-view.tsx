@@ -59,6 +59,7 @@ import {
   usePropuestasPorFeriaQuery,
 } from "@/modules/ferias/hooks/use-ferias-queries";
 import {
+  feriasCanManageEventos,
   feriasCanPostular,
   feriasIsAdmin,
 } from "@/modules/ferias/utils/ferias-permissions";
@@ -92,6 +93,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
   const feriaQuery = useFeriaDetailQuery(feriaId);
   const [estadoFiltro, setEstadoFiltro] = useState<EstadoFiltroUi>("todas");
   const isAdmin = feriasIsAdmin(profile.data);
+  const canManageEventos = feriasCanManageEventos(profile.data);
   const canPostular = feriasCanPostular(profile.data);
 
   const estadoApi = estadoFiltro === "todas" ? undefined : estadoFiltro;
@@ -137,7 +139,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
   }
 
   function canEditPropuesta(row: PropuestaFeriaResponseDto): boolean {
-    if (!profile.data || !feria) return false;
+    if (!canPostular || !profile.data || !feria) return false;
     if (feria.periodo !== FeriaResponseDtoPeriodo.activa) return false;
     if (row.estado !== PropuestaFeriaResponseDtoEstado.POSTULADO) return false;
     return profile.data.id === row.usuarioId;
@@ -191,6 +193,18 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
 
   return (
     <div className="flex flex-col gap-6">
+      {canManageEventos && !canPostular ? (
+        <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          La postulación de emprendimientos en ferias está reservada a
+          estudiantes registrados en la plataforma.
+        </p>
+      ) : null}
+      {!canPostular && !canManageEventos ? (
+        <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          Podés explorar ferias y proyectos publicados. El registro de propuestas
+          no está disponible para tu tipo de cuenta.
+        </p>
+      ) : null}
       <div className="flex flex-col gap-4 rounded-none border border-border bg-card p-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 flex-1 space-y-2">

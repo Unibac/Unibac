@@ -89,7 +89,7 @@ export function talentoCanAccessModule(
   );
 }
 
-/** Ferias (propuestas): staff + estudiante/egresado. */
+/** Ferias — consulta (listado, vitrina): staff + externos con categoría. */
 export function feriasCanAccessModule(
   profile: AuthProfileResponseDto | undefined,
 ): boolean {
@@ -98,6 +98,18 @@ export function feriasCanAccessModule(
   const cat = externalCategoria(profile);
   return (
     cat === AuthProfileResponseDtoCategoria.ESTUDIANTE ||
-    cat === AuthProfileResponseDtoCategoria.EGRESADO
+    cat === AuthProfileResponseDtoCategoria.EGRESADO ||
+    cat === AuthProfileResponseDtoCategoria.EMPRESA
+  );
+}
+
+/** Postular propuesta en feria: solo externo categoría ESTUDIANTE (política backend). */
+export function feriasCanPostular(
+  profile: AuthProfileResponseDto | undefined,
+): boolean {
+  if (!profile) return false;
+  return (
+    profile.tipo === AuthProfileResponseDtoTipo.EXTERNO &&
+    profile.categoria === AuthProfileResponseDtoCategoria.ESTUDIANTE
   );
 }
