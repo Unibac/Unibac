@@ -10,7 +10,8 @@
     "check": "biome check .",
     "format": "biome format --write .",
     "codegen": "orval",
-    "codegen:watch": "orval --watch"
+    "codegen:watch": "orval --watch",
+    "test": "vitest run"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -41,7 +42,8 @@
     "eslint-config-next": "16.2.4",
     "orval": "^8.9.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.6"
   },
   "ignoreScripts": [
     "sharp",

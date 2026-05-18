@@ -26,17 +26,39 @@ const optionalUrl = z
   )
   .transform((v) => (v === "" ? undefined : v));
 
+const optionalCelular = z.preprocess(
+  preprocessOptionalText,
+  z.union([
+    z.literal(""),
+    z
+      .string()
+      .trim()
+      .min(7, "Mínimo 7 caracteres")
+      .max(20, "Máximo 20 caracteres"),
+  ]),
+);
+
+const optionalRedes = z.preprocess(
+  preprocessOptionalText,
+  z.union([z.literal(""), z.string().trim().max(500, "Máximo 500 caracteres")]),
+);
+
 export const propuestaFeriaFormSchema = z.object({
-  nombreEmprendimiento: z.string().min(1, "Requerido"),
+  nombreEmprendimiento: z
+    .string()
+    .trim()
+    .min(2, "Mínimo 2 caracteres")
+    .max(200, "Máximo 200 caracteres"),
   descripcionCorta: z
     .string()
-    .min(1, "Requerido")
+    .trim()
+    .min(10, "Mínimo 10 caracteres")
     .max(500, "Máximo 500 caracteres"),
   imagenUrl: optionalUrl,
   areaCreativa: areaCreativaSchema,
-  redesContacto: z.string(),
+  redesContacto: optionalRedes,
   correo: z.string().trim().email("Correo inválido"),
-  celular: z.string(),
+  celular: optionalCelular,
 });
 
 export type PropuestaFeriaFormValues = z.infer<typeof propuestaFeriaFormSchema>;

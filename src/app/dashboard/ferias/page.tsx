@@ -6,7 +6,7 @@ export default function FeriasPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Ferias virtuales"
-        description="Calendario de ferias, vitrina de propuestas y moderación para administradores; postulación para usuarios internos."
+        description="Calendario de ferias y vitrina de propuestas. El registro de emprendimientos está reservado a estudiantes externos; administradores moderan y el personal interno gestiona eventos."
       />
       <FeriasView />
     </div>

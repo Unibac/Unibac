@@ -35,8 +35,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { getApiErrorMessage } from "@/lib/api/error-message";
 import { cn } from "@/lib/utils";
+import { getFeriasPropuestaErrorMessage } from "@/modules/ferias/lib/ferias-api-error";
 import {
   useCreatePropuestaMutation,
   useUpdateMisPropuestaMutation,
@@ -68,6 +68,8 @@ export type PropuestaFeriaFormSheetProps = {
   onOpenChange: (open: boolean) => void;
   mode: "create" | "edit";
   row: PropuestaFeriaResponseDto | null;
+  /** Si false, el envío queda deshabilitado (feria fuera de vigencia activa). */
+  feriaActiva?: boolean;
 };
 
 export function PropuestaFeriaFormSheet({
@@ -76,6 +78,7 @@ export function PropuestaFeriaFormSheet({
   onOpenChange,
   mode,
   row,
+  feriaActiva = true,
 }: PropuestaFeriaFormSheetProps) {
   const [apiError, setApiError] = useState<string | null>(null);
   const imagenInputRef = useRef<HTMLInputElement>(null);
@@ -114,7 +117,7 @@ export function PropuestaFeriaFormSheet({
       const res = await uploadImagenMut.mutateAsync(file);
       form.setValue("imagenUrl", res.imagenUrl, { shouldValidate: true });
     } catch (err) {
-      setApiError(getApiErrorMessage(err));
+      setApiError(getFeriasPropuestaErrorMessage(err, "uploadImagen"));
     }
     if (imagenInputRef.current) imagenInputRef.current.value = "";
   }
@@ -135,9 +138,16 @@ export function PropuestaFeriaFormSheet({
       }
       onOpenChange(false);
     } catch (err) {
-      setApiError(getApiErrorMessage(err));
+      setApiError(
+        getFeriasPropuestaErrorMessage(
+          err,
+          mode === "create" ? "create" : "update",
+        ),
+      );
     }
   }
+
+  const submitDisabled = pending || !feriaActiva;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -168,6 +178,12 @@ export function PropuestaFeriaFormSheet({
                 {apiError}
               </p>
             ) : null}
+            {!feriaActiva ? (
+              <p className="text-xs text-muted-foreground">
+                Solo podés registrar o editar propuestas mientras la feria está
+                en curso.
+              </p>
+            ) : null}
 
             <div className="flex flex-col gap-4">
               <p className="text-sm font-medium text-foreground">
@@ -179,7 +195,7 @@ export function PropuestaFeriaFormSheet({
                   name="nombreEmprendimiento"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nombre del emprendimiento</FormLabel>
+                      <FormLabel>Nombre del emprendimiento (2–200)</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -223,7 +239,7 @@ export function PropuestaFeriaFormSheet({
                   name="descripcionCorta"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Descripción corta (máx. 500)</FormLabel>
+                      <FormLabel>Descripción corta (10–500)</FormLabel>
                       <FormControl>
                         <textarea className={textareaClassName} {...field} />
                       </FormControl>
@@ -286,7 +302,7 @@ export function PropuestaFeriaFormSheet({
                   name="celular"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Celular (opcional)</FormLabel>
+                      <FormLabel>Celular (opcional, 7–20)</FormLabel>
                       <FormControl>
                         <Input type="tel" autoComplete="tel" {...field} />
                       </FormControl>
@@ -319,7 +335,7 @@ export function PropuestaFeriaFormSheet({
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={pending}>
+              <Button type="submit" disabled={submitDisabled}>
                 {pending ? (
                   <Loader2Icon
                     className="size-4 animate-spin"

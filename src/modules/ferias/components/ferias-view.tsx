@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   type FeriaResponseDto,
   FeriaResponseDtoPeriodo,
+  type PropuestaFeriaResponseDto,
   PropuestaFeriaResponseDtoEstado,
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
@@ -47,14 +48,23 @@ import {
 } from "@/components/ui/table";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
-import { feriasCanAccessModule } from "@/modules/auth/lib/profile-capabilities";
 import { FeriaFormSheet } from "@/modules/ferias/components/feria-form-sheet";
+import { PropuestaFeriaFormSheet } from "@/modules/ferias/components/propuesta-feria-form-sheet";
+import {
+  FERIAS_BROWSE_ONLY_MESSAGE,
+  FERIAS_STAFF_NO_POSTULAR_MESSAGE,
+} from "@/modules/ferias/lib/ferias-copy";
+import {
+  canEditMisPropuesta,
+  feriaPeriodoFromPropuesta,
+} from "@/modules/ferias/lib/propuesta-feria-rules";
 import { useDeleteFeriaMutation } from "@/modules/ferias/hooks/use-ferias-mutations";
 import {
   useFeriasListQuery,
   useMisPropuestasQuery,
 } from "@/modules/ferias/hooks/use-ferias-queries";
 import {
+  feriasCanBrowse,
   feriasCanManageEventos,
   feriasCanPostular,
 } from "@/modules/ferias/utils/ferias-permissions";
@@ -90,6 +100,10 @@ export function FeriasView() {
 
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const [propuestaSheetOpen, setPropuestaSheetOpen] = useState(false);
+  const [propuestaSheetRow, setPropuestaSheetRow] =
+    useState<PropuestaFeriaResponseDto | null>(null);
 
   useEffect(() => {
     if (deleteTargetId != null) setDeleteError(null);
@@ -131,7 +145,20 @@ export function FeriasView() {
 
   const misRows = misPropuestasQuery.data ?? [];
 
-  if (!feriasCanAccessModule(profile.data)) {
+  function openEditMisPropuesta(row: PropuestaFeriaResponseDto) {
+    setPropuestaSheetRow(row);
+    setPropuestaSheetOpen(true);
+  }
+
+  function misPropuestaEditable(p: PropuestaFeriaResponseDto): boolean {
+    return canEditMisPropuesta(p, {
+      canPostular,
+      usuarioId: profile.data?.id,
+      feriaPeriodo: feriaPeriodoFromPropuesta(p),
+    });
+  }
+
+  if (!feriasCanBrowse(profile.data)) {
     return (
       <p
         role="alert"
@@ -167,14 +194,12 @@ export function FeriasView() {
     <div className="flex flex-col gap-8">
       {canManageEventos && !canPostular ? (
         <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          La postulación de emprendimientos en ferias está reservada a
-          estudiantes registrados en la plataforma.
+          {FERIAS_STAFF_NO_POSTULAR_MESSAGE}
         </p>
       ) : null}
       {!canPostular && !canManageEventos ? (
         <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          Podés explorar ferias y proyectos publicados. El registro de
-          propuestas no está disponible para tu tipo de cuenta.
+          {FERIAS_BROWSE_ONLY_MESSAGE}
         </p>
       ) : null}
       {canPostular ? (
@@ -217,12 +242,22 @@ export function FeriasView() {
                       {ESTADO_PROP_LABELS[p.estado]}
                     </p>
                   </CardContent>
-                  <CardFooter className="border-t border-border pt-4 pb-6">
+                  <CardFooter className="flex flex-wrap gap-2 border-t border-border pt-4 pb-6">
                     <Button asChild variant="outline" size="sm">
                       <Link href={`/dashboard/ferias/${p.feriaId}`}>
                         Ver feria
                       </Link>
                     </Button>
+                    {misPropuestaEditable(p) ? (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => openEditMisPropuesta(p)}
+                      >
+                        Editar
+                      </Button>
+                    ) : null}
                   </CardFooter>
                 </Card>
               ))}
@@ -250,11 +285,23 @@ export function FeriasView() {
                       {ESTADO_PROP_LABELS[p.estado]}
                     </TableCell>
                     <TableCell className="text-end">
-                      <Button asChild variant="outline" size="sm">
-                        <Link href={`/dashboard/ferias/${p.feriaId}`}>
-                          Ver feria
-                        </Link>
-                      </Button>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        <Button asChild variant="outline" size="sm">
+                          <Link href={`/dashboard/ferias/${p.feriaId}`}>
+                            Ver feria
+                          </Link>
+                        </Button>
+                        {misPropuestaEditable(p) ? (
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => openEditMisPropuesta(p)}
+                          >
+                            Editar
+                          </Button>
+                        ) : null}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -476,6 +523,23 @@ export function FeriasView() {
         mode={sheetMode}
         row={sheetRow}
       />
+
+      {propuestaSheetRow ? (
+        <PropuestaFeriaFormSheet
+          feriaId={propuestaSheetRow.feriaId}
+          open={propuestaSheetOpen}
+          onOpenChange={(open) => {
+            setPropuestaSheetOpen(open);
+            if (!open) setPropuestaSheetRow(null);
+          }}
+          mode="edit"
+          row={propuestaSheetRow}
+          feriaActiva={
+            feriaPeriodoFromPropuesta(propuestaSheetRow) ===
+            FeriaResponseDtoPeriodo.activa
+          }
+        />
+      ) : null}
 
       <AlertDialog
         open={deleteTargetId != null}

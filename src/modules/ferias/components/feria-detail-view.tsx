@@ -47,18 +47,24 @@ import {
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { parsePublicImageUrl } from "@/lib/media/parse-public-image-url";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
-import { feriasCanAccessModule } from "@/modules/auth/lib/profile-capabilities";
 import {
   ModerarPropuestaDialog,
   type ModerarPropuestaTarget,
 } from "@/modules/ferias/components/moderar-propuesta-dialog";
+import { MiPropuestaEnFeriaCard } from "@/modules/ferias/components/mi-propuesta-en-feria-card";
 import { PropuestaFeriaFormSheet } from "@/modules/ferias/components/propuesta-feria-form-sheet";
+import {
+  FERIAS_BROWSE_ONLY_MESSAGE,
+  FERIAS_STAFF_NO_POSTULAR_MESSAGE,
+} from "@/modules/ferias/lib/ferias-copy";
+import { canEditMisPropuesta } from "@/modules/ferias/lib/propuesta-feria-rules";
 import {
   useFeriaDetailQuery,
   useMisPropuestasQuery,
   usePropuestasPorFeriaQuery,
 } from "@/modules/ferias/hooks/use-ferias-queries";
 import {
+  feriasCanBrowse,
   feriasCanManageEventos,
   feriasCanPostular,
   feriasIsAdmin,
@@ -139,11 +145,14 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
   }
 
   function canEditPropuesta(row: PropuestaFeriaResponseDto): boolean {
-    if (!canPostular || !profile.data || !feria) return false;
-    if (feria.periodo !== FeriaResponseDtoPeriodo.activa) return false;
-    if (row.estado !== PropuestaFeriaResponseDtoEstado.POSTULADO) return false;
-    return profile.data.id === row.usuarioId;
+    return canEditMisPropuesta(row, {
+      canPostular,
+      usuarioId: profile.data?.id,
+      feriaPeriodo: feria?.periodo,
+    });
   }
+
+  const feriaActiva = feria?.periodo === FeriaResponseDtoPeriodo.activa;
 
   const bannerSrc = feria ? parsePublicImageUrl(feria.imagenBannerUrl) : null;
 
@@ -174,7 +183,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
 
   if (!feria) return null;
 
-  if (!feriasCanAccessModule(profile.data)) {
+  if (!feriasCanBrowse(profile.data)) {
     return (
       <div className="flex flex-col gap-4">
         <p
@@ -195,14 +204,12 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
     <div className="flex flex-col gap-6">
       {canManageEventos && !canPostular ? (
         <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          La postulación de emprendimientos en ferias está reservada a
-          estudiantes registrados en la plataforma.
+          {FERIAS_STAFF_NO_POSTULAR_MESSAGE}
         </p>
       ) : null}
       {!canPostular && !canManageEventos ? (
         <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          Podés explorar ferias y proyectos publicados. El registro de
-          propuestas no está disponible para tu tipo de cuenta.
+          {FERIAS_BROWSE_ONLY_MESSAGE}
         </p>
       ) : null}
       <div className="flex flex-col gap-4 rounded-none border border-border bg-card p-4">
@@ -250,6 +257,15 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
           />
         ) : null}
       </div>
+
+      {canPostular && miPropuestaEnEstaFeria ? (
+        <MiPropuestaEnFeriaCard
+          propuesta={miPropuestaEnEstaFeria}
+          feriaPeriodo={feria.periodo}
+          canEdit={canEditPropuesta(miPropuestaEnEstaFeria)}
+          onEdit={() => openEditPropuesta(miPropuestaEnEstaFeria)}
+        />
+      ) : null}
 
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
@@ -528,6 +544,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
         onOpenChange={setSheetOpen}
         mode={sheetMode}
         row={sheetRow}
+        feriaActiva={feriaActiva}
       />
 
       <ModerarPropuestaDialog

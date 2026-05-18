@@ -73,7 +73,7 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md border-border shadow-sm">
       <CardHeader className="flex flex-col items-center gap-4 text-center sm:items-stretch sm:text-start">
-        <div className="flex justify-center sm:justify-start">
+        <div className="flex w-full justify-center">
           <UnibacLogo priority imgClassName="max-h-28 sm:max-h-32" />
         </div>
         <CardTitle className="text-xl">Iniciar sesión</CardTitle>

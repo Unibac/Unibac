@@ -89,8 +89,11 @@ export function talentoCanAccessModule(
   );
 }
 
-/** Ferias — consulta (listado, vitrina): staff + externos con categoría. */
-export function feriasCanAccessModule(
+/**
+ * Ferias — Política B: explorar listado y vitrina (staff o externo con categoría).
+ * No implica registrar propuestas; ver `feriasCanPostular`.
+ */
+export function feriasCanBrowse(
   profile: AuthProfileResponseDto | undefined,
 ): boolean {
   if (!profile) return false;
@@ -103,7 +106,18 @@ export function feriasCanAccessModule(
   );
 }
 
-/** Postular propuesta en feria: solo externo categoría ESTUDIANTE (política backend). */
+/** @deprecated Usar `feriasCanBrowse` (mismo criterio). */
+export function feriasCanAccessModule(
+  profile: AuthProfileResponseDto | undefined,
+): boolean {
+  return feriasCanBrowse(profile);
+}
+
+/**
+ * Postular propuesta en feria: solo externo categoría ESTUDIANTE (política backend).
+ * No usar `isStaffFullUx` — internos gestionan ferias pero no postulan.
+ * Futuro: permisos[] módulo Ferias acción PROPUESTA desde GET /usuarios/me.
+ */
 export function feriasCanPostular(
   profile: AuthProfileResponseDto | undefined,
 ): boolean {

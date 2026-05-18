@@ -12,22 +12,22 @@ type PortalTopBarProps = {
 
 export function PortalTopBar({ onLogout, logoutPending }: PortalTopBarProps) {
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between gap-4 bg-primary px-4 text-primary-foreground lg:px-6">
+    <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4 lg:px-6">
       <div className="flex min-w-0 items-center gap-3">
         <UnibacLogo
           priority
           className="shrink-0"
-          imgClassName="max-h-9 max-w-[120px] brightness-0 invert"
+          imgClassName="max-h-9 max-w-[120px]"
         />
-        <span className="hidden truncate text-sm font-medium sm:inline">
+        <span className="hidden truncate text-sm font-medium text-foreground sm:inline">
           Institución Universitaria Bellas Artes
         </span>
       </div>
       <Button
         type="button"
-        variant="ghost"
+        variant="outline"
         size="sm"
-        className="shrink-0 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+        className="shrink-0"
         onClick={onLogout}
         disabled={logoutPending}
       >

@@ -81,6 +81,7 @@ const feriasControllerFindMisPropuestas = (
       options);
     }
   /**
+ * Solo usuario EXTERNO con categoría ESTUDIANTE y permiso EDICION_PROPIA en Ferias. Personal interno gestiona ferias; no registra propuestas.
  * @summary Editar propuesta propia (POSTULADO, feria en vigencia)
  */
 const feriasControllerUpdateMisPropuesta = (
@@ -124,7 +125,7 @@ const feriasControllerFindPropuestasPorFeria = (
       options);
     }
   /**
- * Requiere permiso PROPUESTA en módulo Ferias (mapa a CREACION) y feria en vigencia inclusiva.
+ * Solo EXTERNO categoría ESTUDIANTE con permiso PROPUESTA en Ferias. Una propuesta por usuario y feria. Feria en vigencia inclusiva. Internos y administradores gestionan ferias, no postulan.
  * @summary Registrar propuesta en una feria
  */
 const feriasControllerCreatePropuesta = (
@@ -139,7 +140,7 @@ const feriasControllerCreatePropuesta = (
       options);
     }
   /**
- * Requiere TRAIKER_API_BASE_URL, TRAIKER_USR y TRAIKER_PSW. Valida feria existente, permiso en módulo Ferias y feria en vigencia inclusiva.
+ * Solo EXTERNO categoría ESTUDIANTE con permiso PROPUESTA en Ferias. Requiere TRAIKER_API_BASE_URL, TRAIKER_USR y TRAIKER_PSW. Valida feria en vigencia inclusiva.
  * @summary Subir imagen para propuesta de feria
  */
 const feriasControllerUploadImagenPropuesta = (
