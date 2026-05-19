@@ -6,16 +6,15 @@ import {
   type PropuestaFeriaResponseDto,
   PropuestaFeriaResponseDtoEstado,
 } from "@/api/generated/models";
-import { feriaPermitePostulacion } from "@/modules/ferias/lib/propuesta-feria-rules";
+import { ListCardContent } from "@/components/shared/list-card-content";
+import { ListCardFooter } from "@/components/shared/list-card-footer";
+import { ListCardHeader } from "@/components/shared/list-card-header";
 import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
 import { ListCardWithMedia } from "@/components/shared/list-card-with-media";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardDescription, CardTitle } from "@/components/ui/card";
+import { feriaPermitePostulacion } from "@/modules/ferias/lib/propuesta-feria-rules";
 
 const ESTADO_LABELS: Record<PropuestaFeriaResponseDtoEstado, string> = {
   [PropuestaFeriaResponseDtoEstado.POSTULADO]: "Postulado",
@@ -29,6 +28,14 @@ const AREA_LABELS: Record<CreatePropuestaFeriaDtoAreaCreativa, string> = {
   [CreatePropuestaFeriaDtoAreaCreativa.DISENO]: "Diseño",
   [CreatePropuestaFeriaDtoAreaCreativa.AUDIOVISUAL]: "Audiovisual",
 };
+
+function propuestaEstadoBadgeVariant(
+  estado: PropuestaFeriaResponseDtoEstado,
+): "default" | "secondary" | "destructive" {
+  if (estado === PropuestaFeriaResponseDtoEstado.RECHAZADO) return "destructive";
+  if (estado === PropuestaFeriaResponseDtoEstado.ACEPTADO) return "default";
+  return "secondary";
+}
 
 function estadoHint(
   estado: PropuestaFeriaResponseDtoEstado,
@@ -75,32 +82,35 @@ export function MiPropuestaEnFeriaCard({
           src={propuesta.imagenUrl}
           alt={propuesta.nombreEmprendimiento}
         />
-        <CardHeader className="gap-2 border-b border-border pb-4">
+        <ListCardHeader className="gap-2">
           <CardTitle className="text-base leading-snug">
             {propuesta.nombreEmprendimiento}
           </CardTitle>
-          <p className="text-xs text-muted-foreground">
-            Estado: {ESTADO_LABELS[propuesta.estado]}
-            {" · "}
-            {
-              AREA_LABELS[
-                propuesta.areaCreativa as CreatePropuestaFeriaDtoAreaCreativa
-              ]
-            }
-          </p>
-        </CardHeader>
-        <CardContent className="pt-4 pb-4 text-sm text-muted-foreground">
-          <p className="line-clamp-3">{propuesta.descripcionCorta}</p>
-          <p className="mt-2 text-xs">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant={propuestaEstadoBadgeVariant(propuesta.estado)}>
+              {ESTADO_LABELS[propuesta.estado]}
+            </Badge>
+            <CardDescription className="text-xs">
+              {
+                AREA_LABELS[
+                  propuesta.areaCreativa as CreatePropuestaFeriaDtoAreaCreativa
+                ]
+              }
+            </CardDescription>
+          </div>
+        </ListCardHeader>
+        <ListCardContent className="pb-4 text-muted-foreground">
+          <p className="line-clamp-3 text-sm">{propuesta.descripcionCorta}</p>
+          <CardDescription className="text-xs">
             {estadoHint(propuesta.estado, feriaPeriodo)}
-          </p>
-        </CardContent>
+          </CardDescription>
+        </ListCardContent>
         {canEdit ? (
-          <CardFooter className="border-t border-border pt-4 pb-6">
+          <ListCardFooter>
             <Button type="button" size="sm" variant="outline" onClick={onEdit}>
               Editar mi propuesta
             </Button>
-          </CardFooter>
+          </ListCardFooter>
         ) : null}
       </ListCardWithMedia>
     </section>

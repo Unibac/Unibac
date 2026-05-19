@@ -9,6 +9,10 @@ import {
   type PublicacionEmprendimientoResponseDto,
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
+import { ListCard } from "@/components/shared/list-card";
+import { ListCardContent } from "@/components/shared/list-card-content";
+import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
+import { ListCardHeader } from "@/components/shared/list-card-header";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -18,12 +22,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardAction,
-  CardContent,
-  CardHeader,
+  CardDescription,
   CardTitle,
 } from "@/components/ui/card";
 import {
@@ -280,9 +283,7 @@ export function ConvocatoriasView() {
         </p>
       ) : layout === "cards" ? (
         rows.length === 0 ? (
-          <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
-            No hay convocatorias.
-          </p>
+          <ListCardGridEmpty>No hay convocatorias.</ListCardGridEmpty>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {rows.map((row) => {
@@ -293,76 +294,71 @@ export function ConvocatoriasView() {
                 !isPast(row.fechaLimite) &&
                 !alreadyPostulado;
               return (
-                <Card
-                  key={row.id}
-                  className="gap-0 py-0 transition-colors duration-150"
-                >
-                  <CardHeader className="gap-3 border-b border-border pb-4">
-                    <div className="flex min-w-0 flex-row items-start justify-between gap-2">
-                      <CardTitle className="line-clamp-2 text-base leading-snug">
-                        {row.titulo}
-                      </CardTitle>
-                      <CardAction>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              aria-label={`Acciones para ${row.titulo}`}
+                <ListCard key={row.id}>
+                  <ListCardHeader>
+                    <CardTitle className="line-clamp-2 text-base leading-snug">
+                      {row.titulo}
+                    </CardTitle>
+                    <CardAction>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label={`Acciones para ${row.titulo}`}
+                          >
+                            <MoreVerticalIcon className="size-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => openDetail(row)}>
+                            Ver detalle
+                          </DropdownMenuItem>
+                          {canPostularRow ? (
+                            <DropdownMenuItem
+                              onClick={() => void doPostular(row.id)}
                             >
-                              <MoreVerticalIcon className="size-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openDetail(row)}>
-                              Ver detalle
+                              Postular
                             </DropdownMenuItem>
-                            {canPostularRow ? (
-                              <DropdownMenuItem
-                                onClick={() => void doPostular(row.id)}
-                              >
-                                Postular
+                          ) : null}
+                          {isAdmin ? (
+                            <>
+                              <DropdownMenuItem onClick={() => openEdit(row)}>
+                                Editar
                               </DropdownMenuItem>
-                            ) : null}
-                            {isAdmin ? (
-                              <>
-                                <DropdownMenuItem onClick={() => openEdit(row)}>
-                                  Editar
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => openPostulaciones(row.id)}
-                                >
-                                  Ver postulaciones
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  variant="destructive"
-                                  onClick={() => setDeleteTargetId(row.id)}
-                                >
-                                  Eliminar
-                                </DropdownMenuItem>
-                              </>
-                            ) : null}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </CardAction>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex flex-col gap-2 pt-4 pb-6 text-sm">
-                    <p className="text-xs text-muted-foreground">
+                              <DropdownMenuItem
+                                onClick={() => openPostulaciones(row.id)}
+                              >
+                                Ver postulaciones
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => setDeleteTargetId(row.id)}
+                              >
+                                Eliminar
+                              </DropdownMenuItem>
+                            </>
+                          ) : null}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </CardAction>
+                  </ListCardHeader>
+                  <ListCardContent>
+                    <CardDescription>
                       {
                         TIPO_LABELS[
                           row.tipoConvocatoria as CreatePublicacionConvocatoriaDtoTipoConvocatoria
                         ]
                       }
-                    </p>
-                    <p className="text-xs tabular-nums text-muted-foreground">
+                    </CardDescription>
+                    <CardDescription className="tabular-nums">
                       Límite: {formatFecha(row.fechaLimite)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
+                    </CardDescription>
+                    <Badge variant={row.activo ? "default" : "secondary"}>
                       {row.activo ? "Activa" : "Inactiva"}
-                    </p>
-                  </CardContent>
-                </Card>
+                    </Badge>
+                  </ListCardContent>
+                </ListCard>
               );
             })}
           </div>
@@ -482,24 +478,19 @@ export function ConvocatoriasView() {
           ) : layout === "cards" ? (
             <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {myPostulaciones.map((p) => (
-                <Card
-                  key={p.id}
-                  className="gap-0 py-0 transition-colors duration-150"
-                >
-                  <CardHeader className="gap-2 border-b border-border pb-4">
+                <ListCard key={p.id}>
+                  <ListCardHeader className="gap-2">
                     <CardTitle className="line-clamp-2 text-base leading-snug">
                       {p.publicacion?.titulo ?? `#${p.publicacionId}`}
                     </CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-col gap-2 pt-4 pb-6">
-                    <p className="text-xs text-muted-foreground">
-                      {p.estadoPostulacion}
-                    </p>
-                    <p className="text-xs tabular-nums text-muted-foreground">
+                  </ListCardHeader>
+                  <ListCardContent>
+                    <Badge variant="secondary">{p.estadoPostulacion}</Badge>
+                    <CardDescription className="tabular-nums">
                       {formatFecha(p.fechaPostulacion)}
-                    </p>
-                  </CardContent>
-                </Card>
+                    </CardDescription>
+                  </ListCardContent>
+                </ListCard>
               ))}
             </div>
           ) : (

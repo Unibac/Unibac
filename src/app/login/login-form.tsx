@@ -7,10 +7,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { PanelCard } from "@/components/shared/panel-card";
 import { UnibacLogo } from "@/components/shared/unibac-logo";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
@@ -71,12 +71,12 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md border-border shadow-sm">
-      <CardHeader className="flex flex-col items-center gap-4 text-center sm:items-stretch sm:text-start">
-        <div className="flex w-full justify-center">
+    <PanelCard>
+      <CardHeader className="flex flex-col items-center gap-4 px-6 text-center sm:items-stretch sm:text-start">
+        <div className="flex w-full justify-center sm:justify-start">
           <UnibacLogo priority imgClassName="max-h-28 sm:max-h-32" />
         </div>
-        <CardTitle className="text-xl">Iniciar sesión</CardTitle>
+        <CardTitle className="text-lg">Iniciar sesión</CardTitle>
         <CardDescription>
           Introduce tu usuario y contraseña para acceder al panel Unibac.
         </CardDescription>
@@ -163,6 +163,6 @@ export function LoginForm() {
           </CardFooter>
         </form>
       </Form>
-    </Card>
+    </PanelCard>
   );
 }

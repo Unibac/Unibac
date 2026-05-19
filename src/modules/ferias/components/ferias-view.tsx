@@ -11,6 +11,10 @@ import {
   PropuestaFeriaResponseDtoEstado,
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
+import { ListCardContent } from "@/components/shared/list-card-content";
+import { ListCardFooter } from "@/components/shared/list-card-footer";
+import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
+import { ListCardHeader } from "@/components/shared/list-card-header";
 import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
 import { ListCardWithMedia } from "@/components/shared/list-card-with-media";
 import {
@@ -22,12 +26,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   CardAction,
-  CardContent,
-  CardFooter,
-  CardHeader,
+  CardDescription,
   CardTitle,
 } from "@/components/ui/card";
 import {
@@ -227,20 +230,29 @@ export function FeriasView() {
                     src={p.imagenUrl}
                     alt={p.nombreEmprendimiento}
                   />
-                  <CardHeader className="gap-2 border-b border-border pb-4">
+                  <ListCardHeader className="gap-2">
                     <CardTitle className="line-clamp-2 text-base leading-snug">
                       {p.nombreEmprendimiento}
                     </CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex flex-col gap-2 pt-4 pb-4 text-sm">
-                    <p className="text-xs text-muted-foreground">
+                  </ListCardHeader>
+                  <ListCardContent className="pb-4">
+                    <CardDescription>
                       {p.feria?.nombre ?? `Feria #${p.feriaId}`}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
+                    </CardDescription>
+                    <Badge
+                      variant={
+                        p.estado === PropuestaFeriaResponseDtoEstado.RECHAZADO
+                          ? "destructive"
+                          : p.estado ===
+                              PropuestaFeriaResponseDtoEstado.ACEPTADO
+                            ? "default"
+                            : "secondary"
+                      }
+                    >
                       {ESTADO_PROP_LABELS[p.estado]}
-                    </p>
-                  </CardContent>
-                  <CardFooter className="flex flex-wrap gap-2 border-t border-border pt-4 pb-6">
+                    </Badge>
+                  </ListCardContent>
+                  <ListCardFooter className="flex flex-wrap gap-2">
                     <Button asChild variant="outline" size="sm">
                       <Link href={`/dashboard/ferias/${p.feriaId}`}>
                         Ver feria
@@ -256,7 +268,7 @@ export function FeriasView() {
                         Editar
                       </Button>
                     ) : null}
-                  </CardFooter>
+                  </ListCardFooter>
                 </ListCardWithMedia>
               ))}
             </div>
@@ -334,11 +346,11 @@ export function FeriasView() {
 
         {layout === "cards" ? (
           filteredRows.length === 0 ? (
-            <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
+            <ListCardGridEmpty>
               {rows.length === 0
                 ? "No hay ferias cargadas."
                 : "Ninguna feria coincide con la búsqueda."}
-            </p>
+            </ListCardGridEmpty>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {filteredRows.map((row) => {
@@ -349,71 +361,67 @@ export function FeriasView() {
                       src={row.imagenBannerUrl}
                       alt={row.nombre}
                     />
-                    <CardHeader className="gap-3 border-b border-border pb-4">
-                      <div className="flex min-w-0 flex-row items-start justify-between gap-2">
-                        <CardTitle className="line-clamp-2 text-base leading-snug">
-                          {row.nombre}
-                        </CardTitle>
-                        {showAdminMenu ? (
-                          <CardAction>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  aria-label={`Acciones para ${row.nombre}`}
-                                >
-                                  <MoreVerticalIcon className="size-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
-                                  <Link href={`/dashboard/ferias/${row.id}`}>
-                                    Ver
-                                  </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => openEdit(row)}>
-                                  Editar
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  variant="destructive"
-                                  onClick={() => setDeleteTargetId(row.id)}
-                                >
-                                  Eliminar
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </CardAction>
-                        ) : null}
-                      </div>
-                    </CardHeader>
-                    <CardContent
-                      className={
-                        showAdminMenu
-                          ? "flex flex-col gap-2 pt-4 pb-6 text-xs text-muted-foreground"
-                          : "flex flex-col gap-2 pt-4 pb-4 text-xs text-muted-foreground"
-                      }
+                    <ListCardHeader>
+                      <CardTitle className="line-clamp-2 text-base leading-snug">
+                        {row.nombre}
+                      </CardTitle>
+                      {showAdminMenu ? (
+                        <CardAction>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label={`Acciones para ${row.nombre}`}
+                              >
+                                <MoreVerticalIcon className="size-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem asChild>
+                                <Link href={`/dashboard/ferias/${row.id}`}>
+                                  Ver
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => openEdit(row)}>
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => setDeleteTargetId(row.id)}
+                              >
+                                Eliminar
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </CardAction>
+                      ) : null}
+                    </ListCardHeader>
+                    <ListCardContent
+                      className={showAdminMenu ? undefined : "pb-4"}
                     >
-                      <p>{PERIODO_LABELS[row.periodo]}</p>
-                      <p>
+                      <Badge variant="outline">
+                        {PERIODO_LABELS[row.periodo]}
+                      </Badge>
+                      <CardDescription>
                         Inicio{" "}
                         <time dateTime={row.fechaInicio}>
                           {new Date(row.fechaInicio).toLocaleDateString()}
                         </time>
-                      </p>
-                      <p>
+                      </CardDescription>
+                      <CardDescription>
                         Fin{" "}
                         <time dateTime={row.fechaFin}>
                           {new Date(row.fechaFin).toLocaleDateString()}
                         </time>
-                      </p>
-                    </CardContent>
+                      </CardDescription>
+                    </ListCardContent>
                     {!showAdminMenu ? (
-                      <CardFooter className="border-t border-border pt-4 pb-6">
+                      <ListCardFooter>
                         <Button asChild variant="outline" size="sm">
                           <Link href={`/dashboard/ferias/${row.id}`}>Ver</Link>
                         </Button>
-                      </CardFooter>
+                      </ListCardFooter>
                     ) : null}
                   </ListCardWithMedia>
                 );

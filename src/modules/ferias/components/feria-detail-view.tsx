@@ -13,13 +13,16 @@ import {
   PropuestaFeriaResponseDtoEstado,
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
+import { ListCardContent } from "@/components/shared/list-card-content";
+import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
+import { ListCardHeader } from "@/components/shared/list-card-header";
 import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
 import { ListCardWithMedia } from "@/components/shared/list-card-with-media";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   CardAction,
-  CardContent,
-  CardHeader,
+  CardDescription,
   CardTitle,
 } from "@/components/ui/card";
 import {
@@ -339,9 +342,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
           </p>
         ) : layout === "cards" ? (
           rows.length === 0 ? (
-            <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
-              No hay propuestas para mostrar.
-            </p>
+            <ListCardGridEmpty>No hay propuestas para mostrar.</ListCardGridEmpty>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {rows.map((row) => {
@@ -356,82 +357,88 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
                       src={row.imagenUrl}
                       alt={row.nombreEmprendimiento}
                     />
-                    <CardHeader className="gap-3 border-b border-border pb-4">
-                      <div className="flex min-w-0 flex-row items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <CardTitle className="text-base leading-snug">
-                            {row.nombreEmprendimiento}
-                          </CardTitle>
-                          <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
-                            {row.descripcionCorta}
-                          </p>
-                        </div>
-                        {menu ? (
-                          <CardAction>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  aria-label={`Acciones para ${row.nombreEmprendimiento}`}
+                    <ListCardHeader>
+                      <CardTitle className="text-base leading-snug">
+                        {row.nombreEmprendimiento}
+                      </CardTitle>
+                      {menu ? (
+                        <CardAction>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label={`Acciones para ${row.nombreEmprendimiento}`}
+                              >
+                                <MoreVerticalIcon className="size-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {editable ? (
+                                <DropdownMenuItem
+                                  onClick={() => openEditPropuesta(row)}
                                 >
-                                  <MoreVerticalIcon className="size-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                {editable ? (
+                                  Editar mi propuesta
+                                </DropdownMenuItem>
+                              ) : null}
+                              {moderar ? (
+                                <>
                                   <DropdownMenuItem
-                                    onClick={() => openEditPropuesta(row)}
+                                    onClick={() =>
+                                      setModerarTarget({
+                                        propuesta: row,
+                                        accion: "aceptar",
+                                      })
+                                    }
                                   >
-                                    Editar mi propuesta
+                                    Aceptar
                                   </DropdownMenuItem>
-                                ) : null}
-                                {moderar ? (
-                                  <>
-                                    <DropdownMenuItem
-                                      onClick={() =>
-                                        setModerarTarget({
-                                          propuesta: row,
-                                          accion: "aceptar",
-                                        })
-                                      }
-                                    >
-                                      Aceptar
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      variant="destructive"
-                                      onClick={() =>
-                                        setModerarTarget({
-                                          propuesta: row,
-                                          accion: "rechazar",
-                                        })
-                                      }
-                                    >
-                                      Rechazar
-                                    </DropdownMenuItem>
-                                  </>
-                                ) : null}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </CardAction>
-                        ) : null}
-                      </div>
-                    </CardHeader>
-                    <CardContent className="flex flex-col gap-2 pt-4 pb-6 text-sm">
-                      <p className="text-xs text-muted-foreground">
+                                  <DropdownMenuItem
+                                    variant="destructive"
+                                    onClick={() =>
+                                      setModerarTarget({
+                                        propuesta: row,
+                                        accion: "rechazar",
+                                      })
+                                    }
+                                  >
+                                    Rechazar
+                                  </DropdownMenuItem>
+                                </>
+                              ) : null}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </CardAction>
+                      ) : null}
+                      <CardDescription className="line-clamp-2">
+                        {row.descripcionCorta}
+                      </CardDescription>
+                    </ListCardHeader>
+                    <ListCardContent>
+                      <CardDescription>
                         {
                           AREA_LABELS[
                             row.areaCreativa as CreatePropuestaFeriaDtoAreaCreativa
                           ]
                         }
-                      </p>
-                      <p className="text-xs text-muted-foreground">
+                      </CardDescription>
+                      <Badge
+                        variant={
+                          row.estado ===
+                          PropuestaFeriaResponseDtoEstado.RECHAZADO
+                            ? "destructive"
+                            : row.estado ===
+                                PropuestaFeriaResponseDtoEstado.ACEPTADO
+                              ? "default"
+                              : "secondary"
+                        }
+                      >
                         {ESTADO_PROP_LABELS[row.estado]}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
+                      </Badge>
+                      <CardDescription className="truncate">
                         {row.correo}
-                      </p>
-                    </CardContent>
+                      </CardDescription>
+                    </ListCardContent>
                   </ListCardWithMedia>
                 );
               })}

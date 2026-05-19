@@ -5,6 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import { AuthProfileResponseDtoNivel } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
+import { ListCard } from "@/components/shared/list-card";
+import { ListCardContent } from "@/components/shared/list-card-content";
+import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
+import { ListCardHeader } from "@/components/shared/list-card-header";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -14,12 +18,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardAction,
-  CardContent,
-  CardHeader,
+  CardDescription,
   CardTitle,
 } from "@/components/ui/card";
 import {
@@ -169,21 +172,15 @@ export function UsuariosView() {
 
       {layout === "cards" ? (
         rows.length === 0 ? (
-          <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
-            No hay usuarios registrados.
-          </p>
+          <ListCardGridEmpty>No hay usuarios registrados.</ListCardGridEmpty>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {rows.map((u) => (
-              <Card
-                key={u.id}
-                className="gap-0 py-0 transition-colors duration-150"
-              >
-                <CardHeader className="gap-3 border-b border-border pb-4">
-                  <div className="flex min-w-0 flex-row items-start justify-between gap-2">
-                    <CardTitle className="truncate text-base leading-snug">
-                      {u.usuario}
-                    </CardTitle>
+              <ListCard key={u.id}>
+                <ListCardHeader>
+                  <CardTitle className="truncate text-base leading-snug">
+                    {u.usuario}
+                  </CardTitle>
                     {canManage ? (
                       <CardAction>
                         <DropdownMenu>
@@ -210,28 +207,26 @@ export function UsuariosView() {
                         </DropdownMenu>
                       </CardAction>
                     ) : null}
+                </ListCardHeader>
+                <ListCardContent>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="outline">{u.nivel}</Badge>
+                    <Badge variant="outline">{u.tipo}</Badge>
+                    <Badge variant={u.activo ? "default" : "secondary"}>
+                      {u.activo ? "Activo" : "Inactivo"}
+                    </Badge>
                   </div>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-2 pt-4 pb-6 text-sm">
-                  <div className="flex flex-wrap gap-x-2 gap-y-1 text-xs text-muted-foreground">
-                    <span>{u.nivel}</span>
-                    <span aria-hidden>·</span>
-                    <span>{u.tipo}</span>
-                    <span aria-hidden>·</span>
-                    <span>{u.activo ? "Activo" : "Inactivo"}</span>
-                  </div>
-                  <p className="truncate text-xs text-muted-foreground">
+                  <CardDescription className="truncate">
                     {u.correo != null ? String(u.correo) : "—"}
-                  </p>
-                  <p className="truncate text-xs">
-                    <span className="text-muted-foreground">Rol: </span>
-                    <span>{formatRolCell(u.rolId)}</span>
-                  </p>
-                  <p className="text-xs tabular-nums text-muted-foreground">
+                  </CardDescription>
+                  <CardDescription className="truncate">
+                    Rol: {formatRolCell(u.rolId)}
+                  </CardDescription>
+                  <CardDescription className="tabular-nums">
                     Permisos (rol): {u.permisos.length}
-                  </p>
-                </CardContent>
-              </Card>
+                  </CardDescription>
+                </ListCardContent>
+              </ListCard>
             ))}
           </div>
         )

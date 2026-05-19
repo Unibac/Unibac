@@ -10,6 +10,10 @@ import {
   EgresadosControllerFindAllEstadoLaboral,
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
+import { ListCard } from "@/components/shared/list-card";
+import { ListCardContent } from "@/components/shared/list-card-content";
+import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
+import { ListCardHeader } from "@/components/shared/list-card-header";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -19,12 +23,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardAction,
-  CardContent,
-  CardHeader,
+  CardDescription,
   CardTitle,
 } from "@/components/ui/card";
 import {
@@ -334,9 +337,9 @@ export function EgresadosView() {
         </p>
       ) : layout === "cards" ? (
         (listQuery.data ?? []).length === 0 ? (
-          <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
+          <ListCardGridEmpty>
             No hay egresados que coincidan con los filtros.
-          </p>
+          </ListCardGridEmpty>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {(listQuery.data ?? []).map((row) => {
@@ -344,15 +347,11 @@ export function EgresadosView() {
               const deletable = isAdmin === true;
               const showMenu = editable || deletable;
               return (
-                <Card
-                  key={row.id}
-                  className="gap-0 py-0 transition-colors duration-150"
-                >
-                  <CardHeader className="gap-3 border-b border-border pb-4">
-                    <div className="flex min-w-0 flex-row items-start justify-between gap-2">
-                      <CardTitle className="truncate text-base leading-snug">
-                        {row.nombreCompleto}
-                      </CardTitle>
+                <ListCard key={row.id}>
+                  <ListCardHeader>
+                    <CardTitle className="truncate text-base leading-snug">
+                      {row.nombreCompleto}
+                    </CardTitle>
                       {showMenu ? (
                         <CardAction>
                           <DropdownMenu>
@@ -383,22 +382,25 @@ export function EgresadosView() {
                           </DropdownMenu>
                         </CardAction>
                       ) : null}
+                  </ListCardHeader>
+                  <ListCardContent>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className="tabular-nums">
+                        {row.anioEgreso}
+                      </Badge>
+                      <Badge variant="secondary">
+                        {ESTADO_TABLA_LABELS[row.estadoLaboral]}
+                      </Badge>
                     </div>
-                  </CardHeader>
-                  <CardContent className="flex flex-col gap-2 pt-4 pb-6 text-sm">
-                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                      <span className="tabular-nums">{row.anioEgreso}</span>
-                      <span>{ESTADO_TABLA_LABELS[row.estadoLaboral]}</span>
-                    </div>
-                    <p className="truncate text-xs">{row.programaCarrera}</p>
-                    <p className="truncate text-xs text-muted-foreground">
+                    <CardDescription className="truncate">
+                      {row.programaCarrera}
+                    </CardDescription>
+                    <CardDescription className="truncate">
                       {row.correo}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {vinculosLabel(row)}
-                    </p>
-                  </CardContent>
-                </Card>
+                    </CardDescription>
+                    <CardDescription>{vinculosLabel(row)}</CardDescription>
+                  </ListCardContent>
+                </ListCard>
               );
             })}
           </div>

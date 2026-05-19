@@ -9,6 +9,9 @@ import {
   type DirectorioEmprendimientoResponseDto,
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
+import { ListCardContent } from "@/components/shared/list-card-content";
+import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
+import { ListCardHeader } from "@/components/shared/list-card-header";
 import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
 import { ListCardWithMedia } from "@/components/shared/list-card-with-media";
 import {
@@ -20,11 +23,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   CardAction,
-  CardContent,
-  CardHeader,
+  CardDescription,
   CardTitle,
 } from "@/components/ui/card";
 import {
@@ -196,9 +199,9 @@ export function DirectorioView() {
 
       {layout === "cards" ? (
         rows.length === 0 ? (
-          <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
+          <ListCardGridEmpty>
             No hay emprendimientos registrados.
-          </p>
+          </ListCardGridEmpty>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {rows.map((row) => {
@@ -211,61 +214,59 @@ export function DirectorioView() {
                     src={row.imagenUrl}
                     alt={row.nombreProyecto}
                   />
-                  <CardHeader className="gap-3 border-b border-border pb-4">
-                    <div className="flex min-w-0 flex-row items-start justify-between gap-2">
-                      <CardTitle className="truncate text-base leading-snug">
-                        {row.nombreProyecto}
-                      </CardTitle>
-                      {showMenu ? (
-                        <CardAction>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                aria-label={`Acciones para ${row.nombreProyecto}`}
+                  <ListCardHeader>
+                    <CardTitle className="truncate text-base leading-snug">
+                      {row.nombreProyecto}
+                    </CardTitle>
+                    {showMenu ? (
+                      <CardAction>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={`Acciones para ${row.nombreProyecto}`}
+                            >
+                              <MoreVerticalIcon className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {editable ? (
+                              <DropdownMenuItem onClick={() => openEdit(row)}>
+                                Editar
+                              </DropdownMenuItem>
+                            ) : null}
+                            {deletable ? (
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => setDeleteTargetId(row.id)}
                               >
-                                <MoreVerticalIcon className="size-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              {editable ? (
-                                <DropdownMenuItem onClick={() => openEdit(row)}>
-                                  Editar
-                                </DropdownMenuItem>
-                              ) : null}
-                              {deletable ? (
-                                <DropdownMenuItem
-                                  variant="destructive"
-                                  onClick={() => setDeleteTargetId(row.id)}
-                                >
-                                  Eliminar
-                                </DropdownMenuItem>
-                              ) : null}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </CardAction>
-                      ) : null}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex flex-col gap-2 pt-4 pb-6 text-sm">
-                    <p className="text-xs text-muted-foreground">
+                                Eliminar
+                              </DropdownMenuItem>
+                            ) : null}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </CardAction>
+                    ) : null}
+                  </ListCardHeader>
+                  <ListCardContent>
+                    <CardDescription>
                       {
                         AREA_LABELS[
                           row.areaCreativa as CreateDirectorioEmprendimientoDtoAreaCreativa
                         ]
                       }
-                    </p>
-                    <p className="text-xs text-muted-foreground">
+                    </CardDescription>
+                    <Badge variant={row.perfilActivo ? "default" : "secondary"}>
                       {row.perfilActivo ? "Activo" : "Inactivo"}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">
+                    </Badge>
+                    <CardDescription className="truncate">
                       {toCellText(row.correo)}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">
+                    </CardDescription>
+                    <CardDescription className="truncate">
                       {toCellText(row.sitioWeb)}
-                    </p>
-                  </CardContent>
+                    </CardDescription>
+                  </ListCardContent>
                 </ListCardWithMedia>
               );
             })}

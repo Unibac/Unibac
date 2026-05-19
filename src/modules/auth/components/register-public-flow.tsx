@@ -8,10 +8,10 @@ import { useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 
 import { RegisterPublicDtoCategoria } from "@/api/generated/models";
+import { PanelCard } from "@/components/shared/panel-card";
 import { UnibacLogo } from "@/components/shared/unibac-logo";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
@@ -108,12 +108,12 @@ export function RegisterPublicFlow() {
 
   if (!enabled) {
     return (
-      <Card className="w-full max-w-md border-border shadow-sm">
-        <CardHeader className="flex flex-col items-center gap-4 text-center sm:items-stretch sm:text-start">
+      <PanelCard>
+        <CardHeader className="flex flex-col items-center gap-4 px-6 text-center sm:items-stretch sm:text-start">
           <div className="flex justify-center sm:justify-start">
             <UnibacLogo priority imgClassName="max-h-28 sm:max-h-32" />
           </div>
-          <CardTitle className="text-xl">Registro no disponible</CardTitle>
+          <CardTitle className="text-lg">Registro no disponible</CardTitle>
           <CardDescription>
             El registro público está deshabilitado en este entorno. Si necesitás
             una cuenta, contactá a la administración.
@@ -124,18 +124,18 @@ export function RegisterPublicFlow() {
             <Link href="/login">Volver al inicio de sesión</Link>
           </Button>
         </CardFooter>
-      </Card>
+      </PanelCard>
     );
   }
 
   if (step === "pick") {
     return (
-      <Card className="w-full max-w-md border-border shadow-sm transition-colors duration-150">
-        <CardHeader className="flex flex-col items-center gap-4 text-center sm:items-stretch sm:text-start">
+      <PanelCard>
+        <CardHeader className="flex flex-col items-center gap-4 px-6 text-center sm:items-stretch sm:text-start">
           <div className="flex justify-center sm:justify-start">
             <UnibacLogo priority imgClassName="max-h-28 sm:max-h-32" />
           </div>
-          <CardTitle className="text-xl">Crear cuenta externa</CardTitle>
+          <CardTitle className="text-lg">Crear cuenta externa</CardTitle>
           <CardDescription>
             Elegí el tipo de cuenta. El sistema asignará el rol y permisos según
             tu perfil.
@@ -152,7 +152,7 @@ export function RegisterPublicFlow() {
               <button
                 key={cat}
                 type="button"
-                className="rounded-md border border-border bg-card p-4 text-start transition-colors duration-150 hover:bg-accent/50"
+                className="rounded-md border border-border bg-card p-4 text-start transition-colors duration-150 hover:border-border/80 hover:bg-accent/50"
                 onClick={() => selectCategoria(cat)}
               >
                 <p className="text-sm font-medium text-foreground">
@@ -170,17 +170,17 @@ export function RegisterPublicFlow() {
             <Link href="/login">Ya tengo cuenta</Link>
           </Button>
         </CardFooter>
-      </Card>
+      </PanelCard>
     );
   }
 
   return (
-    <Card className="w-full max-w-md border-border shadow-sm transition-colors duration-150">
-      <CardHeader className="flex flex-col items-center gap-4 text-center sm:items-stretch sm:text-start">
+    <PanelCard>
+      <CardHeader className="flex flex-col items-center gap-4 px-6 text-center sm:items-stretch sm:text-start">
         <div className="flex justify-center sm:justify-start">
           <UnibacLogo priority imgClassName="max-h-28 sm:max-h-32" />
         </div>
-        <CardTitle className="text-xl">
+        <CardTitle className="text-lg">
           Registro — {CATEGORIA_COPY[categoria].title}
         </CardTitle>
         <CardDescription>
@@ -407,6 +407,6 @@ export function RegisterPublicFlow() {
           </CardFooter>
         </form>
       </Form>
-    </Card>
+    </PanelCard>
   );
 }

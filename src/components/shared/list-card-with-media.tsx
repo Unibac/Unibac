@@ -1,17 +1,12 @@
 import type * as React from "react";
 
-import { Card } from "@/components/ui/card";
+import { ListCard } from "@/components/shared/list-card";
 import { cn } from "@/lib/utils";
 
-/** `Card` para listados con imagen superior (`ListCardThumbnail`). */
-export const listCardWithMediaClassName =
-  "gap-0 overflow-hidden py-0 transition-colors duration-150";
-
+/** `ListCard` para listados con imagen superior (`ListCardThumbnail`). */
 export function ListCardWithMedia({
   className,
   ...props
-}: React.ComponentProps<typeof Card>) {
-  return (
-    <Card className={cn(listCardWithMediaClassName, className)} {...props} />
-  );
+}: React.ComponentProps<typeof ListCard>) {
+  return <ListCard className={className} {...props} />;
 }

@@ -1,5 +1,5 @@
+import { PanelCard } from "@/components/shared/panel-card";
 import {
-  Card,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -15,11 +15,11 @@ export function ModulePlaceholder({
   description = "Estamos trabajando en esta sección. Pronto podrás gestionar el módulo desde aquí.",
 }: ModulePlaceholderProps) {
   return (
-    <Card>
+    <PanelCard className="max-w-2xl">
       <CardHeader className="flex flex-col gap-2">
-        <CardTitle className="text-xl">{title}</CardTitle>
+        <CardTitle className="text-base">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-    </Card>
+    </PanelCard>
   );
 }

@@ -10,6 +10,10 @@ import {
   type TalentoPerfilResponseDto,
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
+import { ListCard } from "@/components/shared/list-card";
+import { ListCardContent } from "@/components/shared/list-card-content";
+import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
+import { ListCardHeader } from "@/components/shared/list-card-header";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -19,12 +23,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardAction,
-  CardContent,
-  CardHeader,
+  CardDescription,
   CardTitle,
 } from "@/components/ui/card";
 import {
@@ -224,11 +227,11 @@ export function TalentoPerfilesView() {
 
       {layout === "cards" ? (
         filteredRows.length === 0 ? (
-          <p className="rounded-md border border-border bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground transition-colors duration-150">
+          <ListCardGridEmpty>
             {rows.length === 0
               ? "No hay perfiles registrados."
               : "Ningún perfil coincide con la búsqueda."}
-          </p>
+          </ListCardGridEmpty>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {filteredRows.map((row) => {
@@ -242,15 +245,11 @@ export function TalentoPerfilesView() {
                 .filter((t) => t !== "—")
                 .join(" · ");
               return (
-                <Card
-                  key={row.id}
-                  className="gap-0 py-0 transition-colors duration-150"
-                >
-                  <CardHeader className="gap-3 border-b border-border pb-4">
-                    <div className="flex min-w-0 flex-row items-start justify-between gap-2">
-                      <CardTitle className="truncate text-base leading-snug">
-                        {row.nombreCompleto}
-                      </CardTitle>
+                <ListCard key={row.id}>
+                  <ListCardHeader>
+                    <CardTitle className="truncate text-base leading-snug">
+                      {row.nombreCompleto}
+                    </CardTitle>
                       {showMenu ? (
                         <CardAction>
                           <DropdownMenu>
@@ -281,32 +280,31 @@ export function TalentoPerfilesView() {
                           </DropdownMenu>
                         </CardAction>
                       ) : null}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex flex-col gap-2 pt-4 pb-6 text-sm">
-                    <div className="flex flex-wrap gap-x-2 gap-y-1 text-xs text-muted-foreground">
-                      <span>
+                  </ListCardHeader>
+                  <ListCardContent>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline">
                         {AREA_LABELS[row.area as CreateTalentoPerfilDtoArea]}
-                      </span>
-                      <span aria-hidden>·</span>
-                      <span>
+                      </Badge>
+                      <Badge variant="outline">
                         {
                           TIPO_PERFIL_LABELS[
                             row.tipoPerfil as CreateTalentoPerfilDtoTipoPerfil
                           ]
                         }
-                      </span>
-                      <span aria-hidden>·</span>
-                      <span>{row.perfilActivo ? "Activo" : "Inactivo"}</span>
+                      </Badge>
+                      <Badge variant={row.perfilActivo ? "default" : "secondary"}>
+                        {row.perfilActivo ? "Activo" : "Inactivo"}
+                      </Badge>
                     </div>
-                    <p className="truncate text-xs text-muted-foreground">
+                    <CardDescription className="truncate">
                       {contacto || "—"}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">
+                    </CardDescription>
+                    <CardDescription className="truncate">
                       {toCellText(row.portafolioUrl)}
-                    </p>
-                  </CardContent>
-                </Card>
+                    </CardDescription>
+                  </ListCardContent>
+                </ListCard>
               );
             })}
           </div>

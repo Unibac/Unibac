@@ -5,8 +5,8 @@ import Link from "next/link";
 import { PortalHero } from "@/components/layout/portal/portal-hero";
 import { PortalServiceGrid } from "@/components/layout/portal/portal-service-grid";
 import { PageHeader } from "@/components/layout/page-header";
+import { NavModuleCard } from "@/components/shared/nav-module-card";
 import {
-  Card,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -54,13 +54,17 @@ export default function DashboardHomePage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {navItems.map((link) => (
-            <Link key={link.href} href={link.href}>
-              <Card className="transition-colors duration-150 hover:bg-accent/50">
+            <Link
+              key={link.href}
+              href={link.href}
+              className="group block h-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <NavModuleCard className="h-full">
                 <CardHeader className="flex flex-col gap-2">
                   <CardTitle className="text-base">{link.label}</CardTitle>
                   <CardDescription>Ir al módulo</CardDescription>
                 </CardHeader>
-              </Card>
+              </NavModuleCard>
             </Link>
           ))}
         </div>
