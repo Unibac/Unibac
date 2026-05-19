@@ -68,8 +68,8 @@ export type PropuestaFeriaFormSheetProps = {
   onOpenChange: (open: boolean) => void;
   mode: "create" | "edit";
   row: PropuestaFeriaResponseDto | null;
-  /** Si false, el envío queda deshabilitado (feria fuera de vigencia activa). */
-  feriaActiva?: boolean;
+  /** Si false, el envío queda deshabilitado (feria finalizada u otro período no admitido). */
+  postulacionAbierta?: boolean;
 };
 
 export function PropuestaFeriaFormSheet({
@@ -78,7 +78,7 @@ export function PropuestaFeriaFormSheet({
   onOpenChange,
   mode,
   row,
-  feriaActiva = true,
+  postulacionAbierta = true,
 }: PropuestaFeriaFormSheetProps) {
   const [apiError, setApiError] = useState<string | null>(null);
   const imagenInputRef = useRef<HTMLInputElement>(null);
@@ -147,7 +147,7 @@ export function PropuestaFeriaFormSheet({
     }
   }
 
-  const submitDisabled = pending || !feriaActiva;
+  const submitDisabled = pending || !postulacionAbierta;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -178,10 +178,10 @@ export function PropuestaFeriaFormSheet({
                 {apiError}
               </p>
             ) : null}
-            {!feriaActiva ? (
+            {!postulacionAbierta ? (
               <p className="text-xs text-muted-foreground">
                 Solo podés registrar o editar propuestas mientras la feria está
-                en curso.
+                próxima o en curso.
               </p>
             ) : null}
 

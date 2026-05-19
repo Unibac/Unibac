@@ -20,7 +20,7 @@ export function ListCardThumbnail({
   return (
     <div
       className={cn(
-        "relative aspect-video w-full overflow-hidden border-b border-border bg-muted/30",
+        "relative aspect-video w-full shrink-0 overflow-hidden rounded-t-xl border-b border-border bg-muted/30",
         className,
       )}
     >
@@ -30,7 +30,7 @@ export function ListCardThumbnail({
         fill
         unoptimized
         sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-        className="object-cover transition-opacity duration-150"
+        className="rounded-t-xl object-cover transition-opacity duration-150"
       />
     </div>
   );

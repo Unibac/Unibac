@@ -14,9 +14,9 @@ import {
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
+import { ListCardWithMedia } from "@/components/shared/list-card-with-media";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardAction,
   CardContent,
   CardHeader,
@@ -55,9 +55,14 @@ import { MiPropuestaEnFeriaCard } from "@/modules/ferias/components/mi-propuesta
 import { PropuestaFeriaFormSheet } from "@/modules/ferias/components/propuesta-feria-form-sheet";
 import {
   FERIAS_BROWSE_ONLY_MESSAGE,
+  FERIAS_POSTULACION_CERRADA_MESSAGE,
+  FERIAS_POSTULACION_PROXIMA_HINT,
   FERIAS_STAFF_NO_POSTULAR_MESSAGE,
 } from "@/modules/ferias/lib/ferias-copy";
-import { canEditMisPropuesta } from "@/modules/ferias/lib/propuesta-feria-rules";
+import {
+  canEditMisPropuesta,
+  feriaPermitePostulacion,
+} from "@/modules/ferias/lib/propuesta-feria-rules";
 import {
   useFeriaDetailQuery,
   useMisPropuestasQuery,
@@ -127,10 +132,10 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
     return list.find((p) => p.feriaId === feriaId) ?? null;
   }, [misPropuestasQuery.data, feriaId]);
 
+  const postulacionAbierta = feriaPermitePostulacion(feria?.periodo);
+
   const puedeNuevaPropuesta =
-    canPostular &&
-    feria?.periodo === FeriaResponseDtoPeriodo.activa &&
-    miPropuestaEnEstaFeria == null;
+    canPostular && postulacionAbierta && miPropuestaEnEstaFeria == null;
 
   function openCreatePropuesta() {
     setSheetMode("create");
@@ -151,8 +156,6 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
       feriaPeriodo: feria?.periodo,
     });
   }
-
-  const feriaActiva = feria?.periodo === FeriaResponseDtoPeriodo.activa;
 
   const bannerSrc = feria ? parsePublicImageUrl(feria.imagenBannerUrl) : null;
 
@@ -182,6 +185,8 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
   }
 
   if (!feria) return null;
+
+  const feriaProxima = feria.periodo === FeriaResponseDtoPeriodo.proxima;
 
   if (!feriasCanBrowse(profile.data)) {
     return (
@@ -246,6 +251,16 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
             ) : null}
           </div>
         </div>
+        {canPostular && feriaProxima && !miPropuestaEnEstaFeria ? (
+          <p className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+            {FERIAS_POSTULACION_PROXIMA_HINT}
+          </p>
+        ) : null}
+        {canPostular && !postulacionAbierta && !miPropuestaEnEstaFeria ? (
+          <p className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+            {FERIAS_POSTULACION_CERRADA_MESSAGE}
+          </p>
+        ) : null}
         {bannerSrc ? (
           <Image
             src={bannerSrc}
@@ -336,10 +351,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
                   row.estado === PropuestaFeriaResponseDtoEstado.POSTULADO;
                 const menu = editable || moderar;
                 return (
-                  <Card
-                    key={row.id}
-                    className="gap-0 py-0 transition-colors duration-150"
-                  >
+                  <ListCardWithMedia key={row.id}>
                     <ListCardThumbnail
                       src={row.imagenUrl}
                       alt={row.nombreEmprendimiento}
@@ -420,7 +432,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
                         {row.correo}
                       </p>
                     </CardContent>
-                  </Card>
+                  </ListCardWithMedia>
                 );
               })}
             </div>
@@ -544,7 +556,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
         onOpenChange={setSheetOpen}
         mode={sheetMode}
         row={sheetRow}
-        feriaActiva={feriaActiva}
+        postulacionAbierta={postulacionAbierta}
       />
 
       <ModerarPropuestaDialog

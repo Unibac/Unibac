@@ -10,6 +10,7 @@ import {
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
+import { ListCardWithMedia } from "@/components/shared/list-card-with-media";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -21,7 +22,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardAction,
   CardContent,
   CardHeader,
@@ -206,10 +206,7 @@ export function DirectorioView() {
               const deletable = isAdmin === true;
               const showMenu = editable || deletable;
               return (
-                <Card
-                  key={row.id}
-                  className="gap-0 py-0 transition-colors duration-150"
-                >
+                <ListCardWithMedia key={row.id}>
                   <ListCardThumbnail
                     src={row.imagenUrl}
                     alt={row.nombreProyecto}
@@ -269,7 +266,7 @@ export function DirectorioView() {
                       {toCellText(row.sitioWeb)}
                     </p>
                   </CardContent>
-                </Card>
+                </ListCardWithMedia>
               );
             })}
           </div>

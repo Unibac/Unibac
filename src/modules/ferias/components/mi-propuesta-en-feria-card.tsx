@@ -6,10 +6,11 @@ import {
   type PropuestaFeriaResponseDto,
   PropuestaFeriaResponseDtoEstado,
 } from "@/api/generated/models";
+import { feriaPermitePostulacion } from "@/modules/ferias/lib/propuesta-feria-rules";
 import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
+import { ListCardWithMedia } from "@/components/shared/list-card-with-media";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardContent,
   CardFooter,
   CardHeader,
@@ -34,10 +35,13 @@ function estadoHint(
   feriaPeriodo: FeriaResponseDtoPeriodo,
 ): string {
   if (estado === PropuestaFeriaResponseDtoEstado.POSTULADO) {
-    if (feriaPeriodo === FeriaResponseDtoPeriodo.activa) {
+    if (feriaPermitePostulacion(feriaPeriodo)) {
+      if (feriaPeriodo === FeriaResponseDtoPeriodo.proxima) {
+        return "Tu propuesta está en revisión. Podés editarla mientras la feria esté próxima o en curso y siga en estado Postulado.";
+      }
       return "Tu propuesta está en revisión. Podés editarla mientras la feria esté en curso y siga en estado Postulado.";
     }
-    return "Tu propuesta está en revisión. No podés editarla fuera del período activo de la feria.";
+    return "Tu propuesta está en revisión. No podés editarla: la feria ya finalizó.";
   }
   if (estado === PropuestaFeriaResponseDtoEstado.ACEPTADO) {
     return "Tu propuesta fue aceptada y puede aparecer en la vitrina pública.";
@@ -66,7 +70,7 @@ export function MiPropuestaEnFeriaCard({
       <h3 id="mi-propuesta-feria-title" className="text-sm font-medium">
         Mi propuesta en esta feria
       </h3>
-      <Card className="gap-0 py-0">
+      <ListCardWithMedia>
         <ListCardThumbnail
           src={propuesta.imagenUrl}
           alt={propuesta.nombreEmprendimiento}
@@ -98,7 +102,7 @@ export function MiPropuestaEnFeriaCard({
             </Button>
           </CardFooter>
         ) : null}
-      </Card>
+      </ListCardWithMedia>
     </section>
   );
 }

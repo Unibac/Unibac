@@ -14,7 +14,7 @@ import {
  * Política B — Ferias:
  * | Perfil | Browse | Postular | CRUD feria | Moderar |
  * | ADMIN / INTERNO | sí | no | sí (interno+) | admin only |
- * | EXTERNO ESTUDIANTE | sí | sí | no | no |
+ * | EXTERNO ESTUDIANTE | sí | sí (próxima o activa) | no | no |
  * | EXTERNO EGRESADO/EMPRESA | sí | no | no | no |
  */
 

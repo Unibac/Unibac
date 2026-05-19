@@ -12,6 +12,7 @@ import {
 } from "@/api/generated/models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
+import { ListCardWithMedia } from "@/components/shared/list-card-with-media";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -23,7 +24,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
   CardAction,
   CardContent,
   CardFooter,
@@ -57,6 +57,7 @@ import {
 import {
   canEditMisPropuesta,
   feriaPeriodoFromPropuesta,
+  feriaPermitePostulacion,
 } from "@/modules/ferias/lib/propuesta-feria-rules";
 import { useDeleteFeriaMutation } from "@/modules/ferias/hooks/use-ferias-mutations";
 import {
@@ -221,10 +222,7 @@ export function FeriasView() {
           ) : layout === "cards" ? (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {misRows.map((p) => (
-                <Card
-                  key={p.id}
-                  className="gap-0 py-0 transition-colors duration-150"
-                >
+                <ListCardWithMedia key={p.id}>
                   <ListCardThumbnail
                     src={p.imagenUrl}
                     alt={p.nombreEmprendimiento}
@@ -259,7 +257,7 @@ export function FeriasView() {
                       </Button>
                     ) : null}
                   </CardFooter>
-                </Card>
+                </ListCardWithMedia>
               ))}
             </div>
           ) : (
@@ -346,10 +344,7 @@ export function FeriasView() {
               {filteredRows.map((row) => {
                 const showAdminMenu = canManageEventos;
                 return (
-                  <Card
-                    key={row.id}
-                    className="gap-0 py-0 transition-colors duration-150"
-                  >
+                  <ListCardWithMedia key={row.id}>
                     <ListCardThumbnail
                       src={row.imagenBannerUrl}
                       alt={row.nombre}
@@ -420,7 +415,7 @@ export function FeriasView() {
                         </Button>
                       </CardFooter>
                     ) : null}
-                  </Card>
+                  </ListCardWithMedia>
                 );
               })}
             </div>
@@ -534,10 +529,9 @@ export function FeriasView() {
           }}
           mode="edit"
           row={propuestaSheetRow}
-          feriaActiva={
-            feriaPeriodoFromPropuesta(propuestaSheetRow) ===
-            FeriaResponseDtoPeriodo.activa
-          }
+          postulacionAbierta={feriaPermitePostulacion(
+            feriaPeriodoFromPropuesta(propuestaSheetRow),
+          )}
         />
       ) : null}
 
