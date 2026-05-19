@@ -4,7 +4,9 @@ import { NextResponse } from "next/server";
 import { ACCESS_TOKEN_COOKIE_NAME } from "@/lib/auth/access-token-cookie";
 
 /**
- * Solo comprueba presencia del cookie HttpOnly `access_token`.
+ * Solo comprueba presencia del cookie HttpOnly `access_token` en el origen del frontend.
+ * Si el login va directo al API en otro dominio, la cookie no llega aquí aunque /auth/profile
+ * responda 200 vía XHR; usar `NEXT_PUBLIC_API_URL=/api-proxy` + `API_PROXY_TARGET`.
  * La autorización real sigue siendo GET /auth/profile en cliente (TanStack Query).
  */
 export function middleware(request: NextRequest) {

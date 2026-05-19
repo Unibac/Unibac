@@ -1,7 +1,21 @@
 import type { NextConfig } from "next";
 
+import { resolveApiProxyTarget } from "./src/lib/api/resolve-api-base-url";
+
+const apiProxyTarget = resolveApiProxyTarget();
+
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    if (!apiProxyTarget) {
+      return [];
+    }
+    return [
+      {
+        source: "/api-proxy/:path*",
+        destination: `${apiProxyTarget}/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
