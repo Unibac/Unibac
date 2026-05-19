@@ -12,7 +12,10 @@ import {
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCard } from "@/components/shared/list-card";
 import { ListCardContent } from "@/components/shared/list-card-content";
+import { FilterPanel } from "@/components/shared/filter-panel";
 import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
+import { ListPageToolbar } from "@/components/shared/list-page-toolbar";
+import { PageCallout } from "@/components/shared/page-callout";
 import { ListCardHeader } from "@/components/shared/list-card-header";
 import {
   AlertDialog,
@@ -199,49 +202,46 @@ export function EgresadosView() {
 
   if (!egresadosCanAccessModule(profile.data)) {
     return (
-      <p
-        role="alert"
-        className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
-      >
+      <PageCallout>
         El directorio de egresados está disponible solo para personal
         institucional o cuentas de egresado. Si necesitás acceso, contactá a
         administración.
-      </p>
+      </PageCallout>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="layout-page-section flex flex-col gap-4">
       {meQuery.isError ? (
-        <p
-          role="alert"
-          className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-        >
+        <PageCallout variant="destructive">
           {getApiErrorMessage(meQuery.error)}
-        </p>
+        </PageCallout>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-2">
-        {canRegisterSelf ? (
-          <Button type="button" size="sm" onClick={() => openCreate()}>
-            Registrar mi perfil
-          </Button>
-        ) : null}
-        {myRecord ? (
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={() => openEdit(myRecord)}
-          >
-            Editar mi perfil
-          </Button>
-        ) : null}
-      </div>
+      <ListPageToolbar
+        end={
+          <>
+            {canRegisterSelf ? (
+              <Button type="button" size="sm" onClick={() => openCreate()}>
+                Registrar mi perfil
+              </Button>
+            ) : null}
+            {myRecord ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => openEdit(myRecord)}
+              >
+                Editar mi perfil
+              </Button>
+            ) : null}
+          </>
+        }
+      />
 
-      <div className="rounded-md border border-border p-4">
-        <p className="text-sm font-medium text-foreground">Filtros</p>
-        <div className="mt-3 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <FilterPanel>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <div className="grid gap-2">
             <Label htmlFor="flt-nombre">Nombre</Label>
             <Input
@@ -321,7 +321,7 @@ export function EgresadosView() {
             Limpiar
           </Button>
         </div>
-      </div>
+      </FilterPanel>
 
       {listQuery.isPending ? (
         <div className="flex flex-col gap-4">
@@ -329,19 +329,16 @@ export function EgresadosView() {
           <Skeleton className="h-64 w-full" />
         </div>
       ) : listQuery.isError ? (
-        <p
-          role="alert"
-          className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-        >
+        <PageCallout variant="destructive">
           {getApiErrorMessage(listQuery.error)}
-        </p>
+        </PageCallout>
       ) : layout === "cards" ? (
         (listQuery.data ?? []).length === 0 ? (
           <ListCardGridEmpty>
             No hay egresados que coincidan con los filtros.
           </ListCardGridEmpty>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="layout-list-grid">
             {(listQuery.data ?? []).map((row) => {
               const editable = canEditRow(row);
               const deletable = isAdmin === true;

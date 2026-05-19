@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { PageHeader } from "@/components/layout/page-header";
+import { DashboardPage } from "@/components/layout/dashboard-page";
 import { Button } from "@/components/ui/button";
 import { FeriaDetailView } from "@/modules/ferias/components/feria-detail-view";
 
@@ -14,29 +14,20 @@ export default async function FeriaDetailPage({ params }: Props) {
 
   if (!Number.isFinite(id) || id <= 0) {
     return (
-      <div className="flex flex-col gap-4">
+      <DashboardPage>
         <p className="text-sm text-destructive">
           Identificador de feria inválido.
         </p>
         <Button asChild variant="outline" size="sm">
           <Link href="/dashboard/ferias">Volver al listado</Link>
         </Button>
-      </div>
+      </DashboardPage>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader
-        title="Detalle de feria"
-        description="Consultá la información de la feria, las propuestas y las acciones disponibles según tu rol."
-        actions={
-          <Button asChild variant="outline" size="sm">
-            <Link href="/dashboard/ferias">Volver a ferias</Link>
-          </Button>
-        }
-      />
+    <DashboardPage>
       <FeriaDetailView feriaId={id} />
-    </div>
+    </DashboardPage>
   );
 }

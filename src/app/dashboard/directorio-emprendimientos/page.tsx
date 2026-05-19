@@ -1,14 +1,15 @@
+import { DashboardPage } from "@/components/layout/dashboard-page";
 import { PageHeader } from "@/components/layout/page-header";
 import { DirectorioView } from "@/modules/directorio-emprendimientos/components/directorio-view";
 
-export default function DirectorioEmprendimientosPage() {
+export default function DirectorioPage() {
   return (
-    <div className="flex flex-col gap-6">
+    <DashboardPage>
       <PageHeader
         title="Directorio de emprendimientos"
-        description="Registro y gestión de emprendimientos creativos."
+        description="Perfiles públicos de emprendimientos registrados en la plataforma."
       />
       <DirectorioView />
-    </div>
+    </DashboardPage>
   );
 }

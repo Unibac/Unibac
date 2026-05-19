@@ -4,6 +4,7 @@ import { SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import { NavModuleCard, navModuleCardClassName } from "@/components/shared/nav-module-card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { DashboardNavItemData } from "@/modules/auth/lib/dashboard-nav-items";
@@ -63,20 +64,27 @@ export function PortalServiceGrid({ items }: PortalServiceGridProps) {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="group flex flex-col items-center gap-3 rounded-md p-2 outline-none ring-ring transition-colors duration-150 hover:bg-accent/50 focus-visible:ring-2"
+                  className="group block h-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   aria-label={`Ir a ${item.label}`}
                 >
-                  <span
+                  <NavModuleCard
                     className={cn(
-                      "flex size-20 items-center justify-center rounded-2xl transition-shadow duration-150 group-hover:shadow-sm sm:size-24",
-                      tileBg,
+                      "flex h-full flex-col items-center gap-3 border-0 bg-transparent p-4 shadow-none",
+                      navModuleCardClassName,
                     )}
                   >
-                    <Icon className="size-8 shrink-0 sm:size-9" aria-hidden />
-                  </span>
-                  <span className="text-center text-sm font-medium leading-snug">
-                    {item.label}
-                  </span>
+                    <span
+                      className={cn(
+                        "flex size-20 items-center justify-center rounded-2xl transition-shadow duration-150 group-hover:shadow-sm sm:size-24",
+                        tileBg,
+                      )}
+                    >
+                      <Icon className="size-8 shrink-0 sm:size-9" aria-hidden />
+                    </span>
+                    <span className="text-center text-sm font-medium leading-snug">
+                      {item.label}
+                    </span>
+                  </NavModuleCard>
                 </Link>
               </li>
             );

@@ -17,6 +17,8 @@ import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
 import { ListCardHeader } from "@/components/shared/list-card-header";
 import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
 import { ListCardWithMedia } from "@/components/shared/list-card-with-media";
+import { ListPageToolbar } from "@/components/shared/list-page-toolbar";
+import { PageCallout } from "@/components/shared/page-callout";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -41,6 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -164,13 +167,10 @@ export function FeriasView() {
 
   if (!feriasCanBrowse(profile.data)) {
     return (
-      <p
-        role="alert"
-        className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
-      >
+      <PageCallout>
         No tenés acceso a ferias con tu tipo de cuenta. Si necesitás permisos,
         contactá a administración.
-      </p>
+      </PageCallout>
     );
   }
 
@@ -185,45 +185,37 @@ export function FeriasView() {
 
   if (listQuery.isError) {
     return (
-      <p
-        role="alert"
-        className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-      >
+      <PageCallout variant="destructive">
         {getApiErrorMessage(listQuery.error)}
-      </p>
+      </PageCallout>
     );
   }
 
-  return (
-    <div className="flex flex-col gap-8">
+  const feriasCallouts = (
+    <>
       {canManageEventos && !canPostular ? (
-        <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          {FERIAS_STAFF_NO_POSTULAR_MESSAGE}
-        </p>
+        <PageCallout>{FERIAS_STAFF_NO_POSTULAR_MESSAGE}</PageCallout>
       ) : null}
       {!canPostular && !canManageEventos ? (
-        <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          {FERIAS_BROWSE_ONLY_MESSAGE}
-        </p>
+        <PageCallout>{FERIAS_BROWSE_ONLY_MESSAGE}</PageCallout>
       ) : null}
-      {canPostular ? (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-sm font-medium">Mis propuestas</h2>
-          {misPropuestasQuery.isPending ? (
+    </>
+  );
+
+  const misPropuestasContent = (
+    <>
+      {misPropuestasQuery.isPending ? (
             <Skeleton className="h-24 w-full max-w-3xl" />
-          ) : misPropuestasQuery.isError ? (
-            <p
-              role="alert"
-              className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive"
-            >
-              {getApiErrorMessage(misPropuestasQuery.error)}
-            </p>
-          ) : misRows.length === 0 ? (
+      ) : misPropuestasQuery.isError ? (
+        <PageCallout variant="destructive" className="text-xs">
+          {getApiErrorMessage(misPropuestasQuery.error)}
+        </PageCallout>
+      ) : misRows.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               Todavía no registraste propuestas en ninguna feria.
             </p>
           ) : layout === "cards" ? (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="layout-list-grid">
               {misRows.map((p) => (
                 <ListCardWithMedia key={p.id}>
                   <ListCardThumbnail
@@ -317,34 +309,36 @@ export function FeriasView() {
                 ))}
               </TableBody>
             </Table>
-          )}
-        </section>
-      ) : null}
+      )}
+    </>
+  );
 
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm text-muted-foreground">
-            Ferias virtuales próximas, en curso y finalizadas.
-          </p>
-          {canManageEventos ? (
+  const explorarFeriasSection = (
+    <section className="layout-page-section flex flex-col gap-4">
+      <p className="text-sm text-muted-foreground">
+        Ferias virtuales próximas, en curso y finalizadas.
+      </p>
+      <ListPageToolbar
+        sticky
+        end={
+          canManageEventos ? (
             <Button type="button" size="sm" onClick={openCreate}>
               Nueva feria
             </Button>
-          ) : null}
-        </div>
+          ) : undefined
+        }
+      >
+        <Input
+          type="search"
+          placeholder="Buscar por nombre o descripción…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          aria-label="Filtrar ferias"
+          className="w-full text-sm sm:max-w-xs"
+        />
+      </ListPageToolbar>
 
-        <div className="max-w-md">
-          <Input
-            type="search"
-            placeholder="Buscar por nombre o descripción…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label="Filtrar ferias"
-            className="text-sm"
-          />
-        </div>
-
-        {layout === "cards" ? (
+      {layout === "cards" ? (
           filteredRows.length === 0 ? (
             <ListCardGridEmpty>
               {rows.length === 0
@@ -352,7 +346,7 @@ export function FeriasView() {
                 : "Ninguna feria coincide con la búsqueda."}
             </ListCardGridEmpty>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="layout-list-grid">
               {filteredRows.map((row) => {
                 const showAdminMenu = canManageEventos;
                 return (
@@ -518,7 +512,28 @@ export function FeriasView() {
             </TableBody>
           </Table>
         )}
-      </section>
+    </section>
+  );
+
+  return (
+    <div className="flex flex-col gap-6">
+      {feriasCallouts}
+      {canPostular ? (
+        <Tabs defaultValue="explorar">
+          <TabsList>
+            <TabsTrigger value="explorar">Explorar ferias</TabsTrigger>
+            <TabsTrigger value="mis">Mis propuestas</TabsTrigger>
+          </TabsList>
+          <TabsContent value="mis" className="flex flex-col gap-4 pt-4">
+            {misPropuestasContent}
+          </TabsContent>
+          <TabsContent value="explorar" className="pt-4">
+            {explorarFeriasSection}
+          </TabsContent>
+        </Tabs>
+      ) : (
+        explorarFeriasSection
+      )}
 
       <FeriaFormSheet
         open={sheetOpen}

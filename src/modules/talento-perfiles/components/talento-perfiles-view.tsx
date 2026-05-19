@@ -13,6 +13,8 @@ import { useDashboardListLayout } from "@/components/layout/dashboard-list-layou
 import { ListCard } from "@/components/shared/list-card";
 import { ListCardContent } from "@/components/shared/list-card-content";
 import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
+import { ListPageToolbar } from "@/components/shared/list-page-toolbar";
+import { PageCallout } from "@/components/shared/page-callout";
 import { ListCardHeader } from "@/components/shared/list-card-header";
 import {
   AlertDialog,
@@ -156,14 +158,11 @@ export function TalentoPerfilesView() {
 
   if (!talentoCanAccessModule(profile.data)) {
     return (
-      <p
-        role="alert"
-        className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
-      >
+      <PageCallout>
         El banco de talento está disponible para personal institucional o
         cuentas estudiante/egresado. Si necesitás acceso, contactá a
         administración.
-      </p>
+      </PageCallout>
     );
   }
 
@@ -178,52 +177,52 @@ export function TalentoPerfilesView() {
 
   if (listQuery.isError) {
     return (
-      <p
-        role="alert"
-        className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-      >
+      <PageCallout variant="destructive">
         {getApiErrorMessage(listQuery.error)}
-      </p>
+      </PageCallout>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="text-sm text-muted-foreground">
-          {isAdmin
-            ? "Podés editar cualquier perfil. Eliminar solo disponible para administradores."
-            : "Podés editar tu propio perfil."}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {myRow ? (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => openEdit(myRow)}
-            >
-              Editar mi perfil
-            </Button>
-          ) : null}
-          {canRegisterSelf ? (
+    <div className="layout-page-section flex flex-col gap-4">
+      <ListPageToolbar
+        end={
+          <>
+            {myRow ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => openEdit(myRow)}
+              >
+                Editar mi perfil
+              </Button>
+            ) : null}
+            {canRegisterSelf ? (
             <Button type="button" size="sm" onClick={() => openCreate()}>
               Registrar mi perfil
             </Button>
-          ) : null}
-        </div>
-      </div>
+            ) : null}
+          </>
+        }
+      >
+        <p className="text-sm text-muted-foreground">
+          {isAdmin
+            ? "Podés editar cualquier perfil. Eliminar solo disponible para administradores."
+            : "Podés editar tu propio perfil."}
+        </p>
+      </ListPageToolbar>
 
-      <div className="max-w-md">
+      <ListPageToolbar sticky>
         <Input
           type="search"
           placeholder="Buscar por nombre o habilidades…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           aria-label="Filtrar perfiles"
-          className="text-sm"
+          className="w-full text-sm sm:max-w-xs"
         />
-      </div>
+      </ListPageToolbar>
 
       {layout === "cards" ? (
         filteredRows.length === 0 ? (
@@ -233,7 +232,7 @@ export function TalentoPerfilesView() {
               : "Ningún perfil coincide con la búsqueda."}
           </ListCardGridEmpty>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="layout-list-grid">
             {filteredRows.map((row) => {
               const editable = canEditRow(row);
               const deletable = isAdmin === true;

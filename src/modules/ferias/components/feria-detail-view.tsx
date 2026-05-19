@@ -1,7 +1,6 @@
 "use client";
 
 import { MoreVerticalIcon } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -18,6 +17,9 @@ import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
 import { ListCardHeader } from "@/components/shared/list-card-header";
 import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
 import { ListCardWithMedia } from "@/components/shared/list-card-with-media";
+import { PageBreadcrumb } from "@/components/shared/page-breadcrumb";
+import { PageCallout } from "@/components/shared/page-callout";
+import { SectionHeader } from "@/components/shared/section-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,7 +50,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getApiErrorMessage } from "@/lib/api/error-message";
-import { parsePublicImageUrl } from "@/lib/media/parse-public-image-url";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
 import {
   ModerarPropuestaDialog,
@@ -158,8 +159,6 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
     });
   }
 
-  const bannerSrc = feria ? parsePublicImageUrl(feria.imagenBannerUrl) : null;
-
   if (feriaQuery.isPending) {
     return (
       <div className="flex flex-col gap-4">
@@ -171,13 +170,10 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
 
   if (feriaQuery.isError) {
     return (
-      <div className="flex flex-col gap-4">
-        <p
-          role="alert"
-          className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-        >
+      <div className="layout-page-section flex flex-col gap-4">
+        <PageCallout variant="destructive">
           {getApiErrorMessage(feriaQuery.error)}
-        </p>
+        </PageCallout>
         <Button asChild variant="outline" size="sm">
           <Link href="/dashboard/ferias">Volver al listado</Link>
         </Button>
@@ -192,13 +188,10 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
   if (!feriasCanBrowse(profile.data)) {
     return (
       <div className="flex flex-col gap-4">
-        <p
-          role="alert"
-          className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
-        >
+        <PageCallout>
           No tenés acceso a ferias con tu tipo de cuenta. Si necesitás permisos,
           contactá a administración.
-        </p>
+        </PageCallout>
         <Button asChild variant="outline" size="sm">
           <Link href="/dashboard/ferias">Volver al listado</Link>
         </Button>
@@ -208,72 +201,62 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
 
   return (
     <div className="flex flex-col gap-6">
+      <PageBreadcrumb
+        items={[
+          { label: "Ferias", href: "/dashboard/ferias" },
+          { label: feria.nombre },
+        ]}
+      />
       {canManageEventos && !canPostular ? (
-        <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          {FERIAS_STAFF_NO_POSTULAR_MESSAGE}
-        </p>
+        <PageCallout>{FERIAS_STAFF_NO_POSTULAR_MESSAGE}</PageCallout>
       ) : null}
       {!canPostular && !canManageEventos ? (
-        <p className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-          {FERIAS_BROWSE_ONLY_MESSAGE}
-        </p>
+        <PageCallout>{FERIAS_BROWSE_ONLY_MESSAGE}</PageCallout>
       ) : null}
-      <div className="flex flex-col gap-4 rounded-none border border-border bg-card p-4">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0 flex-1 space-y-2">
-            <h2 className="font-heading text-lg font-semibold">
-              {feria.nombre}
-            </h2>
-            <p className="text-sm text-muted-foreground">{feria.descripcion}</p>
-            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-              <span>
-                Inicio:{" "}
-                <time dateTime={feria.fechaInicio}>
-                  {new Date(feria.fechaInicio).toLocaleString()}
-                </time>
-              </span>
-              <span>·</span>
-              <span>
-                Fin:{" "}
-                <time dateTime={feria.fechaFin}>
-                  {new Date(feria.fechaFin).toLocaleString()}
-                </time>
-              </span>
-            </div>
-            <span className="inline-flex rounded-none border border-border px-2 py-0.5 text-xs">
-              {PERIODO_LABELS[feria.periodo]}
-            </span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {puedeNuevaPropuesta ? (
+      <ListCardWithMedia>
+        <ListCardThumbnail src={feria.imagenBannerUrl} alt={feria.nombre} />
+        <ListCardHeader>
+          <CardTitle className="font-heading text-lg font-semibold">
+            {feria.nombre}
+          </CardTitle>
+          {puedeNuevaPropuesta ? (
+            <CardAction>
               <Button type="button" size="sm" onClick={openCreatePropuesta}>
                 Nueva propuesta
               </Button>
-            ) : null}
+            </CardAction>
+          ) : null}
+        </ListCardHeader>
+        <ListCardContent className="gap-3">
+          <CardDescription>{feria.descripcion}</CardDescription>
+          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+            <span>
+              Inicio:{" "}
+              <time dateTime={feria.fechaInicio}>
+                {new Date(feria.fechaInicio).toLocaleString()}
+              </time>
+            </span>
+            <span>·</span>
+            <span>
+              Fin:{" "}
+              <time dateTime={feria.fechaFin}>
+                {new Date(feria.fechaFin).toLocaleString()}
+              </time>
+            </span>
           </div>
-        </div>
-        {canPostular && feriaProxima && !miPropuestaEnEstaFeria ? (
-          <p className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-            {FERIAS_POSTULACION_PROXIMA_HINT}
-          </p>
-        ) : null}
-        {canPostular && !postulacionAbierta && !miPropuestaEnEstaFeria ? (
-          <p className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-            {FERIAS_POSTULACION_CERRADA_MESSAGE}
-          </p>
-        ) : null}
-        {bannerSrc ? (
-          <Image
-            src={bannerSrc}
-            alt=""
-            width={1200}
-            height={384}
-            unoptimized
-            className="max-h-48 w-full max-w-3xl border border-border object-cover"
-          />
-        ) : null}
-      </div>
-
+          <Badge variant="outline">{PERIODO_LABELS[feria.periodo]}</Badge>
+          {canPostular && feriaProxima && !miPropuestaEnEstaFeria ? (
+            <PageCallout className="text-xs">
+              {FERIAS_POSTULACION_PROXIMA_HINT}
+            </PageCallout>
+          ) : null}
+          {canPostular && !postulacionAbierta && !miPropuestaEnEstaFeria ? (
+            <PageCallout className="text-xs">
+              {FERIAS_POSTULACION_CERRADA_MESSAGE}
+            </PageCallout>
+          ) : null}
+        </ListCardContent>
+      </ListCardWithMedia>
       {canPostular && miPropuestaEnEstaFeria ? (
         <MiPropuestaEnFeriaCard
           propuesta={miPropuestaEnEstaFeria}
@@ -283,11 +266,17 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
         />
       ) : null}
 
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-sm font-medium">Propuestas</h3>
-          {isAdmin ? (
-            <div className="flex items-center gap-2">
+      <section className="layout-page-section flex flex-col gap-3">
+        <SectionHeader
+          title="Propuestas"
+          description={
+            isAdmin
+              ? undefined
+              : "Solo se muestran propuestas aceptadas en vitrina."
+          }
+          actions={
+            isAdmin ? (
+              <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">Estado</span>
               <Select
                 value={estadoFiltro}
@@ -324,27 +313,21 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
                 </SelectContent>
               </Select>
             </div>
-          ) : (
-            <p className="text-xs text-muted-foreground">
-              Solo se muestran propuestas aceptadas en vitrina.
-            </p>
-          )}
-        </div>
+            ) : undefined
+          }
+        />
 
         {propuestasQuery.isPending ? (
           <Skeleton className="h-48 w-full" />
         ) : propuestasQuery.isError ? (
-          <p
-            role="alert"
-            className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-          >
+          <PageCallout variant="destructive">
             {getApiErrorMessage(propuestasQuery.error)}
-          </p>
+          </PageCallout>
         ) : layout === "cards" ? (
           rows.length === 0 ? (
             <ListCardGridEmpty>No hay propuestas para mostrar.</ListCardGridEmpty>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="layout-list-grid">
               {rows.map((row) => {
                 const editable = canEditPropuesta(row);
                 const moderar =
@@ -555,7 +538,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
             </TableBody>
           </Table>
         )}
-      </div>
+      </section>
 
       <PropuestaFeriaFormSheet
         feriaId={feriaId}

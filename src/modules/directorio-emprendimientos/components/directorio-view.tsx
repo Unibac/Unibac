@@ -11,6 +11,8 @@ import {
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCardContent } from "@/components/shared/list-card-content";
 import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
+import { ListPageToolbar } from "@/components/shared/list-page-toolbar";
+import { PageCallout } from "@/components/shared/page-callout";
 import { ListCardHeader } from "@/components/shared/list-card-header";
 import { ListCardThumbnail } from "@/components/shared/list-card-thumbnail";
 import { ListCardWithMedia } from "@/components/shared/list-card-with-media";
@@ -140,13 +142,10 @@ export function DirectorioView() {
 
   if (!directorioCanAccessModule(profile.data)) {
     return (
-      <p
-        role="alert"
-        className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
-      >
+      <PageCallout>
         No tenés acceso al directorio de emprendimientos con tu tipo de cuenta.
         Si necesitás permisos, contactá a administración.
-      </p>
+      </PageCallout>
     );
   }
 
@@ -161,41 +160,41 @@ export function DirectorioView() {
 
   if (listQuery.isError) {
     return (
-      <p
-        role="alert"
-        className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-      >
+      <PageCallout variant="destructive">
         {getApiErrorMessage(listQuery.error)}
-      </p>
+      </PageCallout>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="text-sm text-muted-foreground">
+    <div className="layout-page-section flex flex-col gap-4">
+      <ListPageToolbar
+        end={
+          <>
+            {myRow ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => openEdit(myRow)}
+              >
+                Editar mi emprendimiento
+              </Button>
+            ) : null}
+            {canRegisterSelf ? (
+              <Button type="button" size="sm" onClick={() => openCreate()}>
+                Registrar mi emprendimiento
+              </Button>
+            ) : null}
+          </>
+        }
+      >
+        <p className="text-sm text-muted-foreground">
           {isAdmin
             ? "Podés editar cualquier registro. Eliminar solo disponible para administradores."
             : "Podés editar tu propio emprendimiento."}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {myRow ? (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => openEdit(myRow)}
-            >
-              Editar mi emprendimiento
-            </Button>
-          ) : null}
-          {canRegisterSelf ? (
-            <Button type="button" size="sm" onClick={() => openCreate()}>
-              Registrar mi emprendimiento
-            </Button>
-          ) : null}
-        </div>
-      </div>
+        </p>
+      </ListPageToolbar>
 
       {layout === "cards" ? (
         rows.length === 0 ? (
@@ -203,7 +202,7 @@ export function DirectorioView() {
             No hay emprendimientos registrados.
           </ListCardGridEmpty>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="layout-list-grid">
             {rows.map((row) => {
               const editable = canEditRow(row);
               const deletable = isAdmin === true;

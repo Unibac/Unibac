@@ -16,6 +16,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { PageCallout } from "@/components/shared/page-callout";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -90,12 +91,9 @@ export function PostulacionesSheet({
 
         <div className="flex flex-1 flex-col gap-4 px-4 py-4">
           {apiError ? (
-            <p
-              role="alert"
-              className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive"
-            >
+            <PageCallout variant="destructive" className="text-xs">
               {apiError}
-            </p>
+            </PageCallout>
           ) : null}
 
           {query.isPending ? (
@@ -104,12 +102,9 @@ export function PostulacionesSheet({
               <Skeleton className="h-64 w-full" />
             </div>
           ) : query.isError ? (
-            <p
-              role="alert"
-              className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-            >
+            <PageCallout variant="destructive">
               {getApiErrorMessage(query.error)}
-            </p>
+            </PageCallout>
           ) : (
             <Table>
               <TableHeader>

@@ -8,6 +8,8 @@ import { useDashboardListLayout } from "@/components/layout/dashboard-list-layou
 import { ListCard } from "@/components/shared/list-card";
 import { ListCardContent } from "@/components/shared/list-card-content";
 import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
+import { ListPageToolbar } from "@/components/shared/list-page-toolbar";
+import { PageCallout } from "@/components/shared/page-callout";
 import { ListCardHeader } from "@/components/shared/list-card-header";
 import {
   AlertDialog,
@@ -106,12 +108,9 @@ export function UsuariosView() {
 
   if (!isAdministrador(profile.data)) {
     return (
-      <p
-        role="alert"
-        className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
-      >
+      <PageCallout>
         Solo los administradores pueden acceder a la gestión de usuarios.
-      </p>
+      </PageCallout>
     );
   }
 
@@ -126,23 +125,17 @@ export function UsuariosView() {
 
   if (usuariosQuery.isError) {
     return (
-      <p
-        role="alert"
-        className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-      >
+      <PageCallout variant="destructive">
         {getApiErrorMessage(usuariosQuery.error)}
-      </p>
+      </PageCallout>
     );
   }
 
   if (rolesQuery.isError) {
     return (
-      <p
-        role="alert"
-        className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-      >
+      <PageCallout variant="destructive">
         {getApiErrorMessage(rolesQuery.error)}
-      </p>
+      </PageCallout>
     );
   }
 
@@ -157,24 +150,27 @@ export function UsuariosView() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="layout-page-section flex flex-col gap-4">
       {!canManage ? (
         <p className="text-sm text-muted-foreground">
           Solo los administradores pueden crear o editar usuarios y roles.
         </p>
-      ) : (
-        <div className="flex justify-end">
-          <Button type="button" size="sm" onClick={() => openCreate()}>
-            Nuevo usuario
-          </Button>
-        </div>
-      )}
+      ) : null}
+      <ListPageToolbar
+        end={
+          canManage ? (
+            <Button type="button" size="sm" onClick={() => openCreate()}>
+              Nuevo usuario
+            </Button>
+          ) : undefined
+        }
+      />
 
       {layout === "cards" ? (
         rows.length === 0 ? (
           <ListCardGridEmpty>No hay usuarios registrados.</ListCardGridEmpty>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="layout-list-grid">
             {rows.map((u) => (
               <ListCard key={u.id}>
                 <ListCardHeader>

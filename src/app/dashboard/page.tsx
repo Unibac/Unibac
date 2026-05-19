@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { DashboardPage } from "@/components/layout/dashboard-page";
 import { PortalHero } from "@/components/layout/portal/portal-hero";
 import { PortalServiceGrid } from "@/components/layout/portal/portal-service-grid";
 import { PageHeader } from "@/components/layout/page-header";
@@ -42,7 +43,7 @@ export default function DashboardHomePage() {
   );
 
   return (
-    <div className="flex flex-col gap-6">
+    <DashboardPage>
       <PageHeader
         title={`Hola, ${data.usuario}`}
         description={`Nivel ${data.nivel} · ${data.tipo}`}
@@ -52,7 +53,7 @@ export default function DashboardHomePage() {
           No hay módulos disponibles para tu cuenta.
         </p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="layout-list-grid">
           {navItems.map((link) => (
             <Link
               key={link.href}
@@ -69,6 +70,6 @@ export default function DashboardHomePage() {
           ))}
         </div>
       )}
-    </div>
+    </DashboardPage>
   );
 }

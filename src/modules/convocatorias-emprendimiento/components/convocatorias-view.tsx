@@ -11,7 +11,10 @@ import {
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCard } from "@/components/shared/list-card";
 import { ListCardContent } from "@/components/shared/list-card-content";
+import { FilterPanel } from "@/components/shared/filter-panel";
 import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
+import { ListPageToolbar } from "@/components/shared/list-page-toolbar";
+import { PageCallout } from "@/components/shared/page-callout";
 import { ListCardHeader } from "@/components/shared/list-card-header";
 import {
   AlertDialog,
@@ -182,29 +185,27 @@ export function ConvocatoriasView() {
 
   if (!convocatoriasCanAccessModule(profile.data)) {
     return (
-      <p
-        role="alert"
-        className="rounded-none border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground"
-      >
+      <PageCallout>
         No tenés acceso a convocatorias con tu tipo de cuenta. Si necesitás
         permisos, contactá a administración.
-      </p>
+      </PageCallout>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      {isAdmin ? (
-        <div className="flex justify-end">
-          <Button type="button" size="sm" onClick={() => openCreate()}>
-            Nueva convocatoria
-          </Button>
-        </div>
-      ) : null}
+    <div className="layout-page-section flex flex-col gap-4">
+      <ListPageToolbar
+        end={
+          isAdmin ? (
+            <Button type="button" size="sm" onClick={() => openCreate()}>
+              Nueva convocatoria
+            </Button>
+          ) : undefined
+        }
+      />
 
-      <div className="rounded-md border border-border p-4">
-        <p className="text-sm font-medium text-foreground">Filtros</p>
-        <div className="mt-3 grid gap-4 md:grid-cols-2">
+      <FilterPanel>
+        <div className="grid gap-4 md:grid-cols-2">
           <div className="grid gap-2">
             <Label>Tipo</Label>
             <Select
@@ -267,7 +268,7 @@ export function ConvocatoriasView() {
             </div>
           ) : null}
         </div>
-      </div>
+      </FilterPanel>
 
       {convocatoriasQuery.isPending ? (
         <div className="flex flex-col gap-4">
@@ -275,17 +276,14 @@ export function ConvocatoriasView() {
           <Skeleton className="h-64 w-full" />
         </div>
       ) : convocatoriasQuery.isError ? (
-        <p
-          role="alert"
-          className="rounded-none border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-        >
+        <PageCallout variant="destructive">
           {getApiErrorMessage(convocatoriasQuery.error)}
-        </p>
+        </PageCallout>
       ) : layout === "cards" ? (
         rows.length === 0 ? (
           <ListCardGridEmpty>No hay convocatorias.</ListCardGridEmpty>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="layout-list-grid">
             {rows.map((row) => {
               const alreadyPostulado = myPostulacionByPublicacionId.has(row.id);
               const canPostularRow =
@@ -460,7 +458,7 @@ export function ConvocatoriasView() {
       )}
 
       {canPostular ? (
-        <div className="rounded-none border border-border p-4">
+        <section className="layout-page-section rounded-md border border-border p-4">
           <div className="text-sm font-medium">Mis postulaciones</div>
           {misPostulacionesQuery.isPending ? (
             <div className="mt-3 flex flex-col gap-2">
@@ -519,7 +517,7 @@ export function ConvocatoriasView() {
               </Table>
             </div>
           )}
-        </div>
+        </section>
       ) : null}
 
       <ConvocatoriaFormSheet
