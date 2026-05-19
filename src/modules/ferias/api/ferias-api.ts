@@ -1,11 +1,13 @@
 import { getFerias } from "@/api/generated/ferias/ferias";
-import type {
-  CreateFeriaDto,
-  CreatePropuestaFeriaDto,
-  FeriasControllerFindPropuestasPorFeriaParams,
-  ModerarPropuestaFeriaDto,
-  UpdateFeriaDto,
-  UpdatePropuestaFeriaPropietarioDto,
+import {
+  FeriasControllerFindPropuestasPorFeriaEstado,
+  type CreateFeriaDto,
+  type CreatePropuestaFeriaDto,
+  type FeriasControllerFindPropuestasPorFeriaParams,
+  type ModerarPropuestaFeriaDto,
+  type PropuestaFeriaResponseDto,
+  type UpdateFeriaDto,
+  type UpdatePropuestaFeriaPropietarioDto,
 } from "@/api/generated/models";
 
 const api = getFerias();
@@ -44,6 +46,36 @@ export async function listPropuestasPorFeria(
   params?: FeriasControllerFindPropuestasPorFeriaParams,
 ) {
   return api.feriasControllerFindPropuestasPorFeria(feriaId, params);
+}
+
+const ESTADOS_MODERACION_PROPUESTA = [
+  FeriasControllerFindPropuestasPorFeriaEstado.POSTULADO,
+  FeriasControllerFindPropuestasPorFeriaEstado.ACEPTADO,
+  FeriasControllerFindPropuestasPorFeriaEstado.RECHAZADO,
+] as const;
+
+/**
+ * Sin `estado` el API devuelve vitrina (ACEPTADO). Para “Todas” en admin hay que
+ * consultar cada estado y fusionar.
+ */
+export async function listPropuestasPorFeriaTodosEstados(
+  feriaId: number,
+): Promise<PropuestaFeriaResponseDto[]> {
+  const batches = await Promise.all(
+    ESTADOS_MODERACION_PROPUESTA.map((estado) =>
+      listPropuestasPorFeria(feriaId, { estado }),
+    ),
+  );
+  const byId = new Map<number, PropuestaFeriaResponseDto>();
+  for (const batch of batches) {
+    for (const row of batch) {
+      byId.set(row.id, row);
+    }
+  }
+  return [...byId.values()].sort(
+    (a, b) =>
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
 }
 
 export async function createPropuestaFeria(

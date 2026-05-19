@@ -1,14 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 
-import type { FeriasControllerFindPropuestasPorFeriaEstado } from "@/api/generated/models";
-
 import {
   getFeria,
   listFerias,
   listMisPropuestas,
   listPropuestasPorFeria,
+  listPropuestasPorFeriaTodosEstados,
 } from "@/modules/ferias/api/ferias-api";
-import { feriasKeys } from "@/modules/ferias/query-keys";
+import {
+  type PropuestasPorFeriaEstadoFilter,
+  feriasKeys,
+} from "@/modules/ferias/query-keys";
 
 export function useFeriasListQuery() {
   return useQuery({
@@ -38,18 +40,34 @@ export function useMisPropuestasQuery(enabled: boolean) {
   });
 }
 
+type UsePropuestasPorFeriaQueryOptions = {
+  enabled?: boolean;
+  /** Admin + filtro “Todas”: fusionar POSTULADO, ACEPTADO y RECHAZADO. */
+  adminVerTodasEstados?: boolean;
+};
+
 export function usePropuestasPorFeriaQuery(
   feriaId: number | null,
-  estado: FeriasControllerFindPropuestasPorFeriaEstado | undefined,
-  enabled = true,
+  estado: PropuestasPorFeriaEstadoFilter,
+  options?: UsePropuestasPorFeriaQueryOptions,
 ) {
+  const enabled = options?.enabled ?? true;
+  const adminVerTodasEstados = options?.adminVerTodasEstados ?? false;
+  const fetchAllEstados = adminVerTodasEstados && estado === "todas";
+
   return useQuery({
     queryKey: feriasKeys.propuestas(feriaId ?? 0, estado),
     queryFn: () => {
       if (feriaId == null || feriaId <= 0) {
         return Promise.reject(new Error("ID de feria inválido"));
       }
-      return listPropuestasPorFeria(feriaId, estado ? { estado } : undefined);
+      if (fetchAllEstados) {
+        return listPropuestasPorFeriaTodosEstados(feriaId);
+      }
+      if (estado === "todas") {
+        return listPropuestasPorFeria(feriaId);
+      }
+      return listPropuestasPorFeria(feriaId, { estado });
     },
     enabled: Boolean(enabled && feriaId != null && feriaId > 0),
   });

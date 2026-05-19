@@ -68,6 +68,7 @@ import {
   useMisPropuestasQuery,
   usePropuestasPorFeriaQuery,
 } from "@/modules/ferias/hooks/use-ferias-queries";
+import type { PropuestasPorFeriaEstadoFilter } from "@/modules/ferias/query-keys";
 import {
   feriasCanBrowse,
   feriasCanManageEventos,
@@ -94,22 +95,19 @@ const AREA_LABELS: Record<CreatePropuestaFeriaDtoAreaCreativa, string> = {
   [CreatePropuestaFeriaDtoAreaCreativa.AUDIOVISUAL]: "Audiovisual",
 };
 
-type EstadoFiltroUi =
-  | "todas"
-  | (typeof FeriasControllerFindPropuestasPorFeriaEstado)[keyof typeof FeriasControllerFindPropuestasPorFeriaEstado];
-
 export function FeriaDetailView({ feriaId }: { feriaId: number }) {
   const profile = useProfile();
   const { layout } = useDashboardListLayout();
   const feriaQuery = useFeriaDetailQuery(feriaId);
-  const [estadoFiltro, setEstadoFiltro] = useState<EstadoFiltroUi>("todas");
+  const [estadoFiltro, setEstadoFiltro] =
+    useState<PropuestasPorFeriaEstadoFilter>("todas");
   const isAdmin = feriasIsAdmin(profile.data);
   const canManageEventos = feriasCanManageEventos(profile.data);
   const canPostular = feriasCanPostular(profile.data);
 
-  const estadoApi = estadoFiltro === "todas" ? undefined : estadoFiltro;
-
-  const propuestasQuery = usePropuestasPorFeriaQuery(feriaId, estadoApi, true);
+  const propuestasQuery = usePropuestasPorFeriaQuery(feriaId, estadoFiltro, {
+    adminVerTodasEstados: isAdmin,
+  });
 
   const misPropuestasQuery = useMisPropuestasQuery(
     Boolean(profile.data && canPostular),
@@ -290,7 +288,9 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
               <span className="text-xs text-muted-foreground">Estado</span>
               <Select
                 value={estadoFiltro}
-                onValueChange={(v) => setEstadoFiltro(v as EstadoFiltroUi)}
+                onValueChange={(v) =>
+                  setEstadoFiltro(v as PropuestasPorFeriaEstadoFilter)
+                }
               >
                 <SelectTrigger size="sm" className="w-[160px]">
                   <SelectValue placeholder="Filtrar" />
