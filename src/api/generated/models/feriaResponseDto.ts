@@ -15,7 +15,7 @@ export interface FeriaResponseDto {
   fechaInicio: string;
   fechaFin: string;
   imagenBannerUrl?: FeriaResponseDtoImagenBannerUrl;
-  /** Derivado de fechaInicio/fechaFin respecto a la hora del servidor (ventana inclusiva para activa). */
+  /** Derivado de fechaInicio/fechaFin respecto a la hora del servidor. Postulación permitida en próxima y activa; no en finalizada. */
   periodo: FeriaResponseDtoPeriodo;
   createdAt: string;
   updatedAt: string;

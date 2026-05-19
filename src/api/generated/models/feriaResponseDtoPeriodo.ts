@@ -7,7 +7,7 @@
  */
 
 /**
- * Derivado de fechaInicio/fechaFin respecto a la hora del servidor (ventana inclusiva para activa).
+ * Derivado de fechaInicio/fechaFin respecto a la hora del servidor. Postulación permitida en próxima y activa; no en finalizada.
  */
 export type FeriaResponseDtoPeriodo = typeof FeriaResponseDtoPeriodo[keyof typeof FeriaResponseDtoPeriodo];
 
