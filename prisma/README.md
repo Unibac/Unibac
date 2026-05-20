@@ -60,9 +60,10 @@ Crea módulos, acciones, roles, permisos y usuarios con `authUserId` vinculado a
 | Usuario | Clave |
 |---------|-------|
 | `administrador` (o `SEED_ADMIN_USUARIO`) | `admin123` (o `SEED_ADMIN_PASSWORD`) |
-| `demo_emprendimiento`, `demo_ferias_interno` | `demo123` (o `SEED_DEMO_PASSWORD`) |
+| `demo_estudiante`, `demo_egresado`, `demo_empresa` | `demo123` (o `SEED_DEMO_PASSWORD`) |
+| `demo_ferias_interno` | `demo123` — personal interno (ferias) |
 
-`demo_emprendimiento` lleva `categoria: ESTUDIANTE` y rol `EXTERNO_ESTUDIANTE` (menú + RBAC). Los internos del seed tienen `categoria` en `null`.
+Cada demo externo tiene `categoria` y rol alineados (`EXTERNO_ESTUDIANTE`, `EXTERNO_EGRESADO`, `EXTERNO_EMPRESA`). El administrador y `demo_ferias_interno` no llevan categoría.
 
 Re-ejecutar el seed es idempotente (upsert + actualización de contraseña en Auth).
 

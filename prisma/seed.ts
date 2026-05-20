@@ -294,8 +294,31 @@ async function main(): Promise<void> {
     });
   }
 
-  const rolEstudianteId = rolIdPorCodigo.get(ROL_EXTERNO_ESTUDIANTE);
   const rolInternoId = rolIdPorCodigo.get(ROL_INTERNO_BASE);
+
+  const demoExternosPorCategoria = [
+    {
+      usuario: "demo_estudiante",
+      descripcion: "Usuario demo — estudiante externo",
+      correo: "demo_estudiante@example.com",
+      categoria: CategoriaUsuarioExterno.ESTUDIANTE,
+      rolCodigo: ROL_EXTERNO_ESTUDIANTE,
+    },
+    {
+      usuario: "demo_egresado",
+      descripcion: "Usuario demo — egresado externo",
+      correo: "demo_egresado@example.com",
+      categoria: CategoriaUsuarioExterno.EGRESADO,
+      rolCodigo: ROL_EXTERNO_EGRESADO,
+    },
+    {
+      usuario: "demo_empresa",
+      descripcion: "Usuario demo — empresa externa",
+      correo: "demo_empresa@example.com",
+      categoria: CategoriaUsuarioExterno.EMPRESA,
+      rolCodigo: ROL_EXTERNO_EMPRESA,
+    },
+  ] as const;
 
   await seedUsuarioConAuth({
     usuario: SEED_ADMIN_USUARIO,
@@ -307,16 +330,19 @@ async function main(): Promise<void> {
     categoria: null,
   });
 
-  await seedUsuarioConAuth({
-    usuario: "demo_emprendimiento",
-    password: SEED_DEMO_PASSWORD,
-    descripcion: "Usuario demo módulo Emprendimiento",
-    nivel: NivelUsuario.USUARIO,
-    tipo: TipoUsuario.EXTERNO,
-    correo: "demo_emprendimiento@example.com",
-    categoria: CategoriaUsuarioExterno.ESTUDIANTE,
-    ...(rolEstudianteId !== undefined ? { rolId: rolEstudianteId } : {}),
-  });
+  for (const demo of demoExternosPorCategoria) {
+    const rolId = rolIdPorCodigo.get(demo.rolCodigo);
+    await seedUsuarioConAuth({
+      usuario: demo.usuario,
+      password: SEED_DEMO_PASSWORD,
+      descripcion: demo.descripcion,
+      nivel: NivelUsuario.USUARIO,
+      tipo: TipoUsuario.EXTERNO,
+      correo: demo.correo,
+      categoria: demo.categoria,
+      ...(rolId !== undefined ? { rolId } : {}),
+    });
+  }
 
   await seedUsuarioConAuth({
     usuario: "demo_ferias_interno",
@@ -358,10 +384,9 @@ async function main(): Promise<void> {
     `  Admin: usuario="${SEED_ADMIN_USUARIO}" clave="${SEED_ADMIN_PASSWORD}"`,
   );
   console.log(
-    '  Demo: usuario="demo_emprendimiento" | "demo_ferias_interno" clave="' +
-      SEED_DEMO_PASSWORD +
-      '"',
+    `  Demo externos (clave="${SEED_DEMO_PASSWORD}"): demo_estudiante, demo_egresado, demo_empresa`,
   );
+  console.log(`  Demo interno (clave="${SEED_DEMO_PASSWORD}"): demo_ferias_interno`);
   console.log(
     `  Auth email interno: ${authEmailForUsuario(SEED_ADMIN_USUARIO)}`,
   );

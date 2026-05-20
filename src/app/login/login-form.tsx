@@ -73,9 +73,11 @@ export function LoginForm() {
   return (
     <PanelCard>
       <CardHeader className="flex flex-col items-center gap-4 px-6 text-center sm:items-stretch sm:text-start">
-        <div className="flex w-full justify-center sm:justify-start">
-          <UnibacLogo priority imgClassName="max-h-28 sm:max-h-32" />
-        </div>
+        <UnibacLogo
+          priority
+          className="w-full justify-center"
+          imgClassName="mx-auto max-h-28 sm:max-h-32"
+        />
         <CardTitle className="text-lg">Iniciar sesión</CardTitle>
         <CardDescription>
           Introduce tu usuario y contraseña para acceder al panel Unibac.
