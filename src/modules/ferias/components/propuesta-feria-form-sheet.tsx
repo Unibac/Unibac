@@ -98,11 +98,7 @@ export function PropuestaFeriaFormSheet({
       setApiError(null);
       return;
     }
-    if (mode === "create") {
-      form.reset(emptyPropuestaFeriaFormValues());
-      return;
-    }
-    if (row) {
+    if (mode === "edit" && row) {
       form.reset(propuestaFeriaResponseToFormValues(row));
     }
   }, [open, mode, row, form]);
@@ -130,6 +126,7 @@ export function PropuestaFeriaFormSheet({
           feriaId,
           body: buildCreatePropuestaFeriaDto(values),
         });
+        form.reset(emptyPropuestaFeriaFormValues());
       } else if (row) {
         await updateMut.mutateAsync({
           propuestaId: row.id,

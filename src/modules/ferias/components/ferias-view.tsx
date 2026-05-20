@@ -100,6 +100,7 @@ export function FeriasView() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMode, setSheetMode] = useState<"create" | "edit">("create");
   const [sheetRow, setSheetRow] = useState<FeriaResponseDto | null>(null);
+  const [feriaCreateSheetKey, setFeriaCreateSheetKey] = useState(0);
 
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -126,6 +127,7 @@ export function FeriasView() {
   function openCreate() {
     setSheetMode("create");
     setSheetRow(null);
+    setFeriaCreateSheetKey((k) => k + 1);
     setSheetOpen(true);
   }
 
@@ -525,6 +527,11 @@ export function FeriasView() {
       )}
 
       <FeriaFormSheet
+        key={
+          sheetMode === "edit" && sheetRow
+            ? `feria-edit-${sheetRow.id}`
+            : `feria-create-${feriaCreateSheetKey}`
+        }
         open={sheetOpen}
         onOpenChange={setSheetOpen}
         mode={sheetMode}

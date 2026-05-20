@@ -74,11 +74,7 @@ export function FeriaFormSheet({
       setApiError(null);
       return;
     }
-    if (mode === "create") {
-      form.reset(emptyFeriaFormValues());
-      return;
-    }
-    if (row) {
+    if (mode === "edit" && row) {
       form.reset(feriaResponseToFormValues(row));
     }
   }, [open, mode, row, form]);
@@ -105,6 +101,7 @@ export function FeriaFormSheet({
     try {
       if (mode === "create") {
         await createMut.mutateAsync(buildCreateFeriaDto(values));
+        form.reset(emptyFeriaFormValues());
       } else if (row) {
         await updateMut.mutateAsync({
           id: row.id,
@@ -234,6 +231,7 @@ export function FeriaFormSheet({
                           type="url"
                           placeholder="https://..."
                           {...field}
+                          value={field.value ?? ""}
                         />
                       </FormControl>
                       <FormMessage />

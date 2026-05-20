@@ -82,7 +82,7 @@ export function propuestaFeriaResponseToFormValues(
   return {
     nombreEmprendimiento: row.nombreEmprendimiento,
     descripcionCorta: row.descripcionCorta,
-    imagenUrl: img ? img : undefined,
+    imagenUrl: img,
     areaCreativa: row.areaCreativa as z.infer<typeof areaCreativaSchema>,
     redesContacto: redes,
     correo: row.correo,
@@ -94,7 +94,7 @@ export function emptyPropuestaFeriaFormValues(): PropuestaFeriaFormValues {
   return {
     nombreEmprendimiento: "",
     descripcionCorta: "",
-    imagenUrl: undefined,
+    imagenUrl: "",
     areaCreativa: AreaCreativaEmprendimiento.ARTES_PLASTICAS,
     redesContacto: "",
     correo: "",

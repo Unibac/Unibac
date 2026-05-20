@@ -60,7 +60,7 @@ export function feriaResponseToFormValues(
     descripcion: row.descripcion,
     fechaInicioLocal: isoToDatetimeLocalValue(row.fechaInicio),
     fechaFinLocal: isoToDatetimeLocalValue(row.fechaFin),
-    imagenBannerUrl: banner ? banner : undefined,
+    imagenBannerUrl: banner,
   };
 }
 
@@ -70,7 +70,7 @@ export function emptyFeriaFormValues(): FeriaFormValues {
     descripcion: "",
     fechaInicioLocal: "",
     fechaFinLocal: "",
-    imagenBannerUrl: undefined,
+    imagenBannerUrl: "",
   };
 }
 

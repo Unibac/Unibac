@@ -117,6 +117,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
   const [sheetRow, setSheetRow] = useState<PropuestaFeriaResponseDto | null>(
     null,
   );
+  const [propuestaCreateSheetKey, setPropuestaCreateSheetKey] = useState(0);
 
   const [moderarTarget, setModerarTarget] =
     useState<ModerarPropuestaTarget | null>(null);
@@ -137,6 +138,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
   function openCreatePropuesta() {
     setSheetMode("create");
     setSheetRow(null);
+    setPropuestaCreateSheetKey((k) => k + 1);
     setSheetOpen(true);
   }
 
@@ -522,6 +524,11 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
       </section>
 
       <PropuestaFeriaFormSheet
+        key={
+          sheetMode === "edit" && sheetRow
+            ? `propuesta-edit-${sheetRow.id}`
+            : `propuesta-create-${propuestaCreateSheetKey}`
+        }
         feriaId={feriaId}
         open={sheetOpen}
         onOpenChange={setSheetOpen}
