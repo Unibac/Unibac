@@ -8,18 +8,18 @@ import {
   findPropuestasPorFeria,
 } from "@/modules/ferias/server/ferias-service";
 
-type RouteContext = { params: Promise<{ feriaId: string }> };
+type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(request: Request, context: RouteContext) {
   try {
     const user = await requireSessionUsuario();
     await assertPermission(user, "Ferias", "CONSULTA");
-    const { feriaId } = await context.params;
+    const { id } = await context.params;
     const estadoRaw = new URL(request.url).searchParams.get("estado");
     const estado = estadoRaw ? (estadoRaw as EstadoPropuestaFeria) : undefined;
     return jsonOk(
       await findPropuestasPorFeria(
-        parseIdParam(feriaId, "feriaId"),
+        parseIdParam(id),
         { estado },
         toAuthProfile(user),
       ),
@@ -33,15 +33,11 @@ export async function POST(request: Request, context: RouteContext) {
   try {
     const user = await requireSessionUsuario();
     await assertPermission(user, "Ferias", "PROPUESTA");
-    const { feriaId } = await context.params;
+    const { id } = await context.params;
     const body =
       await parseJsonBody<Parameters<typeof createPropuesta>[1]>(request);
     return jsonOk(
-      await createPropuesta(
-        parseIdParam(feriaId, "feriaId"),
-        body,
-        toAuthProfile(user),
-      ),
+      await createPropuesta(parseIdParam(id), body, toAuthProfile(user)),
       201,
     );
   } catch (error) {

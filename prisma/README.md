@@ -49,6 +49,20 @@ La tabla `USUARIOS` incluye `AUTH_USER_ID` (`authUserId` en Prisma): UUID opcion
 | `npm run db:push` | Aplica el schema sin migraciones (prototipo) |
 | `npm run db:migrate` | Crea y aplica migraciones |
 | `npm run db:studio` | GUI de datos |
+| `npm run db:seed` | Catálogo RBAC + usuarios demo en Postgres y Supabase Auth |
+
+### Seed (`npm run db:seed`)
+
+Requiere **`DIRECT_URL`** (o `DATABASE_URL`), **`NEXT_PUBLIC_SUPABASE_URL`** y **`SUPABASE_SERVICE_ROLE_KEY`**.
+
+Crea módulos, acciones, roles, permisos y usuarios con `authUserId` vinculado a Supabase Auth (email interno `usuario@auth.unibac.local`). Credenciales por defecto:
+
+| Usuario | Clave |
+|---------|-------|
+| `administrador` (o `SEED_ADMIN_USUARIO`) | `admin123` (o `SEED_ADMIN_PASSWORD`) |
+| `demo_emprendimiento`, `demo_ferias_interno` | `demo123` (o `SEED_DEMO_PASSWORD`) |
+
+Re-ejecutar el seed es idempotente (upsert + actualización de contraseña en Auth).
 
 ## Cliente en la app
 

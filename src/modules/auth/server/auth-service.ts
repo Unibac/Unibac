@@ -5,11 +5,12 @@ import {
   NivelUsuario,
   TipoUsuario,
 } from "@/generated/prisma/client";
+import { prisma } from "@/lib/prisma";
 import {
   ApiError,
   isPrismaUniqueConstraintError,
 } from "@/lib/server/api-error";
-import { prisma } from "@/lib/prisma";
+import { toAuthProfile } from "@/lib/server/session";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
@@ -21,13 +22,13 @@ import type {
   LoginResponse,
   RegisterPublicInput,
 } from "@/modules/auth/types";
-import { toAuthProfile } from "@/lib/server/session";
+import {
+  ROL_EXTERNO_EGRESADO,
+  ROL_EXTERNO_EMPRESA,
+  ROL_EXTERNO_ESTUDIANTE,
+} from "@/modules/shared/constants/rol-codigos";
 
-const BCRYPT_ROUNDS = 10;
-
-export const ROL_EXTERNO_ESTUDIANTE = "EXTERNO_ESTUDIANTE";
-export const ROL_EXTERNO_EGRESADO = "EXTERNO_EGRESADO";
-export const ROL_EXTERNO_EMPRESA = "EXTERNO_EMPRESA";
+export { ROL_EXTERNO_EGRESADO, ROL_EXTERNO_EMPRESA, ROL_EXTERNO_ESTUDIANTE };
 
 function isPublicRegistrationEnabledServer(): boolean {
   const raw = process.env.PUBLIC_REGISTRATION_ENABLED?.trim().toLowerCase();
