@@ -5,6 +5,7 @@ import { config } from "dotenv";
 import { Pool } from "pg";
 
 import {
+  CategoriaUsuarioExterno,
   NivelUsuario,
   PrismaClient,
   TipoUsuario,
@@ -151,34 +152,46 @@ async function seedUsuarioConAuth(params: {
   tipo: TipoUsuario;
   correo: string;
   rolId?: number;
+  /** Externos: obligatoria para menú/UX. Internos: `null`. */
+  categoria?: CategoriaUsuarioExterno | null;
 }): Promise<void> {
+  if (
+    params.tipo === TipoUsuario.EXTERNO &&
+    params.categoria == null
+  ) {
+    throw new Error(
+      `Usuario externo "${params.usuario}" requiere categoria (ESTUDIANTE, EGRESADO o EMPRESA)`,
+    );
+  }
+
   const authUserId = await ensureSupabaseAuthUser(
     params.usuario,
     params.password,
   );
 
+  const categoria =
+    params.tipo === TipoUsuario.INTERNO
+      ? null
+      : (params.categoria ?? null);
+
+  const usuarioData = {
+    authUserId,
+    clave: CLAVE_MANAGED_BY_SUPABASE,
+    descripcion: params.descripcion,
+    nivel: params.nivel,
+    tipo: params.tipo,
+    correo: params.correo,
+    activo: true,
+    categoria,
+    ...(params.rolId !== undefined ? { rolId: params.rolId } : {}),
+  };
+
   await prisma.usuario.upsert({
     where: { usuario: params.usuario },
-    update: {
-      authUserId,
-      clave: CLAVE_MANAGED_BY_SUPABASE,
-      descripcion: params.descripcion,
-      nivel: params.nivel,
-      tipo: params.tipo,
-      correo: params.correo,
-      activo: true,
-      ...(params.rolId !== undefined ? { rolId: params.rolId } : {}),
-    },
+    update: usuarioData,
     create: {
       usuario: params.usuario,
-      descripcion: params.descripcion,
-      clave: CLAVE_MANAGED_BY_SUPABASE,
-      authUserId,
-      nivel: params.nivel,
-      tipo: params.tipo,
-      correo: params.correo,
-      activo: true,
-      ...(params.rolId !== undefined ? { rolId: params.rolId } : {}),
+      ...usuarioData,
     },
   });
 }
@@ -291,6 +304,7 @@ async function main(): Promise<void> {
     nivel: NivelUsuario.ADMINISTRADOR,
     tipo: TipoUsuario.INTERNO,
     correo: "admin@empresa.com",
+    categoria: null,
   });
 
   await seedUsuarioConAuth({
@@ -300,6 +314,7 @@ async function main(): Promise<void> {
     nivel: NivelUsuario.USUARIO,
     tipo: TipoUsuario.EXTERNO,
     correo: "demo_emprendimiento@example.com",
+    categoria: CategoriaUsuarioExterno.ESTUDIANTE,
     ...(rolEstudianteId !== undefined ? { rolId: rolEstudianteId } : {}),
   });
 
@@ -310,6 +325,7 @@ async function main(): Promise<void> {
     nivel: NivelUsuario.USUARIO,
     tipo: TipoUsuario.INTERNO,
     correo: "demo_ferias_interno@example.com",
+    categoria: null,
     ...(rolInternoId !== undefined ? { rolId: rolInternoId } : {}),
   });
 

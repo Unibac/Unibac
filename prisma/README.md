@@ -62,6 +62,8 @@ Crea módulos, acciones, roles, permisos y usuarios con `authUserId` vinculado a
 | `administrador` (o `SEED_ADMIN_USUARIO`) | `admin123` (o `SEED_ADMIN_PASSWORD`) |
 | `demo_emprendimiento`, `demo_ferias_interno` | `demo123` (o `SEED_DEMO_PASSWORD`) |
 
+`demo_emprendimiento` lleva `categoria: ESTUDIANTE` y rol `EXTERNO_ESTUDIANTE` (menú + RBAC). Los internos del seed tienen `categoria` en `null`.
+
 Re-ejecutar el seed es idempotente (upsert + actualización de contraseña en Auth).
 
 ## Cliente en la app
