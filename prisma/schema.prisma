@@ -1,0 +1,319 @@
+// Prisma + Supabase (PostgreSQL)
+// Docs: https://www.prisma.io/docs/orm/overview/databases/supabase
+//
+// Tras definir tablas: `npm run db:migrate` o `npm run db:push`
+// Introspectar esquema existente en Supabase: `npm run db:pull`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TipoUsuario {
+  INTERNO
+  EXTERNO
+}
+
+enum NivelUsuario {
+  USUARIO
+  ADMINISTRADOR
+}
+
+enum CategoriaUsuarioExterno {
+  ESTUDIANTE
+  EGRESADO
+  EMPRESA
+}
+
+enum TipoPerfilTalento {
+  ESTUDIANTE
+  EGRESADO
+  EMPRENDEDOR
+}
+
+enum AreaTalento {
+  MUSICA
+  ARTES_PLASTICAS
+  DISENO
+  AUDIOVISUAL
+  ARTES_ESCENICAS
+}
+
+enum AreaCreativaEmprendimiento {
+  ARTES_PLASTICAS
+  MUSICA
+  DISENO
+  AUDIOVISUAL
+}
+
+enum EstadoLaboralEgresado {
+  EMPLEADO
+  EMPRENDEDOR
+  DESEMPLEADO
+  ESTUDIANDO
+}
+
+enum TipoConvocatoriaEmprendimiento {
+  FINANCIAMIENTO
+  FORMACION
+  PRACTICAS
+}
+
+enum EstadoPostulacionConvocatoria {
+  POSTULADO
+  RECHAZADO
+  APROBADO
+}
+
+enum EstadoPropuestaFeria {
+  POSTULADO
+  RECHAZADO
+  ACEPTADO
+}
+
+model Usuario {
+  id                       Int                       @id @default(autoincrement()) @map("IDUSUARIO")
+  usuario                  String                    @unique @map("USUARIO")
+  descripcion              String?                   @map("DESCRIPCION")
+  clave                    String                    @map("CLAVE")
+  activo                   Boolean                   @default(true) @map("ACTIVO")
+  nivel                    NivelUsuario              @map("NIVEL")
+  tipo                     TipoUsuario               @map("TIPO")
+  correo                   String?                   @map("CORREO")
+  celular                  String?                   @map("CELULAR")
+  rolId                    Int?                      @map("ID_ROL")
+  categoria                CategoriaUsuarioExterno?  @map("CATEGORIA_EXTERNA")
+  rol                      Rol?                      @relation(fields: [rolId], references: [id])
+  talentoPerfil            TalentoPerfil?
+  directorioEmprendimiento DirectorioEmprendimiento?
+  egreso                   Egresado?
+  empresa                  Empresa?
+  postulacionesConvocatorias PostulacionConvocatoria[]
+  propuestasFeria          PropuestaFeria[]
+
+  @@index([rolId])
+  @@map("USUARIOS")
+}
+
+model Rol {
+  id       Int          @id @default(autoincrement()) @map("ID_ROL")
+  codigo   String       @unique @map("CODIGO")
+  nombre   String       @map("NOMBRE")
+  activo   Boolean      @default(true) @map("ACTIVO")
+  usuarios Usuario[]
+  permisos RolPermiso[]
+
+  @@map("ROLES")
+}
+
+model RolPermiso {
+  id       Int    @id @default(autoincrement()) @map("ID_ROL_PERMISO")
+  rolId    Int    @map("ID_ROL")
+  moduloId Int    @map("IDMODULO")
+  accionId Int    @map("IDACCION")
+  rol      Rol    @relation(fields: [rolId], references: [id], onDelete: Cascade)
+  modulo   Modulo @relation(fields: [moduloId], references: [id], onDelete: Cascade)
+  accion   Accion @relation(fields: [accionId], references: [id], onDelete: Cascade)
+
+  @@unique([rolId, moduloId, accionId])
+  @@map("ROLES_PERMISOS")
+}
+
+model EstudianteHabilitado {
+  id                  Int     @id @default(autoincrement()) @map("ID")
+  identificacion      String  @map("IDENTIFICACION")
+  codigoEstudiantil   String  @map("CODIGO_ESTUDIANTIL")
+  nombres             String  @map("NOMBRES")
+  apellidos           String  @map("APELLIDOS")
+  programa            String? @map("PROGRAMA") @db.VarChar(200)
+  semestre            Int?    @map("SEMESTRE")
+  createdAt           DateTime @default(now()) @map("CREATED_AT")
+  updatedAt           DateTime @updatedAt @map("UPDATED_AT")
+
+  @@unique([identificacion, codigoEstudiantil])
+  @@index([identificacion])
+  @@map("ESTUDIANTES_HABILITADOS")
+}
+
+model EgresadoHabilitado {
+  id             Int      @id @default(autoincrement()) @map("ID")
+  identificacion String   @unique @map("IDENTIFICACION")
+  createdAt      DateTime @default(now()) @map("CREATED_AT")
+  updatedAt      DateTime @updatedAt @map("UPDATED_AT")
+
+  @@map("EGRESADOS_HABILITADOS")
+}
+
+model Empresa {
+  id              Int      @id @default(autoincrement()) @map("ID")
+  usuarioId       Int      @unique @map("ID_USUARIO")
+  nit             String   @unique @map("NIT")
+  razonSocial     String   @map("RAZON_SOCIAL") @db.VarChar(300)
+  nombreContacto  String?  @map("NOMBRE_CONTACTO") @db.VarChar(200)
+  correoContacto  String?  @map("CORREO_CONTACTO")
+  telefono        String?  @map("TELEFONO")
+  createdAt       DateTime @default(now()) @map("CREATED_AT")
+  updatedAt       DateTime @updatedAt @map("UPDATED_AT")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("EMPRESAS")
+}
+
+model Egresado {
+  id                         Int                     @id @default(autoincrement()) @map("ID")
+  usuarioId                  Int                     @unique @map("IDUSUARIO")
+  nombreCompleto             String                  @map("NOMBRE_COMPLETO")
+  identificacion             String                  @unique @map("IDENTIFICACION")
+  telefono                   String?                 @map("TELEFONO")
+  correo                     String                  @unique @map("CORREO")
+  anioEgreso                 Int                     @map("ANIO_EGRESO")
+  programaCarrera            String                  @map("PROGRAMA_CARRERA") @db.VarChar(200)
+  estadoLaboral              EstadoLaboralEgresado   @map("ESTADO_LABORAL")
+  brevePerfilProfesional     String                  @map("BREVE_PERFIL") @db.Text
+  informacionEmprendimiento  String?                 @map("INFO_EMPRENDIMIENTO") @db.Text
+  createdAt                  DateTime                @default(now()) @map("CREATED_AT")
+  updatedAt                  DateTime                @updatedAt @map("UPDATED_AT")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([anioEgreso])
+  @@index([programaCarrera])
+  @@index([estadoLaboral])
+  @@map("EGRESADOS")
+}
+
+model TalentoPerfil {
+  id              Int               @id @default(autoincrement()) @map("ID")
+  usuarioId       Int               @unique @map("IDUSUARIO")
+  nombreCompleto  String            @map("NOMBRE_COMPLETO")
+  area            AreaTalento       @map("AREA")
+  habilidades     String            @map("HABILIDADES") @db.Text
+  portafolioUrl   String?           @map("PORTAFOLIO_URL")
+  telefono        String?           @map("TELEFONO")
+  correoContacto  String?           @map("CORREO_CONTACTO")
+  perfilActivo    Boolean           @default(true) @map("PERFIL_ACTIVO")
+  tipoPerfil      TipoPerfilTalento @map("TIPO_PERFIL")
+  createdAt       DateTime          @default(now()) @map("CREATED_AT")
+  updatedAt       DateTime          @updatedAt @map("UPDATED_AT")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("TALENTO_PERFILES")
+}
+
+model DirectorioEmprendimiento {
+  id               Int                         @id @default(autoincrement()) @map("ID")
+  usuarioId        Int                         @unique @map("IDUSUARIO")
+  nombreProyecto   String                      @map("NOMBRE_PROYECTO")
+  descripcionCorta String                      @map("DESCRIPCION_CORTA") @db.VarChar(500)
+  imagenUrl        String?                     @map("IMAGEN_URL")
+  correo           String?                     @map("CORREO")
+  redes            String?                     @map("REDES") @db.Text
+  sitioWeb         String?                     @map("SITIO_WEB")
+  areaCreativa     AreaCreativaEmprendimiento  @map("AREA_CREATIVA")
+  perfilActivo     Boolean                     @default(true) @map("PERFIL_ACTIVO")
+  createdAt        DateTime                    @default(now()) @map("CREATED_AT")
+  updatedAt        DateTime                    @updatedAt @map("UPDATED_AT")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("EMPRENDIMIENTOS_DIRECTORIO")
+}
+
+model PublicacionEmprendimiento {
+  id                Int                           @id @default(autoincrement()) @map("ID")
+  titulo            String                        @map("TITULO")
+  descripcion       String                        @map("DESCRIPCION") @db.Text
+  tipoConvocatoria  TipoConvocatoriaEmprendimiento @map("TIPO_CONVOCATORIA")
+  convocados        String                        @map("CONVOCADOS")
+  fechaLimite       DateTime                      @map("FECHA_LIMITE")
+  montoTipoApoyo    String?                       @map("MONTO_TIPO_APOYO")
+  linkExterno       String?                       @map("LINK_EXTERNO")
+  activo            Boolean                       @default(true) @map("ACTIVO")
+  createdAt         DateTime                      @default(now()) @map("CREATED_AT")
+  updatedAt         DateTime                      @updatedAt @map("UPDATED_AT")
+
+  postulaciones PostulacionConvocatoria[]
+
+  @@index([tipoConvocatoria])
+  @@index([activo])
+  @@index([fechaLimite])
+  @@map("PUBLICACION_EMPRENDIMIENTO")
+}
+
+model PostulacionConvocatoria {
+  id                  Int                          @id @default(autoincrement()) @map("ID")
+  usuarioId           Int                          @map("ID_ESTUDIANTE")
+  publicacionId       Int                          @map("ID_CONVOCATORIA")
+  fechaPostulacion    DateTime                     @default(now()) @map("FECHA_POSTULACION")
+  estadoPostulacion   EstadoPostulacionConvocatoria @default(POSTULADO) @map("ESTADO_POSTULACION")
+
+  usuario    Usuario                  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  publicacion PublicacionEmprendimiento @relation(fields: [publicacionId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, publicacionId])
+  @@map("POSTULADOS_CONVOCATORIAS")
+}
+
+model Feria {
+  id                Int       @id @default(autoincrement()) @map("ID")
+  nombre            String    @map("NOMBRE")
+  descripcion       String    @map("DESCRIPCION") @db.Text
+  fechaInicio       DateTime  @map("FECHA_INICIO")
+  fechaFin          DateTime  @map("FECHA_FIN")
+  imagenBannerUrl   String?   @map("IMAGEN_BANNER_URL")
+  createdAt         DateTime  @default(now()) @map("CREATED_AT")
+  updatedAt         DateTime  @updatedAt @map("UPDATED_AT")
+
+  propuestas PropuestaFeria[]
+
+  @@index([fechaInicio])
+  @@index([fechaFin])
+  @@map("FERIAS")
+}
+
+model PropuestaFeria {
+  id                   Int                          @id @default(autoincrement()) @map("ID")
+  usuarioId            Int                          @map("ID_USUARIO")
+  feriaId              Int                          @map("ID_FERIA")
+  nombreEmprendimiento String                       @map("NOMBRE_EMPRENDIMIENTO")
+  descripcionCorta     String                       @map("DESCRIPCION_CORTA") @db.VarChar(500)
+  imagenUrl            String?                      @map("IMAGEN_URL")
+  areaCreativa         AreaCreativaEmprendimiento   @map("AREA_CREATIVA")
+  redesContacto        String?                      @map("REDES_CONTACTO") @db.Text
+  correo               String                       @map("CORREO")
+  celular              String?                      @map("CELULAR")
+  estado               EstadoPropuestaFeria         @default(POSTULADO) @map("ESTADO")
+  createdAt            DateTime                     @default(now()) @map("CREATED_AT")
+  updatedAt            DateTime                     @updatedAt @map("UPDATED_AT")
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  feria   Feria    @relation(fields: [feriaId], references: [id], onDelete: Restrict)
+
+  @@unique([usuarioId, feriaId])
+  @@index([feriaId, estado])
+  @@index([usuarioId])
+  @@map("FERIAS_PROPUESTAS")
+}
+
+model Modulo {
+  id          Int          @id @default(autoincrement()) @map("IDMODULO")
+  nombre      String       @unique @map("NOMBRE")
+  activo      Boolean      @default(true) @map("ACTIVO")
+  rolPermisos RolPermiso[]
+
+  @@map("MODULOS")
+}
+
+model Accion {
+  id          Int          @id @default(autoincrement()) @map("IDACCION")
+  nombre      String       @unique @map("NOMBRE")
+  rolPermisos RolPermiso[]
+
+  @@map("ACCIONES")
+}
