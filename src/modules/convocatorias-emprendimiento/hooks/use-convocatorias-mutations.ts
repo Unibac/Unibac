@@ -4,7 +4,7 @@ import type {
   CreatePublicacionConvocatoriaDto,
   UpdateEstadoPostulacionDto,
   UpdatePublicacionConvocatoriaDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 
 import {
   createPublicacion,

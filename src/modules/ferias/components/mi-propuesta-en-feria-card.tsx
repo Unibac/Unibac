@@ -1,11 +1,11 @@
 "use client";
 
 import {
-  CreatePropuestaFeriaDtoAreaCreativa,
-  FeriaResponseDtoPeriodo,
+  AreaCreativaEmprendimiento,
+  FeriaPeriodo,
   type PropuestaFeriaResponseDto,
-  PropuestaFeriaResponseDtoEstado,
-} from "@/api/generated/models";
+  EstadoPropuestaFeria,
+} from "@/modules/shared/types/api-models";
 import { ListCardContent } from "@/components/shared/list-card-content";
 import { ListCardFooter } from "@/components/shared/list-card-footer";
 import { ListCardHeader } from "@/components/shared/list-card-header";
@@ -16,41 +16,41 @@ import { Button } from "@/components/ui/button";
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { feriaPermitePostulacion } from "@/modules/ferias/lib/propuesta-feria-rules";
 
-const ESTADO_LABELS: Record<PropuestaFeriaResponseDtoEstado, string> = {
-  [PropuestaFeriaResponseDtoEstado.POSTULADO]: "Postulado",
-  [PropuestaFeriaResponseDtoEstado.ACEPTADO]: "Aceptado",
-  [PropuestaFeriaResponseDtoEstado.RECHAZADO]: "Rechazado",
+const ESTADO_LABELS: Record<EstadoPropuestaFeria, string> = {
+  [EstadoPropuestaFeria.POSTULADO]: "Postulado",
+  [EstadoPropuestaFeria.ACEPTADO]: "Aceptado",
+  [EstadoPropuestaFeria.RECHAZADO]: "Rechazado",
 };
 
-const AREA_LABELS: Record<CreatePropuestaFeriaDtoAreaCreativa, string> = {
-  [CreatePropuestaFeriaDtoAreaCreativa.ARTES_PLASTICAS]: "Artes plásticas",
-  [CreatePropuestaFeriaDtoAreaCreativa.MUSICA]: "Música",
-  [CreatePropuestaFeriaDtoAreaCreativa.DISENO]: "Diseño",
-  [CreatePropuestaFeriaDtoAreaCreativa.AUDIOVISUAL]: "Audiovisual",
+const AREA_LABELS: Record<AreaCreativaEmprendimiento, string> = {
+  [AreaCreativaEmprendimiento.ARTES_PLASTICAS]: "Artes plásticas",
+  [AreaCreativaEmprendimiento.MUSICA]: "Música",
+  [AreaCreativaEmprendimiento.DISENO]: "Diseño",
+  [AreaCreativaEmprendimiento.AUDIOVISUAL]: "Audiovisual",
 };
 
 function propuestaEstadoBadgeVariant(
-  estado: PropuestaFeriaResponseDtoEstado,
+  estado: EstadoPropuestaFeria,
 ): "default" | "secondary" | "destructive" {
-  if (estado === PropuestaFeriaResponseDtoEstado.RECHAZADO) return "destructive";
-  if (estado === PropuestaFeriaResponseDtoEstado.ACEPTADO) return "default";
+  if (estado === EstadoPropuestaFeria.RECHAZADO) return "destructive";
+  if (estado === EstadoPropuestaFeria.ACEPTADO) return "default";
   return "secondary";
 }
 
 function estadoHint(
-  estado: PropuestaFeriaResponseDtoEstado,
-  feriaPeriodo: FeriaResponseDtoPeriodo,
+  estado: EstadoPropuestaFeria,
+  feriaPeriodo: FeriaPeriodo,
 ): string {
-  if (estado === PropuestaFeriaResponseDtoEstado.POSTULADO) {
+  if (estado === EstadoPropuestaFeria.POSTULADO) {
     if (feriaPermitePostulacion(feriaPeriodo)) {
-      if (feriaPeriodo === FeriaResponseDtoPeriodo.proxima) {
+      if (feriaPeriodo === FeriaPeriodo.proxima) {
         return "Tu propuesta está en revisión. Podés editarla mientras la feria esté próxima o en curso y siga en estado Postulado.";
       }
       return "Tu propuesta está en revisión. Podés editarla mientras la feria esté en curso y siga en estado Postulado.";
     }
     return "Tu propuesta está en revisión. No podés editarla: la feria ya finalizó.";
   }
-  if (estado === PropuestaFeriaResponseDtoEstado.ACEPTADO) {
+  if (estado === EstadoPropuestaFeria.ACEPTADO) {
     return "Tu propuesta fue aceptada y puede aparecer en la vitrina pública.";
   }
   return "Tu propuesta fue rechazada. No podés editarla ni volver a registrar otra en esta feria.";
@@ -58,7 +58,7 @@ function estadoHint(
 
 type MiPropuestaEnFeriaCardProps = {
   propuesta: PropuestaFeriaResponseDto;
-  feriaPeriodo: FeriaResponseDtoPeriodo;
+  feriaPeriodo: FeriaPeriodo;
   canEdit: boolean;
   onEdit: () => void;
 };
@@ -93,7 +93,7 @@ export function MiPropuestaEnFeriaCard({
             <CardDescription className="text-xs">
               {
                 AREA_LABELS[
-                  propuesta.areaCreativa as CreatePropuestaFeriaDtoAreaCreativa
+                  propuesta.areaCreativa as AreaCreativaEmprendimiento
                 ]
               }
             </CardDescription>

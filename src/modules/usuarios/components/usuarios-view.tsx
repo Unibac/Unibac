@@ -3,7 +3,7 @@
 import { MoreVerticalIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-import { AuthProfileResponseDtoNivel } from "@/api/generated/models";
+import { NivelUsuario } from "@/modules/shared/types/api-models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCard } from "@/components/shared/list-card";
 import { ListCardContent } from "@/components/shared/list-card-content";
@@ -22,11 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  CardAction,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardAction, CardDescription, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -60,8 +56,7 @@ export function UsuariosView() {
   const rolesQuery = useRolesCatalogQuery();
   const deleteMut = useDeleteUsuarioMutation();
 
-  const canManage =
-    profile.data?.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR;
+  const canManage = profile.data?.nivel === NivelUsuario.ADMINISTRADOR;
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMode, setSheetMode] = useState<"create" | "edit">("create");
@@ -177,32 +172,32 @@ export function UsuariosView() {
                   <CardTitle className="truncate text-base leading-snug">
                     {u.usuario}
                   </CardTitle>
-                    {canManage ? (
-                      <CardAction>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              aria-label={`Acciones para ${u.usuario}`}
-                            >
-                              <MoreVerticalIcon className="size-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openEdit(u.id)}>
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              variant="destructive"
-                              onClick={() => setDeleteTargetId(u.id)}
-                            >
-                              Eliminar
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </CardAction>
-                    ) : null}
+                  {canManage ? (
+                    <CardAction>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label={`Acciones para ${u.usuario}`}
+                          >
+                            <MoreVerticalIcon className="size-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => openEdit(u.id)}>
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            variant="destructive"
+                            onClick={() => setDeleteTargetId(u.id)}
+                          >
+                            Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </CardAction>
+                  ) : null}
                 </ListCardHeader>
                 <ListCardContent>
                   <div className="flex flex-wrap items-center gap-2">

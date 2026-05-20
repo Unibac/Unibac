@@ -4,9 +4,9 @@ import { useState } from "react";
 
 import {
   type PostulacionConvocatoriaResponseDto,
-  PostulacionConvocatoriaResponseDtoEstadoPostulacion,
-  UpdateEstadoPostulacionDtoEstado,
-} from "@/api/generated/models";
+  EstadoPostulacionConvocatoria,
+  ResolverPostulacionEstado,
+} from "@/modules/shared/types/api-models";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -60,7 +60,7 @@ export function PostulacionesSheet({
 
   async function resolve(
     row: PostulacionConvocatoriaResponseDto,
-    estado: UpdateEstadoPostulacionDtoEstado,
+    estado: ResolverPostulacionEstado,
   ) {
     if (!publicacionId) return;
     setApiError(null);
@@ -129,7 +129,7 @@ export function PostulacionesSheet({
                   rows.map((row) => {
                     const canResolve =
                       row.estadoPostulacion ===
-                      PostulacionConvocatoriaResponseDtoEstadoPostulacion.POSTULADO;
+                      EstadoPostulacionConvocatoria.POSTULADO;
                     return (
                       <TableRow key={row.id}>
                         <TableCell className="font-medium">
@@ -150,7 +150,7 @@ export function PostulacionesSheet({
                                 onClick={() =>
                                   void resolve(
                                     row,
-                                    UpdateEstadoPostulacionDtoEstado.RECHAZADO,
+                                    ResolverPostulacionEstado.RECHAZADO,
                                   )
                                 }
                               >
@@ -163,7 +163,7 @@ export function PostulacionesSheet({
                                 onClick={() =>
                                   void resolve(
                                     row,
-                                    UpdateEstadoPostulacionDtoEstado.APROBADO,
+                                    ResolverPostulacionEstado.APROBADO,
                                   )
                                 }
                               >

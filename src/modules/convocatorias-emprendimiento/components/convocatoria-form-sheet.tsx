@@ -5,8 +5,8 @@ import { Loader2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 
-import type { PublicacionEmprendimientoResponseDto } from "@/api/generated/models";
-import { CreatePublicacionConvocatoriaDtoTipoConvocatoria } from "@/api/generated/models";
+import type { PublicacionEmprendimientoResponseDto } from "@/modules/shared/types/api-models";
+import { TipoConvocatoriaEmprendimiento } from "@/modules/shared/types/api-models";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -51,14 +51,10 @@ const textareaClassName = cn(
   "flex min-h-[88px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:bg-input/30 dark:aria-invalid:ring-destructive/40 md:text-sm",
 );
 
-const TIPO_LABELS: Record<
-  CreatePublicacionConvocatoriaDtoTipoConvocatoria,
-  string
-> = {
-  [CreatePublicacionConvocatoriaDtoTipoConvocatoria.FINANCIAMIENTO]:
-    "Financiamiento",
-  [CreatePublicacionConvocatoriaDtoTipoConvocatoria.FORMACION]: "Formación",
-  [CreatePublicacionConvocatoriaDtoTipoConvocatoria.PRACTICAS]: "Prácticas",
+const TIPO_LABELS: Record<TipoConvocatoriaEmprendimiento, string> = {
+  [TipoConvocatoriaEmprendimiento.FINANCIAMIENTO]: "Financiamiento",
+  [TipoConvocatoriaEmprendimiento.FORMACION]: "Formación",
+  [TipoConvocatoriaEmprendimiento.PRACTICAS]: "Prácticas",
 };
 
 export type ConvocatoriaFormSheetProps = {
@@ -181,8 +177,8 @@ export function ConvocatoriaFormSheet({
                         <SelectContent>
                           {(
                             Object.values(
-                              CreatePublicacionConvocatoriaDtoTipoConvocatoria,
-                            ) as CreatePublicacionConvocatoriaDtoTipoConvocatoria[]
+                              TipoConvocatoriaEmprendimiento,
+                            ) as TipoConvocatoriaEmprendimiento[]
                           ).map((v) => (
                             <SelectItem key={v} value={v}>
                               {TIPO_LABELS[v]}

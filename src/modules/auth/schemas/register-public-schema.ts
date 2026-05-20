@@ -1,9 +1,7 @@
 import { z } from "zod";
 
-import {
-  type RegisterPublicDto,
-  RegisterPublicDtoCategoria,
-} from "@/api/generated/models";
+import type { RegisterPublicInput } from "@/modules/auth/types";
+import { CategoriaUsuarioExterno } from "@/modules/shared/types/enums";
 
 const optionalTrimmed = z
   .string()
@@ -26,9 +24,9 @@ const optionalCorreoContacto = z
 export const registerPublicFormSchema = z
   .object({
     categoria: z.enum([
-      RegisterPublicDtoCategoria.ESTUDIANTE,
-      RegisterPublicDtoCategoria.EGRESADO,
-      RegisterPublicDtoCategoria.EMPRESA,
+      CategoriaUsuarioExterno.ESTUDIANTE,
+      CategoriaUsuarioExterno.EGRESADO,
+      CategoriaUsuarioExterno.EMPRESA,
     ]),
     usuario: z.string().min(3, "Mínimo 3 caracteres"),
     clave: z.string().min(6, "Mínimo 6 caracteres"),
@@ -45,8 +43,8 @@ export const registerPublicFormSchema = z
   })
   .superRefine((data, ctx) => {
     if (
-      data.categoria === RegisterPublicDtoCategoria.ESTUDIANTE ||
-      data.categoria === RegisterPublicDtoCategoria.EGRESADO
+      data.categoria === CategoriaUsuarioExterno.ESTUDIANTE ||
+      data.categoria === CategoriaUsuarioExterno.EGRESADO
     ) {
       if (!data.identificacion?.trim()) {
         ctx.addIssue({
@@ -56,7 +54,7 @@ export const registerPublicFormSchema = z
         });
       }
     }
-    if (data.categoria === RegisterPublicDtoCategoria.ESTUDIANTE) {
+    if (data.categoria === CategoriaUsuarioExterno.ESTUDIANTE) {
       if (!data.codigoEstudiantil?.trim()) {
         ctx.addIssue({
           code: "custom",
@@ -65,7 +63,7 @@ export const registerPublicFormSchema = z
         });
       }
     }
-    if (data.categoria === RegisterPublicDtoCategoria.EMPRESA) {
+    if (data.categoria === CategoriaUsuarioExterno.EMPRESA) {
       if (!data.nit?.trim()) {
         ctx.addIssue({
           code: "custom",
@@ -87,8 +85,8 @@ export type RegisterPublicFormValues = z.infer<typeof registerPublicFormSchema>;
 
 export function toRegisterPublicDto(
   data: RegisterPublicFormValues,
-): RegisterPublicDto {
-  const base: RegisterPublicDto = {
+): RegisterPublicInput {
+  const base: RegisterPublicInput = {
     categoria: data.categoria,
     usuario: data.usuario.trim(),
     clave: data.clave,
@@ -104,15 +102,15 @@ export function toRegisterPublicDto(
   }
 
   if (
-    data.categoria === RegisterPublicDtoCategoria.ESTUDIANTE ||
-    data.categoria === RegisterPublicDtoCategoria.EGRESADO
+    data.categoria === CategoriaUsuarioExterno.ESTUDIANTE ||
+    data.categoria === CategoriaUsuarioExterno.EGRESADO
   ) {
     base.identificacion = data.identificacion?.trim();
   }
-  if (data.categoria === RegisterPublicDtoCategoria.ESTUDIANTE) {
+  if (data.categoria === CategoriaUsuarioExterno.ESTUDIANTE) {
     base.codigoEstudiantil = data.codigoEstudiantil?.trim();
   }
-  if (data.categoria === RegisterPublicDtoCategoria.EMPRESA) {
+  if (data.categoria === CategoriaUsuarioExterno.EMPRESA) {
     base.nit = data.nit?.trim();
     base.razonSocial = data.razonSocial?.trim();
     if (data.nombreContacto !== undefined) {

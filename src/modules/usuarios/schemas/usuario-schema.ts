@@ -1,19 +1,10 @@
 import { z } from "zod";
 
-import {
-  CreateUsuarioDtoNivel,
-  CreateUsuarioDtoTipo,
-} from "@/api/generated/models";
+import { NivelUsuario, TipoUsuario } from "@/modules/shared/types/api-models";
 
-const nivelSchema = z.enum([
-  CreateUsuarioDtoNivel.USUARIO,
-  CreateUsuarioDtoNivel.ADMINISTRADOR,
-]);
+const nivelSchema = z.enum([NivelUsuario.USUARIO, NivelUsuario.ADMINISTRADOR]);
 
-const tipoSchema = z.enum([
-  CreateUsuarioDtoTipo.INTERNO,
-  CreateUsuarioDtoTipo.EXTERNO,
-]);
+const tipoSchema = z.enum([TipoUsuario.INTERNO, TipoUsuario.EXTERNO]);
 
 const rolIdSchema = z.coerce
   .number()

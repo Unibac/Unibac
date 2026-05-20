@@ -18,6 +18,28 @@ DATABASE_URL="postgresql://postgres.[project-ref]:[password]@aws-0-[region].pool
 DIRECT_URL="postgresql://postgres:[password]@db.[project-ref].supabase.co:5432/postgres"
 ```
 
+### Supabase Auth (cliente Next.js)
+
+| Variable | Uso |
+|----------|-----|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` o `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Clave pública del cliente (`@supabase/ssr`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Solo servidor (admin API, operaciones privilegiadas) |
+
+### Traiker (uploads de imágenes)
+
+| Variable | Uso |
+|----------|-----|
+| `TRAIKER_API_BASE_URL` | Base URL del API Traiker |
+| `TRAIKER_USR` | Usuario de servicio |
+| `TRAIKER_PSW` | Contraseña de servicio |
+
+Sin estas variables, los endpoints de upload responden 503.
+
+## Campo `authUserId`
+
+La tabla `USUARIOS` incluye `AUTH_USER_ID` (`authUserId` en Prisma): UUID opcional y único que enlaza el registro local con el usuario de **Supabase Auth**. Se rellena al registrar o vincular cuentas; permite resolver sesión cookie/JWT → fila `Usuario` para RBAC y datos de dominio.
+
 ## Comandos (desde la raíz del repo)
 
 | Script | Acción |
@@ -37,3 +59,7 @@ import { prisma } from "@/lib/prisma";
 ```
 
 No usar `prisma` en componentes cliente ni exponer `DIRECT_URL`.
+
+## Capa API
+
+Los contratos JSON compartidos entre Route Handlers (`src/app/api/**`) y wrappers del frontend viven en `src/modules/shared/types/api-models.ts`. Los wrappers llaman `/api/*` con `fetchApi`; no hay codegen OpenAPI.

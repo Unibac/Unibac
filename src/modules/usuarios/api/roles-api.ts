@@ -1,7 +1,6 @@
-import { getRoles } from "@/api/generated/roles/roles";
-
-const roles = getRoles();
+import type { RolResponseDto } from "@/modules/shared/types/api-models";
+import { fetchApi } from "@/lib/api/fetch-api";
 
 export async function listRolesCatalog() {
-  return roles.rolesControllerFindAll();
+  return fetchApi<RolResponseDto[]>("/api/roles");
 }

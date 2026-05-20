@@ -2,17 +2,17 @@ import { z } from "zod";
 
 import {
   type CreateDirectorioEmprendimientoDto,
-  CreateDirectorioEmprendimientoDtoAreaCreativa,
+  AreaCreativaEmprendimiento,
   type DirectorioEmprendimientoResponseDto,
   type UpdateDirectorioEmprendimientoDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 import { parsePublicImageUrl } from "@/lib/media/parse-public-image-url";
 
 const areaCreativaSchema = z.enum([
-  CreateDirectorioEmprendimientoDtoAreaCreativa.ARTES_PLASTICAS,
-  CreateDirectorioEmprendimientoDtoAreaCreativa.MUSICA,
-  CreateDirectorioEmprendimientoDtoAreaCreativa.DISENO,
-  CreateDirectorioEmprendimientoDtoAreaCreativa.AUDIOVISUAL,
+  AreaCreativaEmprendimiento.ARTES_PLASTICAS,
+  AreaCreativaEmprendimiento.MUSICA,
+  AreaCreativaEmprendimiento.DISENO,
+  AreaCreativaEmprendimiento.AUDIOVISUAL,
 ]);
 
 function preprocessOptionalText(val: unknown): string {
@@ -83,7 +83,7 @@ export function emptyDirectorioFormValues(): DirectorioFormValues {
     correo: undefined,
     redes: undefined,
     sitioWeb: undefined,
-    areaCreativa: CreateDirectorioEmprendimientoDtoAreaCreativa.ARTES_PLASTICAS,
+    areaCreativa: AreaCreativaEmprendimiento.ARTES_PLASTICAS,
     perfilActivo: true,
   };
 }

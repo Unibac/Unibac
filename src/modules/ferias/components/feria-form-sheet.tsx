@@ -5,7 +5,7 @@ import { Loader2Icon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 
-import type { FeriaResponseDto } from "@/api/generated/models";
+import type { FeriaResponseDto } from "@/modules/shared/types/api-models";
 import { Button } from "@/components/ui/button";
 import {
   Form,

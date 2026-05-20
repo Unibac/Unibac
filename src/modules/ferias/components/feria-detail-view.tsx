@@ -5,12 +5,11 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import {
-  CreatePropuestaFeriaDtoAreaCreativa,
-  FeriaResponseDtoPeriodo,
-  FeriasControllerFindPropuestasPorFeriaEstado,
+  AreaCreativaEmprendimiento,
+  FeriaPeriodo,
+  EstadoPropuestaFeria,
   type PropuestaFeriaResponseDto,
-  PropuestaFeriaResponseDtoEstado,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCardContent } from "@/components/shared/list-card-content";
 import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
@@ -22,11 +21,7 @@ import { PageCallout } from "@/components/shared/page-callout";
 import { SectionHeader } from "@/components/shared/section-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  CardAction,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardAction, CardDescription, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -80,23 +75,23 @@ import {
   feriasIsAdmin,
 } from "@/modules/ferias/utils/ferias-permissions";
 
-const PERIODO_LABELS: Record<FeriaResponseDtoPeriodo, string> = {
-  [FeriaResponseDtoPeriodo.proxima]: "Próxima",
-  [FeriaResponseDtoPeriodo.activa]: "En curso",
-  [FeriaResponseDtoPeriodo.finalizada]: "Finalizada",
+const PERIODO_LABELS: Record<FeriaPeriodo, string> = {
+  [FeriaPeriodo.proxima]: "Próxima",
+  [FeriaPeriodo.activa]: "En curso",
+  [FeriaPeriodo.finalizada]: "Finalizada",
 };
 
-const ESTADO_PROP_LABELS: Record<PropuestaFeriaResponseDtoEstado, string> = {
-  [PropuestaFeriaResponseDtoEstado.POSTULADO]: "Postulado",
-  [PropuestaFeriaResponseDtoEstado.ACEPTADO]: "Aceptado",
-  [PropuestaFeriaResponseDtoEstado.RECHAZADO]: "Rechazado",
+const ESTADO_PROP_LABELS: Record<EstadoPropuestaFeria, string> = {
+  [EstadoPropuestaFeria.POSTULADO]: "Postulado",
+  [EstadoPropuestaFeria.ACEPTADO]: "Aceptado",
+  [EstadoPropuestaFeria.RECHAZADO]: "Rechazado",
 };
 
-const AREA_LABELS: Record<CreatePropuestaFeriaDtoAreaCreativa, string> = {
-  [CreatePropuestaFeriaDtoAreaCreativa.ARTES_PLASTICAS]: "Artes plásticas",
-  [CreatePropuestaFeriaDtoAreaCreativa.MUSICA]: "Música",
-  [CreatePropuestaFeriaDtoAreaCreativa.DISENO]: "Diseño",
-  [CreatePropuestaFeriaDtoAreaCreativa.AUDIOVISUAL]: "Audiovisual",
+const AREA_LABELS: Record<AreaCreativaEmprendimiento, string> = {
+  [AreaCreativaEmprendimiento.ARTES_PLASTICAS]: "Artes plásticas",
+  [AreaCreativaEmprendimiento.MUSICA]: "Música",
+  [AreaCreativaEmprendimiento.DISENO]: "Diseño",
+  [AreaCreativaEmprendimiento.AUDIOVISUAL]: "Audiovisual",
 };
 
 export function FeriaDetailView({ feriaId }: { feriaId: number }) {
@@ -183,7 +178,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
 
   if (!feria) return null;
 
-  const feriaProxima = feria.periodo === FeriaResponseDtoPeriodo.proxima;
+  const feriaProxima = feria.periodo === FeriaPeriodo.proxima;
 
   if (!feriasCanBrowse(profile.data)) {
     return (
@@ -277,42 +272,30 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
           actions={
             isAdmin ? (
               <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Estado</span>
-              <Select
-                value={estadoFiltro}
-                onValueChange={(v) =>
-                  setEstadoFiltro(v as PropuestasPorFeriaEstadoFilter)
-                }
-              >
-                <SelectTrigger size="sm" className="w-[160px]">
-                  <SelectValue placeholder="Filtrar" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todas">Todas</SelectItem>
-                  <SelectItem
-                    value={
-                      FeriasControllerFindPropuestasPorFeriaEstado.POSTULADO
-                    }
-                  >
-                    Postulado
-                  </SelectItem>
-                  <SelectItem
-                    value={
-                      FeriasControllerFindPropuestasPorFeriaEstado.ACEPTADO
-                    }
-                  >
-                    Aceptado
-                  </SelectItem>
-                  <SelectItem
-                    value={
-                      FeriasControllerFindPropuestasPorFeriaEstado.RECHAZADO
-                    }
-                  >
-                    Rechazado
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+                <span className="text-xs text-muted-foreground">Estado</span>
+                <Select
+                  value={estadoFiltro}
+                  onValueChange={(v) =>
+                    setEstadoFiltro(v as PropuestasPorFeriaEstadoFilter)
+                  }
+                >
+                  <SelectTrigger size="sm" className="w-[160px]">
+                    <SelectValue placeholder="Filtrar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todas">Todas</SelectItem>
+                    <SelectItem value={EstadoPropuestaFeria.POSTULADO}>
+                      Postulado
+                    </SelectItem>
+                    <SelectItem value={EstadoPropuestaFeria.ACEPTADO}>
+                      Aceptado
+                    </SelectItem>
+                    <SelectItem value={EstadoPropuestaFeria.RECHAZADO}>
+                      Rechazado
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             ) : undefined
           }
         />
@@ -325,14 +308,15 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
           </PageCallout>
         ) : layout === "cards" ? (
           rows.length === 0 ? (
-            <ListCardGridEmpty>No hay propuestas para mostrar.</ListCardGridEmpty>
+            <ListCardGridEmpty>
+              No hay propuestas para mostrar.
+            </ListCardGridEmpty>
           ) : (
             <div className="layout-list-grid">
               {rows.map((row) => {
                 const editable = canEditPropuesta(row);
                 const moderar =
-                  isAdmin &&
-                  row.estado === PropuestaFeriaResponseDtoEstado.POSTULADO;
+                  isAdmin && row.estado === EstadoPropuestaFeria.POSTULADO;
                 const menu = editable || moderar;
                 return (
                   <ListCardWithMedia key={row.id}>
@@ -401,17 +385,15 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
                       <CardDescription>
                         {
                           AREA_LABELS[
-                            row.areaCreativa as CreatePropuestaFeriaDtoAreaCreativa
+                            row.areaCreativa as AreaCreativaEmprendimiento
                           ]
                         }
                       </CardDescription>
                       <Badge
                         variant={
-                          row.estado ===
-                          PropuestaFeriaResponseDtoEstado.RECHAZADO
+                          row.estado === EstadoPropuestaFeria.RECHAZADO
                             ? "destructive"
-                            : row.estado ===
-                                PropuestaFeriaResponseDtoEstado.ACEPTADO
+                            : row.estado === EstadoPropuestaFeria.ACEPTADO
                               ? "default"
                               : "secondary"
                         }
@@ -454,8 +436,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
                 rows.map((row) => {
                   const editable = canEditPropuesta(row);
                   const moderar =
-                    isAdmin &&
-                    row.estado === PropuestaFeriaResponseDtoEstado.POSTULADO;
+                    isAdmin && row.estado === EstadoPropuestaFeria.POSTULADO;
                   const menu = editable || moderar;
                   return (
                     <TableRow key={row.id}>
@@ -470,7 +451,7 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
                       <TableCell className="text-xs">
                         {
                           AREA_LABELS[
-                            row.areaCreativa as CreatePropuestaFeriaDtoAreaCreativa
+                            row.areaCreativa as AreaCreativaEmprendimiento
                           ]
                         }
                       </TableCell>

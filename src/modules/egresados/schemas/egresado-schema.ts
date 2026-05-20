@@ -2,16 +2,16 @@ import { z } from "zod";
 
 import {
   type CreateEgresadoDto,
-  CreateEgresadoDtoEstadoLaboral,
+  EstadoLaboralEgresado,
   type EgresadoResponseDto,
   type UpdateEgresadoDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 
 const estadoLaboralSchema = z.enum([
-  CreateEgresadoDtoEstadoLaboral.EMPLEADO,
-  CreateEgresadoDtoEstadoLaboral.EMPRENDEDOR,
-  CreateEgresadoDtoEstadoLaboral.DESEMPLEADO,
-  CreateEgresadoDtoEstadoLaboral.ESTUDIANDO,
+  EstadoLaboralEgresado.EMPLEADO,
+  EstadoLaboralEgresado.EMPRENDEDOR,
+  EstadoLaboralEgresado.DESEMPLEADO,
+  EstadoLaboralEgresado.ESTUDIANDO,
 ]);
 
 const currentYear = new Date().getFullYear();
@@ -131,7 +131,7 @@ export function emptyEgresadoFormValues(): EgresadoFormValues {
     correo: "",
     anioEgreso: currentYear,
     programaCarrera: "",
-    estadoLaboral: CreateEgresadoDtoEstadoLaboral.EMPLEADO,
+    estadoLaboral: EstadoLaboralEgresado.EMPLEADO,
     brevePerfilProfesional: "",
     informacionEmprendimiento: "",
   };

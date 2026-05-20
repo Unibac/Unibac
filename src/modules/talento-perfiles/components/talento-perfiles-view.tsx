@@ -4,11 +4,11 @@ import { MoreVerticalIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import {
-  AuthProfileResponseDtoNivel,
-  CreateTalentoPerfilDtoArea,
-  CreateTalentoPerfilDtoTipoPerfil,
+  NivelUsuario,
+  AreaTalento,
+  TipoPerfilTalento,
   type TalentoPerfilResponseDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCard } from "@/components/shared/list-card";
 import { ListCardContent } from "@/components/shared/list-card-content";
@@ -27,11 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  CardAction,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardAction, CardDescription, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,18 +51,18 @@ import { TalentoPerfilFormSheet } from "@/modules/talento-perfiles/components/ta
 import { useDeleteTalentoMutation } from "@/modules/talento-perfiles/hooks/use-talento-mutations";
 import { useTalentoListQuery } from "@/modules/talento-perfiles/hooks/use-talento-queries";
 
-const AREA_LABELS: Record<CreateTalentoPerfilDtoArea, string> = {
-  [CreateTalentoPerfilDtoArea.MUSICA]: "Música",
-  [CreateTalentoPerfilDtoArea.ARTES_PLASTICAS]: "Artes plásticas",
-  [CreateTalentoPerfilDtoArea.DISENO]: "Diseño",
-  [CreateTalentoPerfilDtoArea.AUDIOVISUAL]: "Audiovisual",
-  [CreateTalentoPerfilDtoArea.ARTES_ESCENICAS]: "Artes escénicas",
+const AREA_LABELS: Record<AreaTalento, string> = {
+  [AreaTalento.MUSICA]: "Música",
+  [AreaTalento.ARTES_PLASTICAS]: "Artes plásticas",
+  [AreaTalento.DISENO]: "Diseño",
+  [AreaTalento.AUDIOVISUAL]: "Audiovisual",
+  [AreaTalento.ARTES_ESCENICAS]: "Artes escénicas",
 };
 
-const TIPO_PERFIL_LABELS: Record<CreateTalentoPerfilDtoTipoPerfil, string> = {
-  [CreateTalentoPerfilDtoTipoPerfil.ESTUDIANTE]: "Estudiante",
-  [CreateTalentoPerfilDtoTipoPerfil.EGRESADO]: "Egresado",
-  [CreateTalentoPerfilDtoTipoPerfil.EMPRENDEDOR]: "Emprendedor",
+const TIPO_PERFIL_LABELS: Record<TipoPerfilTalento, string> = {
+  [TipoPerfilTalento.ESTUDIANTE]: "Estudiante",
+  [TipoPerfilTalento.EGRESADO]: "Egresado",
+  [TipoPerfilTalento.EMPRENDEDOR]: "Emprendedor",
 };
 
 function toCellText(value: unknown): string {
@@ -86,8 +82,7 @@ export function TalentoPerfilesView() {
   const listQuery = useTalentoListQuery();
   const deleteMut = useDeleteTalentoMutation();
 
-  const isAdmin =
-    profile.data?.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR;
+  const isAdmin = profile.data?.nivel === NivelUsuario.ADMINISTRADOR;
 
   const [search, setSearch] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -140,7 +135,7 @@ export function TalentoPerfilesView() {
   function canEditRow(row: TalentoPerfilResponseDto): boolean {
     if (!profile.data) return false;
     return (
-      profile.data.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR ||
+      profile.data.nivel === NivelUsuario.ADMINISTRADOR ||
       profile.data.id === row.usuarioId
     );
   }
@@ -199,9 +194,9 @@ export function TalentoPerfilesView() {
               </Button>
             ) : null}
             {canRegisterSelf ? (
-            <Button type="button" size="sm" onClick={() => openCreate()}>
-              Registrar mi perfil
-            </Button>
+              <Button type="button" size="sm" onClick={() => openCreate()}>
+                Registrar mi perfil
+              </Button>
             ) : null}
           </>
         }
@@ -249,50 +244,52 @@ export function TalentoPerfilesView() {
                     <CardTitle className="truncate text-base leading-snug">
                       {row.nombreCompleto}
                     </CardTitle>
-                      {showMenu ? (
-                        <CardAction>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                aria-label={`Acciones para ${row.nombreCompleto}`}
+                    {showMenu ? (
+                      <CardAction>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={`Acciones para ${row.nombreCompleto}`}
+                            >
+                              <MoreVerticalIcon className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {editable ? (
+                              <DropdownMenuItem onClick={() => openEdit(row)}>
+                                Editar
+                              </DropdownMenuItem>
+                            ) : null}
+                            {deletable ? (
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => setDeleteTargetId(row.id)}
                               >
-                                <MoreVerticalIcon className="size-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              {editable ? (
-                                <DropdownMenuItem onClick={() => openEdit(row)}>
-                                  Editar
-                                </DropdownMenuItem>
-                              ) : null}
-                              {deletable ? (
-                                <DropdownMenuItem
-                                  variant="destructive"
-                                  onClick={() => setDeleteTargetId(row.id)}
-                                >
-                                  Eliminar
-                                </DropdownMenuItem>
-                              ) : null}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </CardAction>
-                      ) : null}
+                                Eliminar
+                              </DropdownMenuItem>
+                            ) : null}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </CardAction>
+                    ) : null}
                   </ListCardHeader>
                   <ListCardContent>
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="outline">
-                        {AREA_LABELS[row.area as CreateTalentoPerfilDtoArea]}
+                        {AREA_LABELS[row.area as AreaTalento]}
                       </Badge>
                       <Badge variant="outline">
                         {
                           TIPO_PERFIL_LABELS[
-                            row.tipoPerfil as CreateTalentoPerfilDtoTipoPerfil
+                            row.tipoPerfil as TipoPerfilTalento
                           ]
                         }
                       </Badge>
-                      <Badge variant={row.perfilActivo ? "default" : "secondary"}>
+                      <Badge
+                        variant={row.perfilActivo ? "default" : "secondary"}
+                      >
                         {row.perfilActivo ? "Activo" : "Inactivo"}
                       </Badge>
                     </div>
@@ -352,14 +349,10 @@ export function TalentoPerfilesView() {
                       {row.nombreCompleto}
                     </TableCell>
                     <TableCell>
-                      {AREA_LABELS[row.area as CreateTalentoPerfilDtoArea]}
+                      {AREA_LABELS[row.area as AreaTalento]}
                     </TableCell>
                     <TableCell>
-                      {
-                        TIPO_PERFIL_LABELS[
-                          row.tipoPerfil as CreateTalentoPerfilDtoTipoPerfil
-                        ]
-                      }
+                      {TIPO_PERFIL_LABELS[row.tipoPerfil as TipoPerfilTalento]}
                     </TableCell>
                     <TableCell>{row.perfilActivo ? "Sí" : "No"}</TableCell>
                     <TableCell className="max-w-[180px] truncate text-muted-foreground">

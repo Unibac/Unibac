@@ -7,11 +7,7 @@ import { PortalHero } from "@/components/layout/portal/portal-hero";
 import { PortalServiceGrid } from "@/components/layout/portal/portal-service-grid";
 import { PageHeader } from "@/components/layout/page-header";
 import { NavModuleCard } from "@/components/shared/nav-module-card";
-import {
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
 import { getDashboardNavItemsForProfile } from "@/modules/auth/lib/dashboard-nav-items";
 import { isPortalExternoUx } from "@/modules/auth/lib/portal-ux";

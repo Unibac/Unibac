@@ -77,6 +77,7 @@ enum EstadoPropuestaFeria {
 
 model Usuario {
   id                       Int                       @id @default(autoincrement()) @map("IDUSUARIO")
+  authUserId               String?                   @unique @map("AUTH_USER_ID") @db.Uuid
   usuario                  String                    @unique @map("USUARIO")
   descripcion              String?                   @map("DESCRIPCION")
   clave                    String                    @map("CLAVE")

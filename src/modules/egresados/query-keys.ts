@@ -1,4 +1,4 @@
-import type { EgresadosControllerFindAllParams } from "@/api/generated/models";
+import type { FindEgresadosParams } from "@/modules/shared/types/api-models";
 
 export const egresadosKeys = {
   all: ["egresados"] as const,
@@ -15,13 +15,13 @@ export type EgresadosListFilters = {
   nombre?: string;
   anioEgreso?: number;
   programaCarrera?: string;
-  estadoLaboral?: EgresadosControllerFindAllParams["estadoLaboral"];
+  estadoLaboral?: FindEgresadosParams["estadoLaboral"];
 };
 
 export function toFindAllParams(
   filters: EgresadosListFilters,
-): EgresadosControllerFindAllParams | undefined {
-  const params: EgresadosControllerFindAllParams = {};
+): FindEgresadosParams | undefined {
+  const params: FindEgresadosParams = {};
   if (filters.nombre?.trim()) {
     params.nombre = filters.nombre.trim();
   }

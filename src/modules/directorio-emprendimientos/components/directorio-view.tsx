@@ -4,10 +4,10 @@ import { MoreVerticalIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import {
-  AuthProfileResponseDtoNivel,
-  CreateDirectorioEmprendimientoDtoAreaCreativa,
+  NivelUsuario,
+  AreaCreativaEmprendimiento,
   type DirectorioEmprendimientoResponseDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCardContent } from "@/components/shared/list-card-content";
 import { ListCardGridEmpty } from "@/components/shared/list-card-grid-empty";
@@ -27,11 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  CardAction,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardAction, CardDescription, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,15 +50,11 @@ import { DirectorioFormSheet } from "@/modules/directorio-emprendimientos/compon
 import { useDeleteDirectorioMutation } from "@/modules/directorio-emprendimientos/hooks/use-directorio-mutations";
 import { useDirectorioListQuery } from "@/modules/directorio-emprendimientos/hooks/use-directorio-queries";
 
-const AREA_LABELS: Record<
-  CreateDirectorioEmprendimientoDtoAreaCreativa,
-  string
-> = {
-  [CreateDirectorioEmprendimientoDtoAreaCreativa.ARTES_PLASTICAS]:
-    "Artes plásticas",
-  [CreateDirectorioEmprendimientoDtoAreaCreativa.MUSICA]: "Música",
-  [CreateDirectorioEmprendimientoDtoAreaCreativa.DISENO]: "Diseño",
-  [CreateDirectorioEmprendimientoDtoAreaCreativa.AUDIOVISUAL]: "Audiovisual",
+const AREA_LABELS: Record<AreaCreativaEmprendimiento, string> = {
+  [AreaCreativaEmprendimiento.ARTES_PLASTICAS]: "Artes plásticas",
+  [AreaCreativaEmprendimiento.MUSICA]: "Música",
+  [AreaCreativaEmprendimiento.DISENO]: "Diseño",
+  [AreaCreativaEmprendimiento.AUDIOVISUAL]: "Audiovisual",
 };
 
 function toCellText(value: unknown): string {
@@ -82,8 +74,7 @@ export function DirectorioView() {
   const listQuery = useDirectorioListQuery();
   const deleteMut = useDeleteDirectorioMutation();
 
-  const isAdmin =
-    profile.data?.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR;
+  const isAdmin = profile.data?.nivel === NivelUsuario.ADMINISTRADOR;
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMode, setSheetMode] = useState<"create" | "edit">("create");
@@ -124,7 +115,7 @@ export function DirectorioView() {
   function canEditRow(row: DirectorioEmprendimientoResponseDto): boolean {
     if (!profile.data) return false;
     return (
-      profile.data.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR ||
+      profile.data.nivel === NivelUsuario.ADMINISTRADOR ||
       profile.data.id === row.usuarioId
     );
   }
@@ -252,7 +243,7 @@ export function DirectorioView() {
                     <CardDescription>
                       {
                         AREA_LABELS[
-                          row.areaCreativa as CreateDirectorioEmprendimientoDtoAreaCreativa
+                          row.areaCreativa as AreaCreativaEmprendimiento
                         ]
                       }
                     </CardDescription>
@@ -308,7 +299,7 @@ export function DirectorioView() {
                     <TableCell>
                       {
                         AREA_LABELS[
-                          row.areaCreativa as CreateDirectorioEmprendimientoDtoAreaCreativa
+                          row.areaCreativa as AreaCreativaEmprendimiento
                         ]
                       }
                     </TableCell>

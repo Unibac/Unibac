@@ -1,5 +1,4 @@
-import axios from "axios";
-
+import { ApiClientError } from "@/lib/api/fetch-api";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 
 export type FeriasPropuestaErrorContext = "create" | "update" | "uploadImagen";
@@ -36,12 +35,9 @@ export function getFeriasPropuestaErrorMessage(
   error: unknown,
   context: FeriasPropuestaErrorContext,
 ): string {
-  if (axios.isAxiosError(error)) {
-    const status = error.response?.status;
-    if (status != null) {
-      const mapped = MESSAGES[status]?.[context];
-      if (mapped) return mapped;
-    }
+  if (error instanceof ApiClientError) {
+    const mapped = MESSAGES[error.status]?.[context];
+    if (mapped) return mapped;
   }
   return getApiErrorMessage(error);
 }

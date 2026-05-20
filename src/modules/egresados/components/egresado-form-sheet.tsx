@@ -5,8 +5,8 @@ import { Loader2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 
-import type { EgresadoResponseDto } from "@/api/generated/models";
-import { CreateEgresadoDtoEstadoLaboral } from "@/api/generated/models";
+import type { EgresadoResponseDto } from "@/modules/shared/types/api-models";
+import { EstadoLaboralEgresado } from "@/modules/shared/types/api-models";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -51,11 +51,11 @@ const textareaClassName = cn(
   "flex min-h-[88px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:bg-input/30 dark:aria-invalid:ring-destructive/40 md:text-sm",
 );
 
-const ESTADO_LABELS: Record<CreateEgresadoDtoEstadoLaboral, string> = {
-  [CreateEgresadoDtoEstadoLaboral.EMPLEADO]: "Empleado",
-  [CreateEgresadoDtoEstadoLaboral.EMPRENDEDOR]: "Emprendedor",
-  [CreateEgresadoDtoEstadoLaboral.DESEMPLEADO]: "Desempleado",
-  [CreateEgresadoDtoEstadoLaboral.ESTUDIANDO]: "Estudiando",
+const ESTADO_LABELS: Record<EstadoLaboralEgresado, string> = {
+  [EstadoLaboralEgresado.EMPLEADO]: "Empleado",
+  [EstadoLaboralEgresado.EMPRENDEDOR]: "Emprendedor",
+  [EstadoLaboralEgresado.DESEMPLEADO]: "Desempleado",
+  [EstadoLaboralEgresado.ESTUDIANDO]: "Estudiando",
 };
 
 export type EgresadoFormSheetProps = {
@@ -269,8 +269,8 @@ export function EgresadoFormSheet({
                         <SelectContent>
                           {(
                             Object.values(
-                              CreateEgresadoDtoEstadoLaboral,
-                            ) as CreateEgresadoDtoEstadoLaboral[]
+                              EstadoLaboralEgresado,
+                            ) as EstadoLaboralEgresado[]
                           ).map((v) => (
                             <SelectItem key={v} value={v}>
                               {ESTADO_LABELS[v]}

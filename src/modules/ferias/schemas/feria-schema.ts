@@ -4,7 +4,7 @@ import type {
   CreateFeriaDto,
   FeriaResponseDto,
   UpdateFeriaDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 
 export function isoToDatetimeLocalValue(iso: string): string {
   const d = new Date(iso);

@@ -1,15 +1,14 @@
-import type { ConvocatoriasEmprendimientoControllerFindAllPublicacionesParams } from "@/api/generated/models";
+import type { FindConvocatoriasParams } from "@/modules/shared/types/api-models";
 
 export type ConvocatoriasListFilters = {
-  tipoConvocatoria?: ConvocatoriasEmprendimientoControllerFindAllPublicacionesParams["tipoConvocatoria"];
+  tipoConvocatoria?: FindConvocatoriasParams["tipoConvocatoria"];
   activo?: boolean;
 };
 
 export function toListParams(
   filters: ConvocatoriasListFilters,
-): ConvocatoriasEmprendimientoControllerFindAllPublicacionesParams | undefined {
-  const params: ConvocatoriasEmprendimientoControllerFindAllPublicacionesParams =
-    {};
+): FindConvocatoriasParams | undefined {
+  const params: FindConvocatoriasParams = {};
   if (filters.tipoConvocatoria) {
     params.tipoConvocatoria = filters.tipoConvocatoria;
   }

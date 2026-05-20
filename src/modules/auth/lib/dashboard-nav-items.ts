@@ -9,7 +9,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 
-import type { AuthProfileResponseDto } from "@/api/generated/models";
+import type { AuthProfile } from "@/modules/auth/types";
 
 import { getVisibleDashboardNavHrefs } from "@/modules/auth/lib/dashboard-sidebar-policy";
 
@@ -52,7 +52,7 @@ export const DASHBOARD_NAV_ITEM_DATA = [
 ] as const satisfies readonly DashboardNavItemData[];
 
 export function getDashboardNavItemsForProfile(
-  profile: AuthProfileResponseDto,
+  profile: AuthProfile,
 ): DashboardNavItemData[] {
   const visible = new Set(getVisibleDashboardNavHrefs(profile));
   return DASHBOARD_NAV_ITEM_DATA.filter((item) => visible.has(item.href));

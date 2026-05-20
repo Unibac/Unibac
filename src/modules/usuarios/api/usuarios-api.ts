@@ -1,27 +1,33 @@
 import type {
   CreateUsuarioDto,
   UpdateUsuarioDto,
-} from "@/api/generated/models";
-import { getUsuarios } from "@/api/generated/usuarios/usuarios";
-
-const usuarios = getUsuarios();
+  UsuarioResponseDto,
+  UsuarioWithPermisosResponseDto,
+} from "@/modules/shared/types/api-models";
+import { fetchApi } from "@/lib/api/fetch-api";
 
 export async function listUsuarios() {
-  return usuarios.usuariosControllerFindAll();
+  return fetchApi<UsuarioWithPermisosResponseDto[]>("/api/usuarios");
 }
 
 export async function getUsuario(id: number) {
-  return usuarios.usuariosControllerFindOne(id);
+  return fetchApi<UsuarioWithPermisosResponseDto>(`/api/usuarios/${id}`);
 }
 
 export async function createUsuario(body: CreateUsuarioDto) {
-  return usuarios.usuariosControllerCreate(body);
+  return fetchApi<UsuarioResponseDto>("/api/usuarios", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }
 
 export async function updateUsuario(id: number, body: UpdateUsuarioDto) {
-  return usuarios.usuariosControllerUpdate(id, body);
+  return fetchApi<UsuarioResponseDto>(`/api/usuarios/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
 }
 
 export async function deleteUsuario(id: number) {
-  return usuarios.usuariosControllerRemove(id);
+  return fetchApi<void>(`/api/usuarios/${id}`, { method: "DELETE" });
 }

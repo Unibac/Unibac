@@ -6,9 +6,9 @@ import { useEffect, useRef, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 
 import {
-  CreatePropuestaFeriaDtoAreaCreativa,
+  AreaCreativaEmprendimiento,
   type PropuestaFeriaResponseDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -55,11 +55,11 @@ const textareaClassName = cn(
   "flex min-h-[88px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:bg-input/30 dark:aria-invalid:ring-destructive/40 md:text-sm",
 );
 
-const AREA_LABELS: Record<CreatePropuestaFeriaDtoAreaCreativa, string> = {
-  [CreatePropuestaFeriaDtoAreaCreativa.ARTES_PLASTICAS]: "Artes plásticas",
-  [CreatePropuestaFeriaDtoAreaCreativa.MUSICA]: "Música",
-  [CreatePropuestaFeriaDtoAreaCreativa.DISENO]: "Diseño",
-  [CreatePropuestaFeriaDtoAreaCreativa.AUDIOVISUAL]: "Audiovisual",
+const AREA_LABELS: Record<AreaCreativaEmprendimiento, string> = {
+  [AreaCreativaEmprendimiento.ARTES_PLASTICAS]: "Artes plásticas",
+  [AreaCreativaEmprendimiento.MUSICA]: "Música",
+  [AreaCreativaEmprendimiento.DISENO]: "Diseño",
+  [AreaCreativaEmprendimiento.AUDIOVISUAL]: "Audiovisual",
 };
 
 export type PropuestaFeriaFormSheetProps = {
@@ -221,8 +221,8 @@ export function PropuestaFeriaFormSheet({
                         <SelectContent>
                           {(
                             Object.values(
-                              CreatePropuestaFeriaDtoAreaCreativa,
-                            ) as CreatePropuestaFeriaDtoAreaCreativa[]
+                              AreaCreativaEmprendimiento,
+                            ) as AreaCreativaEmprendimiento[]
                           ).map((v) => (
                             <SelectItem key={v} value={v}>
                               {AREA_LABELS[v]}

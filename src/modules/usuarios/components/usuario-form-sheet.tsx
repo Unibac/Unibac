@@ -5,10 +5,7 @@ import { Loader2Icon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 
-import {
-  CreateUsuarioDtoNivel,
-  CreateUsuarioDtoTipo,
-} from "@/api/generated/models";
+import { NivelUsuario, TipoUsuario } from "@/modules/shared/types/api-models";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -57,8 +54,8 @@ function emptyCreateValues(): CreateUsuarioFormValues {
     clave: "",
     descripcion: "",
     activo: true,
-    nivel: CreateUsuarioDtoNivel.USUARIO,
-    tipo: CreateUsuarioDtoTipo.INTERNO,
+    nivel: NivelUsuario.USUARIO,
+    tipo: TipoUsuario.INTERNO,
     correo: "",
     celular: "",
     rolId: 0,
@@ -318,14 +315,10 @@ export function UsuarioFormSheet({
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem
-                                  value={CreateUsuarioDtoNivel.USUARIO}
-                                >
+                                <SelectItem value={NivelUsuario.USUARIO}>
                                   Usuario
                                 </SelectItem>
-                                <SelectItem
-                                  value={CreateUsuarioDtoNivel.ADMINISTRADOR}
-                                >
+                                <SelectItem value={NivelUsuario.ADMINISTRADOR}>
                                   Administrador
                                 </SelectItem>
                               </SelectContent>
@@ -350,14 +343,10 @@ export function UsuarioFormSheet({
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem
-                                  value={CreateUsuarioDtoTipo.INTERNO}
-                                >
+                                <SelectItem value={TipoUsuario.INTERNO}>
                                   Interno
                                 </SelectItem>
-                                <SelectItem
-                                  value={CreateUsuarioDtoTipo.EXTERNO}
-                                >
+                                <SelectItem value={TipoUsuario.EXTERNO}>
                                   Externo
                                 </SelectItem>
                               </SelectContent>

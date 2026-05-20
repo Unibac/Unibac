@@ -10,7 +10,7 @@ import type {
   ModerarPropuestaFeriaDto,
   UpdateFeriaDto,
   UpdatePropuestaFeriaPropietarioDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 
 import {
   createFeria,

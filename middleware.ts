@@ -1,41 +1,55 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
-import { ACCESS_TOKEN_COOKIE_NAME } from "@/lib/auth/access-token-cookie";
+import { getSupabaseAnonKey, getSupabaseUrl } from "@/lib/supabase/env";
 
 /**
- * Solo comprueba presencia del cookie HttpOnly `access_token` en el origen del frontend.
- * Si el login va directo al API en otro dominio, la cookie no llega aquí aunque /auth/profile
- * responda 200 vía XHR; usar `NEXT_PUBLIC_API_URL=/api-proxy` + `API_PROXY_TARGET`.
- * La autorización real sigue siendo GET /auth/profile en cliente (TanStack Query).
+ * Refresca sesión Supabase y protege rutas del dashboard.
+ * La autorización de negocio sigue en GET /api/auth/profile (cliente).
  */
-export function middleware(request: NextRequest) {
-  const hasToken = request.cookies.has(ACCESS_TOKEN_COOKIE_NAME);
+export async function middleware(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({ request });
+
+  const supabase = createServerClient(getSupabaseUrl(), getSupabaseAnonKey(), {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        for (const { name, value } of cookiesToSet) {
+          request.cookies.set(name, value);
+        }
+        supabaseResponse = NextResponse.next({ request });
+        for (const { name, value, options } of cookiesToSet) {
+          supabaseResponse.cookies.set(name, value, options);
+        }
+      },
+    },
+  });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/dashboard")) {
-    if (!hasToken) {
+    if (!user) {
       const url = request.nextUrl.clone();
       url.pathname = "/login";
       url.search = "";
       return NextResponse.redirect(url);
     }
-    return NextResponse.next();
+    return supabaseResponse;
   }
 
-  if (pathname === "/register" && hasToken) {
+  if ((pathname === "/register" || pathname === "/login") && user) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 
-  if (pathname === "/login" && hasToken) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
-  }
-
-  return NextResponse.next();
+  return supabaseResponse;
 }
 
 export const config = {

@@ -1,63 +1,79 @@
-import { getFerias } from "@/api/generated/ferias/ferias";
-import {
-  FeriasControllerFindPropuestasPorFeriaEstado,
-  type CreateFeriaDto,
-  type CreatePropuestaFeriaDto,
-  type FeriasControllerFindPropuestasPorFeriaParams,
-  type ModerarPropuestaFeriaDto,
-  type PropuestaFeriaResponseDto,
-  type UpdateFeriaDto,
-  type UpdatePropuestaFeriaPropietarioDto,
-} from "@/api/generated/models";
-
-const api = getFerias();
+import type {
+  CreateFeriaDto,
+  CreatePropuestaFeriaDto,
+  FeriaBannerUploadResponseDto,
+  FeriaPropuestaImagenUploadResponseDto,
+  FeriaResponseDto,
+  FindPropuestasPorFeriaParams,
+  ModerarPropuestaFeriaDto,
+  PropuestaFeriaResponseDto,
+  UpdateFeriaDto,
+  UpdatePropuestaFeriaPropietarioDto,
+} from "@/modules/shared/types/api-models";
+import { fetchApi } from "@/lib/api/fetch-api";
+import { EstadoPropuestaFeria } from "@/modules/shared/types/enums";
 
 export async function listFerias() {
-  return api.feriasControllerFindAll();
+  return fetchApi<FeriaResponseDto[]>("/api/ferias");
 }
 
 export async function getFeria(id: number) {
-  return api.feriasControllerFindOne(id);
+  return fetchApi<FeriaResponseDto>(`/api/ferias/${id}`);
 }
 
 export async function createFeria(body: CreateFeriaDto) {
-  return api.feriasControllerCreate(body);
+  return fetchApi<FeriaResponseDto>("/api/ferias", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }
 
 export async function updateFeria(id: number, body: UpdateFeriaDto) {
-  return api.feriasControllerUpdate(id, body);
+  return fetchApi<FeriaResponseDto>(`/api/ferias/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
 }
 
 export async function deleteFeria(id: number) {
-  return api.feriasControllerRemove(id);
+  return fetchApi<void>(`/api/ferias/${id}`, { method: "DELETE" });
 }
 
-/** Multipart al API Nest; Traiker es transparente para el cliente. */
 export async function uploadFeriaBanner(archivo: File) {
-  return api.feriasControllerUploadBanner({ archivo });
+  const formData = new FormData();
+  formData.append("archivo", archivo);
+  return fetchApi<FeriaBannerUploadResponseDto>("/api/uploads/ferias/banner", {
+    method: "POST",
+    body: formData,
+  });
 }
 
 export async function listMisPropuestas() {
-  return api.feriasControllerFindMisPropuestas();
+  return fetchApi<PropuestaFeriaResponseDto[]>("/api/ferias/mis-propuestas");
+}
+
+function propuestasPath(
+  feriaId: number,
+  params?: FindPropuestasPorFeriaParams,
+): string {
+  const base = `/api/ferias/${feriaId}/propuestas`;
+  if (!params?.estado) return base;
+  return `${base}?estado=${encodeURIComponent(params.estado)}`;
 }
 
 export async function listPropuestasPorFeria(
   feriaId: number,
-  params?: FeriasControllerFindPropuestasPorFeriaParams,
+  params?: FindPropuestasPorFeriaParams,
 ) {
-  return api.feriasControllerFindPropuestasPorFeria(feriaId, params);
+  return fetchApi<PropuestaFeriaResponseDto[]>(propuestasPath(feriaId, params));
 }
 
 const ESTADOS_MODERACION_PROPUESTA = [
-  FeriasControllerFindPropuestasPorFeriaEstado.POSTULADO,
-  FeriasControllerFindPropuestasPorFeriaEstado.ACEPTADO,
-  FeriasControllerFindPropuestasPorFeriaEstado.RECHAZADO,
+  EstadoPropuestaFeria.POSTULADO,
+  EstadoPropuestaFeria.ACEPTADO,
+  EstadoPropuestaFeria.RECHAZADO,
 ] as const;
 
-/**
- * Sin `estado` el API devuelve vitrina (ACEPTADO). Para “Todas” en admin hay que
- * consultar cada estado y fusionar.
- */
 export async function listPropuestasPorFeriaTodosEstados(
   feriaId: number,
 ): Promise<PropuestaFeriaResponseDto[]> {
@@ -73,8 +89,7 @@ export async function listPropuestasPorFeriaTodosEstados(
     }
   }
   return [...byId.values()].sort(
-    (a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 }
 
@@ -82,27 +97,52 @@ export async function createPropuestaFeria(
   feriaId: number,
   body: CreatePropuestaFeriaDto,
 ) {
-  return api.feriasControllerCreatePropuesta(feriaId, body);
+  return fetchApi<PropuestaFeriaResponseDto>(
+    `/api/ferias/${feriaId}/propuestas`,
+    {
+      method: "POST",
+      body: JSON.stringify(body),
+    },
+  );
 }
 
 export async function updateMisPropuestaFeria(
   propuestaId: number,
   body: UpdatePropuestaFeriaPropietarioDto,
 ) {
-  return api.feriasControllerUpdateMisPropuesta(propuestaId, body);
+  return fetchApi<PropuestaFeriaResponseDto>(
+    `/api/ferias/mis-propuestas/${propuestaId}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    },
+  );
 }
 
-/** Multipart al API Nest; Traiker es transparente para el cliente. */
 export async function uploadPropuestaFeriaImagen(
   feriaId: number,
   archivo: File,
 ) {
-  return api.feriasControllerUploadImagenPropuesta(feriaId, { archivo });
+  const formData = new FormData();
+  formData.append("archivo", archivo);
+  return fetchApi<FeriaPropuestaImagenUploadResponseDto>(
+    `/api/uploads/ferias/${feriaId}/propuestas/imagen`,
+    {
+      method: "POST",
+      body: formData,
+    },
+  );
 }
 
 export async function moderarPropuestaFeria(
   propuestaId: number,
   body: ModerarPropuestaFeriaDto,
 ) {
-  return api.feriasControllerModerarPropuesta(propuestaId, body);
+  return fetchApi<PropuestaFeriaResponseDto>(
+    `/api/ferias/propuestas/${propuestaId}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    },
+  );
 }

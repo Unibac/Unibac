@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 
-import { RegisterPublicDtoCategoria } from "@/api/generated/models";
+import { CategoriaUsuarioExterno } from "@/modules/shared/types/enums";
 import { PanelCard } from "@/components/shared/panel-card";
 import { UnibacLogo } from "@/components/shared/unibac-logo";
 import { Button } from "@/components/ui/button";
@@ -42,17 +42,17 @@ const CATEGORIA_COPY: Record<
   RegisterPublicFormValues["categoria"],
   { title: string; description: string }
 > = {
-  [RegisterPublicDtoCategoria.ESTUDIANTE]: {
+  [CategoriaUsuarioExterno.ESTUDIANTE]: {
     title: "Estudiante",
     description:
       "Acceso como usuario externo estudiante. Necesitamos tu identificación y código estudiantil.",
   },
-  [RegisterPublicDtoCategoria.EGRESADO]: {
+  [CategoriaUsuarioExterno.EGRESADO]: {
     title: "Egresado",
     description:
       "Acceso como egresado. Necesitamos tu identificación para validar el registro.",
   },
-  [RegisterPublicDtoCategoria.EMPRESA]: {
+  [CategoriaUsuarioExterno.EMPRESA]: {
     title: "Empresa",
     description:
       "Cuenta para organizaciones. Indicá NIT y razón social; el resto es opcional.",
@@ -72,7 +72,7 @@ export function RegisterPublicFlow() {
       registerPublicFormSchema,
     ) as Resolver<RegisterPublicFormValues>,
     defaultValues: emptyRegisterPublicFormValues(
-      RegisterPublicDtoCategoria.ESTUDIANTE,
+      CategoriaUsuarioExterno.ESTUDIANTE,
     ),
   });
 
@@ -269,8 +269,8 @@ export function RegisterPublicFlow() {
               )}
             />
 
-            {categoria === RegisterPublicDtoCategoria.ESTUDIANTE ||
-            categoria === RegisterPublicDtoCategoria.EGRESADO ? (
+            {categoria === CategoriaUsuarioExterno.ESTUDIANTE ||
+            categoria === CategoriaUsuarioExterno.EGRESADO ? (
               <FormField
                 control={form.control}
                 name="identificacion"
@@ -286,7 +286,7 @@ export function RegisterPublicFlow() {
               />
             ) : null}
 
-            {categoria === RegisterPublicDtoCategoria.ESTUDIANTE ? (
+            {categoria === CategoriaUsuarioExterno.ESTUDIANTE ? (
               <FormField
                 control={form.control}
                 name="codigoEstudiantil"
@@ -302,7 +302,7 @@ export function RegisterPublicFlow() {
               />
             ) : null}
 
-            {categoria === RegisterPublicDtoCategoria.EMPRESA ? (
+            {categoria === CategoriaUsuarioExterno.EMPRESA ? (
               <>
                 <FormField
                   control={form.control}

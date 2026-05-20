@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import type { AuthProfileResponseDto } from "@/api/generated/models";
+import type { AuthProfile } from "@/modules/auth/types";
 import {
-  AuthProfileResponseDtoCategoria,
-  AuthProfileResponseDtoNivel,
-  AuthProfileResponseDtoTipo,
-} from "@/api/generated/models";
+  CategoriaUsuarioExterno,
+  NivelUsuario,
+  TipoUsuario,
+} from "@/modules/shared/types/enums";
 
 import {
   feriasCanBrowse,
@@ -14,13 +14,12 @@ import {
 } from "@/modules/auth/lib/profile-capabilities";
 
 function profile(
-  partial: Partial<AuthProfileResponseDto> &
-    Pick<AuthProfileResponseDto, "tipo">,
-): AuthProfileResponseDto {
+  partial: Partial<AuthProfile> & Pick<AuthProfile, "tipo">,
+): AuthProfile {
   return {
     id: 1,
     usuario: "demo",
-    nivel: AuthProfileResponseDtoNivel.USUARIO,
+    nivel: NivelUsuario.USUARIO,
     ...partial,
   };
 }
@@ -28,10 +27,10 @@ function profile(
 describe("ferias Política B — profile-capabilities", () => {
   it("admin e interno pueden browse pero no postular", () => {
     const admin = profile({
-      tipo: AuthProfileResponseDtoTipo.INTERNO,
-      nivel: AuthProfileResponseDtoNivel.ADMINISTRADOR,
+      tipo: TipoUsuario.INTERNO,
+      nivel: NivelUsuario.ADMINISTRADOR,
     });
-    const interno = profile({ tipo: AuthProfileResponseDtoTipo.INTERNO });
+    const interno = profile({ tipo: TipoUsuario.INTERNO });
     expect(feriasCanBrowse(admin)).toBe(true);
     expect(feriasCanBrowse(interno)).toBe(true);
     expect(feriasCanPostular(admin)).toBe(false);
@@ -41,8 +40,8 @@ describe("ferias Política B — profile-capabilities", () => {
 
   it("externo estudiante puede browse y postular", () => {
     const estudiante = profile({
-      tipo: AuthProfileResponseDtoTipo.EXTERNO,
-      categoria: AuthProfileResponseDtoCategoria.ESTUDIANTE,
+      tipo: TipoUsuario.EXTERNO,
+      categoria: CategoriaUsuarioExterno.ESTUDIANTE,
     });
     expect(feriasCanBrowse(estudiante)).toBe(true);
     expect(feriasCanPostular(estudiante)).toBe(true);
@@ -50,12 +49,12 @@ describe("ferias Política B — profile-capabilities", () => {
 
   it("externo egresado y empresa pueden browse pero no postular", () => {
     const egresado = profile({
-      tipo: AuthProfileResponseDtoTipo.EXTERNO,
-      categoria: AuthProfileResponseDtoCategoria.EGRESADO,
+      tipo: TipoUsuario.EXTERNO,
+      categoria: CategoriaUsuarioExterno.EGRESADO,
     });
     const empresa = profile({
-      tipo: AuthProfileResponseDtoTipo.EXTERNO,
-      categoria: AuthProfileResponseDtoCategoria.EMPRESA,
+      tipo: TipoUsuario.EXTERNO,
+      categoria: CategoriaUsuarioExterno.EMPRESA,
     });
     expect(feriasCanBrowse(egresado)).toBe(true);
     expect(feriasCanBrowse(empresa)).toBe(true);
@@ -68,8 +67,8 @@ describe("ferias Política B — profile-capabilities", () => {
       "@/modules/auth/lib/profile-capabilities"
     );
     const estudiante = profile({
-      tipo: AuthProfileResponseDtoTipo.EXTERNO,
-      categoria: AuthProfileResponseDtoCategoria.ESTUDIANTE,
+      tipo: TipoUsuario.EXTERNO,
+      categoria: CategoriaUsuarioExterno.ESTUDIANTE,
     });
     expect(feriasCanAccessModule(estudiante)).toBe(feriasCanBrowse(estudiante));
   });

@@ -1,30 +1,35 @@
 import type {
   CreateTalentoPerfilDto,
+  TalentoPerfilResponseDto,
   UpdateTalentoPerfilDto,
-} from "@/api/generated/models";
-import { getTalentoPerfiles } from "@/api/generated/talento-perfiles/talento-perfiles";
-
-const api = getTalentoPerfiles();
+} from "@/modules/shared/types/api-models";
+import { fetchApi } from "@/lib/api/fetch-api";
 
 export async function listTalentoPerfiles() {
-  return api.talentoPerfilesControllerFindAll();
+  return fetchApi<TalentoPerfilResponseDto[]>("/api/talento-perfiles");
 }
 
 export async function getTalentoPerfil(id: number) {
-  return api.talentoPerfilesControllerFindOne(id);
+  return fetchApi<TalentoPerfilResponseDto>(`/api/talento-perfiles/${id}`);
 }
 
 export async function createTalentoPerfil(body: CreateTalentoPerfilDto) {
-  return api.talentoPerfilesControllerCreate(body);
+  return fetchApi<TalentoPerfilResponseDto>("/api/talento-perfiles", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }
 
 export async function updateTalentoPerfil(
   id: number,
   body: UpdateTalentoPerfilDto,
 ) {
-  return api.talentoPerfilesControllerUpdate(id, body);
+  return fetchApi<TalentoPerfilResponseDto>(`/api/talento-perfiles/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
 }
 
 export async function deleteTalentoPerfil(id: number) {
-  return api.talentoPerfilesControllerRemove(id);
+  return fetchApi<void>(`/api/talento-perfiles/${id}`, { method: "DELETE" });
 }

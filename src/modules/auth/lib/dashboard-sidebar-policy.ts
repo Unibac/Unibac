@@ -2,11 +2,11 @@
  * Rutas del menú lateral del dashboard y visibilidad por perfil.
  * Alinear `SIDEBAR_HREFS_BY_CATEGORIA` con permisos de módulo en backend.
  */
-import type { AuthProfileResponseDto } from "@/api/generated/models";
+import type { AuthProfile } from "@/modules/auth/types";
 import {
-  AuthProfileResponseDtoCategoria,
-  AuthProfileResponseDtoTipo,
-} from "@/api/generated/models";
+  CategoriaUsuarioExterno,
+  TipoUsuario,
+} from "@/modules/shared/types/enums";
 
 import type { DashboardNavHref } from "@/modules/auth/lib/dashboard-nav-items";
 import { DASHBOARD_NAV_ITEM_DATA } from "@/modules/auth/lib/dashboard-nav-items";
@@ -20,17 +20,17 @@ import {
  * Mantener coherente con `*-CanAccessModule` en profile-capabilities y RBAC backend.
  */
 export const SIDEBAR_HREFS_BY_CATEGORIA: Record<
-  AuthProfileResponseDtoCategoria,
+  CategoriaUsuarioExterno,
   readonly DashboardNavHref[]
 > = {
-  [AuthProfileResponseDtoCategoria.ESTUDIANTE]: [
+  [CategoriaUsuarioExterno.ESTUDIANTE]: [
     "/dashboard",
     "/dashboard/convocatorias",
     "/dashboard/talento-perfiles",
     "/dashboard/ferias",
     "/dashboard/directorio-emprendimientos",
   ],
-  [AuthProfileResponseDtoCategoria.EGRESADO]: [
+  [CategoriaUsuarioExterno.EGRESADO]: [
     "/dashboard",
     "/dashboard/egresados",
     "/dashboard/directorio-emprendimientos",
@@ -38,7 +38,7 @@ export const SIDEBAR_HREFS_BY_CATEGORIA: Record<
     "/dashboard/talento-perfiles",
     "/dashboard/ferias",
   ],
-  [AuthProfileResponseDtoCategoria.EMPRESA]: [
+  [CategoriaUsuarioExterno.EMPRESA]: [
     "/dashboard",
     "/dashboard/directorio-emprendimientos",
     "/dashboard/convocatorias",
@@ -47,7 +47,7 @@ export const SIDEBAR_HREFS_BY_CATEGORIA: Record<
 };
 
 export function getVisibleDashboardNavHrefs(
-  profile: AuthProfileResponseDto,
+  profile: AuthProfile,
 ): readonly DashboardNavHref[] {
   const allHrefs = DASHBOARD_NAV_ITEM_DATA.map((i) => i.href);
 
@@ -57,7 +57,7 @@ export function getVisibleDashboardNavHrefs(
     );
   }
 
-  if (profile.tipo === AuthProfileResponseDtoTipo.EXTERNO) {
+  if (profile.tipo === TipoUsuario.EXTERNO) {
     const cat = externalCategoria(profile);
     if (cat === undefined) {
       return ["/dashboard"];

@@ -26,7 +26,10 @@ export function PageBreadcrumb({ items, className }: PageBreadcrumbProps) {
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
-            <li key={breadcrumbItemKey(item)} className="flex items-center gap-1">
+            <li
+              key={breadcrumbItemKey(item)}
+              className="flex items-center gap-1"
+            >
               {index > 0 ? (
                 <ChevronRightIcon
                   className="size-3.5 shrink-0 text-muted-foreground"
@@ -43,7 +46,9 @@ export function PageBreadcrumb({ items, className }: PageBreadcrumbProps) {
               ) : (
                 <span
                   className={cn(
-                    isLast ? "font-medium text-foreground" : "text-muted-foreground",
+                    isLast
+                      ? "font-medium text-foreground"
+                      : "text-muted-foreground",
                   )}
                   aria-current={isLast ? "page" : undefined}
                 >

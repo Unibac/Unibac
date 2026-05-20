@@ -4,10 +4,10 @@ import { MoreVerticalIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import {
-  AuthProfileResponseDtoNivel,
-  CreatePublicacionConvocatoriaDtoTipoConvocatoria,
+  NivelUsuario,
+  TipoConvocatoriaEmprendimiento,
   type PublicacionEmprendimientoResponseDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCard } from "@/components/shared/list-card";
 import { ListCardContent } from "@/components/shared/list-card-content";
@@ -27,11 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  CardAction,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardAction, CardDescription, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -73,14 +69,10 @@ import {
 } from "@/modules/convocatorias-emprendimiento/hooks/use-convocatorias-queries";
 import type { ConvocatoriasListFilters } from "@/modules/convocatorias-emprendimiento/query-keys";
 
-const TIPO_LABELS: Record<
-  CreatePublicacionConvocatoriaDtoTipoConvocatoria,
-  string
-> = {
-  [CreatePublicacionConvocatoriaDtoTipoConvocatoria.FINANCIAMIENTO]:
-    "Financiamiento",
-  [CreatePublicacionConvocatoriaDtoTipoConvocatoria.FORMACION]: "Formación",
-  [CreatePublicacionConvocatoriaDtoTipoConvocatoria.PRACTICAS]: "Prácticas",
+const TIPO_LABELS: Record<TipoConvocatoriaEmprendimiento, string> = {
+  [TipoConvocatoriaEmprendimiento.FINANCIAMIENTO]: "Financiamiento",
+  [TipoConvocatoriaEmprendimiento.FORMACION]: "Formación",
+  [TipoConvocatoriaEmprendimiento.PRACTICAS]: "Prácticas",
 };
 
 const FILTER_ALL = "__all__";
@@ -99,8 +91,7 @@ function isPast(iso: string): boolean {
 export function ConvocatoriasView() {
   const profile = useProfile();
   const { layout } = useDashboardListLayout();
-  const isAdmin =
-    profile.data?.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR;
+  const isAdmin = profile.data?.nivel === NivelUsuario.ADMINISTRADOR;
   const canPostular = convocatoriasCanPostular(profile.data);
 
   const [filters, setFilters] = useState<ConvocatoriasListFilters>({});
@@ -216,7 +207,7 @@ export function ConvocatoriasView() {
                   tipoConvocatoria:
                     v === FILTER_ALL
                       ? undefined
-                      : (v as CreatePublicacionConvocatoriaDtoTipoConvocatoria),
+                      : (v as TipoConvocatoriaEmprendimiento),
                 }))
               }
             >
@@ -227,8 +218,8 @@ export function ConvocatoriasView() {
                 <SelectItem value={FILTER_ALL}>Todos</SelectItem>
                 {(
                   Object.values(
-                    CreatePublicacionConvocatoriaDtoTipoConvocatoria,
-                  ) as CreatePublicacionConvocatoriaDtoTipoConvocatoria[]
+                    TipoConvocatoriaEmprendimiento,
+                  ) as TipoConvocatoriaEmprendimiento[]
                 ).map((v) => (
                   <SelectItem key={v} value={v}>
                     {TIPO_LABELS[v]}
@@ -345,7 +336,7 @@ export function ConvocatoriasView() {
                     <CardDescription>
                       {
                         TIPO_LABELS[
-                          row.tipoConvocatoria as CreatePublicacionConvocatoriaDtoTipoConvocatoria
+                          row.tipoConvocatoria as TipoConvocatoriaEmprendimiento
                         ]
                       }
                     </CardDescription>
@@ -398,7 +389,7 @@ export function ConvocatoriasView() {
                     <TableCell>
                       {
                         TIPO_LABELS[
-                          row.tipoConvocatoria as CreatePublicacionConvocatoriaDtoTipoConvocatoria
+                          row.tipoConvocatoria as TipoConvocatoriaEmprendimiento
                         ]
                       }
                     </TableCell>
@@ -552,7 +543,7 @@ export function ConvocatoriasView() {
                     <span className="text-foreground">Tipo:</span>{" "}
                     {
                       TIPO_LABELS[
-                        detailRow.tipoConvocatoria as CreatePublicacionConvocatoriaDtoTipoConvocatoria
+                        detailRow.tipoConvocatoria as TipoConvocatoriaEmprendimiento
                       ]
                     }
                   </p>

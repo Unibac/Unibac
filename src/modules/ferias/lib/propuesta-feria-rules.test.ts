@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  FeriaResponseDtoPeriodo,
-  PropuestaFeriaResponseDtoEstado,
+  FeriaPeriodo,
+  EstadoPropuestaFeria,
   type PropuestaFeriaResponseDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 
 import {
   canEditMisPropuesta,
@@ -13,14 +13,12 @@ import {
 
 describe("feriaPermitePostulacion", () => {
   it("permite próxima y activa", () => {
-    expect(feriaPermitePostulacion(FeriaResponseDtoPeriodo.proxima)).toBe(true);
-    expect(feriaPermitePostulacion(FeriaResponseDtoPeriodo.activa)).toBe(true);
+    expect(feriaPermitePostulacion(FeriaPeriodo.proxima)).toBe(true);
+    expect(feriaPermitePostulacion(FeriaPeriodo.activa)).toBe(true);
   });
 
   it("no permite finalizada ni indefinido", () => {
-    expect(feriaPermitePostulacion(FeriaResponseDtoPeriodo.finalizada)).toBe(
-      false,
-    );
+    expect(feriaPermitePostulacion(FeriaPeriodo.finalizada)).toBe(false);
     expect(feriaPermitePostulacion(undefined)).toBe(false);
   });
 });
@@ -29,7 +27,7 @@ describe("canEditMisPropuesta", () => {
   const row = {
     id: 1,
     usuarioId: 8,
-    estado: PropuestaFeriaResponseDtoEstado.POSTULADO,
+    estado: EstadoPropuestaFeria.POSTULADO,
   } as PropuestaFeriaResponseDto;
 
   it("permite editar en feria próxima", () => {
@@ -37,7 +35,7 @@ describe("canEditMisPropuesta", () => {
       canEditMisPropuesta(row, {
         canPostular: true,
         usuarioId: 8,
-        feriaPeriodo: FeriaResponseDtoPeriodo.proxima,
+        feriaPeriodo: FeriaPeriodo.proxima,
       }),
     ).toBe(true);
   });
@@ -47,7 +45,7 @@ describe("canEditMisPropuesta", () => {
       canEditMisPropuesta(row, {
         canPostular: true,
         usuarioId: 8,
-        feriaPeriodo: FeriaResponseDtoPeriodo.finalizada,
+        feriaPeriodo: FeriaPeriodo.finalizada,
       }),
     ).toBe(false);
   });

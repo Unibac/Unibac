@@ -2,16 +2,16 @@ import { z } from "zod";
 
 import {
   type CreatePropuestaFeriaDto,
-  CreatePropuestaFeriaDtoAreaCreativa,
+  AreaCreativaEmprendimiento,
   type PropuestaFeriaResponseDto,
   type UpdatePropuestaFeriaPropietarioDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 
 const areaCreativaSchema = z.enum([
-  CreatePropuestaFeriaDtoAreaCreativa.ARTES_PLASTICAS,
-  CreatePropuestaFeriaDtoAreaCreativa.MUSICA,
-  CreatePropuestaFeriaDtoAreaCreativa.DISENO,
-  CreatePropuestaFeriaDtoAreaCreativa.AUDIOVISUAL,
+  AreaCreativaEmprendimiento.ARTES_PLASTICAS,
+  AreaCreativaEmprendimiento.MUSICA,
+  AreaCreativaEmprendimiento.DISENO,
+  AreaCreativaEmprendimiento.AUDIOVISUAL,
 ]);
 
 function preprocessOptionalText(val: unknown): string {
@@ -95,7 +95,7 @@ export function emptyPropuestaFeriaFormValues(): PropuestaFeriaFormValues {
     nombreEmprendimiento: "",
     descripcionCorta: "",
     imagenUrl: undefined,
-    areaCreativa: CreatePropuestaFeriaDtoAreaCreativa.ARTES_PLASTICAS,
+    areaCreativa: AreaCreativaEmprendimiento.ARTES_PLASTICAS,
     redesContacto: "",
     correo: "",
     celular: "",

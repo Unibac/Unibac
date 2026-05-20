@@ -1,14 +1,10 @@
-import type { AuthProfileResponseDto } from "@/api/generated/models";
-import {
-  AuthProfileResponseDtoNivel,
-  AuthProfileResponseDtoTipo,
-} from "@/api/generated/models";
-
+import type { AuthProfile } from "@/modules/auth/types";
 import {
   feriasCanBrowse as feriasCanBrowseFromProfile,
   feriasCanPostular as feriasCanPostularFromProfile,
   isAdministrador,
 } from "@/modules/auth/lib/profile-capabilities";
+import { TipoUsuario } from "@/modules/shared/types/enums";
 
 /**
  * Política B — Ferias:
@@ -18,32 +14,23 @@ import {
  * | EXTERNO EGRESADO/EMPRESA | sí | no | no | no |
  */
 
-export function feriasCanBrowse(
-  profile: AuthProfileResponseDto | undefined,
-): boolean {
+export function feriasCanBrowse(profile: AuthProfile | undefined): boolean {
   return feriasCanBrowseFromProfile(profile);
 }
 
-export function feriasIsAdmin(
-  profile: AuthProfileResponseDto | undefined,
-): boolean {
-  return profile?.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR;
+export function feriasIsAdmin(profile: AuthProfile | undefined): boolean {
+  return isAdministrador(profile);
 }
 
 /** Registrar/editar propuesta propia: delega a política de dominio (externo estudiante). */
-export function feriasCanPostular(
-  profile: AuthProfileResponseDto | undefined,
-): boolean {
+export function feriasCanPostular(profile: AuthProfile | undefined): boolean {
   return feriasCanPostularFromProfile(profile);
 }
 
 /** CRUD del evento feria: administrador o personal interno (INTERNO_BASE). */
 export function feriasCanManageEventos(
-  profile: AuthProfileResponseDto | undefined,
+  profile: AuthProfile | undefined,
 ): boolean {
   if (!profile) return false;
-  return (
-    isAdministrador(profile) ||
-    profile.tipo === AuthProfileResponseDtoTipo.INTERNO
-  );
+  return isAdministrador(profile) || profile.tipo === TipoUsuario.INTERNO;
 }

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 
+import { ApiClientError } from "@/lib/api/fetch-api";
 import {
   getEgresado,
   getEgresadoMe,
@@ -35,7 +35,7 @@ export function useEgresadoMeQuery() {
       try {
         return await getEgresadoMe();
       } catch (e) {
-        if (axios.isAxiosError(e) && e.response?.status === 404) {
+        if (e instanceof ApiClientError && e.status === 404) {
           return null;
         }
         throw e;

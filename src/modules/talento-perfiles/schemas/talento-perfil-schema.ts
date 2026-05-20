@@ -2,24 +2,24 @@ import { z } from "zod";
 
 import {
   type CreateTalentoPerfilDto,
-  CreateTalentoPerfilDtoArea,
-  CreateTalentoPerfilDtoTipoPerfil,
+  AreaTalento,
+  TipoPerfilTalento,
   type TalentoPerfilResponseDto,
   type UpdateTalentoPerfilDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 
 const areaSchema = z.enum([
-  CreateTalentoPerfilDtoArea.MUSICA,
-  CreateTalentoPerfilDtoArea.ARTES_PLASTICAS,
-  CreateTalentoPerfilDtoArea.DISENO,
-  CreateTalentoPerfilDtoArea.AUDIOVISUAL,
-  CreateTalentoPerfilDtoArea.ARTES_ESCENICAS,
+  AreaTalento.MUSICA,
+  AreaTalento.ARTES_PLASTICAS,
+  AreaTalento.DISENO,
+  AreaTalento.AUDIOVISUAL,
+  AreaTalento.ARTES_ESCENICAS,
 ]);
 
 const tipoPerfilSchema = z.enum([
-  CreateTalentoPerfilDtoTipoPerfil.ESTUDIANTE,
-  CreateTalentoPerfilDtoTipoPerfil.EGRESADO,
-  CreateTalentoPerfilDtoTipoPerfil.EMPRENDEDOR,
+  TipoPerfilTalento.ESTUDIANTE,
+  TipoPerfilTalento.EGRESADO,
+  TipoPerfilTalento.EMPRENDEDOR,
 ]);
 
 function preprocessOptionalText(val: unknown): string {
@@ -89,12 +89,12 @@ export function talentoResponseToFormValues(
 export function emptyTalentoPerfilFormValues(): TalentoPerfilFormValues {
   return {
     nombreCompleto: "",
-    area: CreateTalentoPerfilDtoArea.MUSICA,
+    area: AreaTalento.MUSICA,
     habilidades: "",
     portafolioUrl: undefined,
     telefono: undefined,
     correoContacto: undefined,
-    tipoPerfil: CreateTalentoPerfilDtoTipoPerfil.ESTUDIANTE,
+    tipoPerfil: TipoPerfilTalento.ESTUDIANTE,
     perfilActivo: true,
   };
 }

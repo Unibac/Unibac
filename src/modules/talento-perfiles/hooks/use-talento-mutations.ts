@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type {
   CreateTalentoPerfilDto,
   UpdateTalentoPerfilDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 
 import {
   createTalentoPerfil,

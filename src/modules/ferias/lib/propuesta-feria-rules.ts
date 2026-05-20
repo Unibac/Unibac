@@ -1,17 +1,14 @@
 import {
-  FeriaResponseDtoPeriodo,
+  FeriaPeriodo,
   type PropuestaFeriaResponseDto,
-  PropuestaFeriaResponseDtoEstado,
-} from "@/api/generated/models";
+  EstadoPropuestaFeria,
+} from "@/modules/shared/types/api-models";
 
 /** Alta/edición de propuesta: feria próxima o en curso (no finalizada). */
 export function feriaPermitePostulacion(
-  periodo: FeriaResponseDtoPeriodo | undefined,
+  periodo: FeriaPeriodo | undefined,
 ): boolean {
-  return (
-    periodo === FeriaResponseDtoPeriodo.proxima ||
-    periodo === FeriaResponseDtoPeriodo.activa
-  );
+  return periodo === FeriaPeriodo.proxima || periodo === FeriaPeriodo.activa;
 }
 
 export function canEditMisPropuesta(
@@ -19,18 +16,18 @@ export function canEditMisPropuesta(
   options: {
     canPostular: boolean;
     usuarioId: number | undefined;
-    feriaPeriodo: FeriaResponseDtoPeriodo | undefined;
+    feriaPeriodo: FeriaPeriodo | undefined;
   },
 ): boolean {
   const { canPostular, usuarioId, feriaPeriodo } = options;
   if (!canPostular || usuarioId == null) return false;
   if (!feriaPermitePostulacion(feriaPeriodo)) return false;
-  if (row.estado !== PropuestaFeriaResponseDtoEstado.POSTULADO) return false;
+  if (row.estado !== EstadoPropuestaFeria.POSTULADO) return false;
   return usuarioId === row.usuarioId;
 }
 
 export function feriaPeriodoFromPropuesta(
   propuesta: PropuestaFeriaResponseDto,
-): FeriaResponseDtoPeriodo | undefined {
+): FeriaPeriodo | undefined {
   return propuesta.feria?.periodo;
 }

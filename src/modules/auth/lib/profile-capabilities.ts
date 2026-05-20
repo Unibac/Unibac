@@ -1,129 +1,105 @@
 /**
- * Capacidades UX por perfil (`GET /auth/profile`).
+ * Capacidades UX por perfil (`GET /api/auth/profile`).
  * Debe alinearse con RBAC del backend; solo oculta/mostrar UI — la API sigue siendo autoridad.
  */
-import type { AuthProfileResponseDto } from "@/api/generated/models";
+import type { AuthProfile } from "@/modules/auth/types";
 import {
-  AuthProfileResponseDtoCategoria,
-  AuthProfileResponseDtoNivel,
-  AuthProfileResponseDtoTipo,
-} from "@/api/generated/models";
+  CategoriaUsuarioExterno,
+  NivelUsuario,
+  TipoUsuario,
+} from "@/modules/shared/types/enums";
 
-export function isAdministrador(
-  profile: AuthProfileResponseDto | undefined,
-): boolean {
-  return profile?.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR;
+export function isAdministrador(profile: AuthProfile | undefined): boolean {
+  return profile?.nivel === NivelUsuario.ADMINISTRADOR;
 }
 
 /** Admin o usuario institucional: panel operativo completo en UX. */
-export function isStaffFullUx(
-  profile: AuthProfileResponseDto | undefined,
-): boolean {
+export function isStaffFullUx(profile: AuthProfile | undefined): boolean {
   if (!profile) return false;
   return (
-    profile.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR ||
-    profile.tipo === AuthProfileResponseDtoTipo.INTERNO
+    profile.nivel === NivelUsuario.ADMINISTRADOR ||
+    profile.tipo === TipoUsuario.INTERNO
   );
 }
 
 export function externalCategoria(
-  profile: AuthProfileResponseDto | undefined,
-): AuthProfileResponseDtoCategoria | undefined {
-  if (!profile || profile.tipo !== AuthProfileResponseDtoTipo.EXTERNO) {
+  profile: AuthProfile | undefined,
+): CategoriaUsuarioExterno | undefined {
+  if (!profile || profile.tipo !== TipoUsuario.EXTERNO) {
     return undefined;
   }
-  return profile.categoria;
+  return profile.categoria ?? undefined;
 }
 
-/** Ver módulo convocatorias en UX (staff o externo con categoría). */
 export function convocatoriasCanAccessModule(
-  profile: AuthProfileResponseDto | undefined,
+  profile: AuthProfile | undefined,
 ): boolean {
   if (!profile) return false;
   if (isStaffFullUx(profile)) return true;
   return externalCategoria(profile) != null;
 }
 
-/** Postular a convocatorias: staff o cualquier externo con categoría (empresa incluida si el módulo está en su menú). */
 export function convocatoriasCanPostular(
-  profile: AuthProfileResponseDto | undefined,
+  profile: AuthProfile | undefined,
 ): boolean {
   return convocatoriasCanAccessModule(profile);
 }
 
-/** Módulo egresados: personal y externos categoría EGRESADO. */
 export function egresadosCanAccessModule(
-  profile: AuthProfileResponseDto | undefined,
+  profile: AuthProfile | undefined,
 ): boolean {
   if (!profile) return false;
   if (isStaffFullUx(profile)) return true;
-  return (
-    externalCategoria(profile) === AuthProfileResponseDtoCategoria.EGRESADO
-  );
+  return externalCategoria(profile) === CategoriaUsuarioExterno.EGRESADO;
 }
 
-/** Directorio: staff + externos con categoría (incluye empresa). */
 export function directorioCanAccessModule(
-  profile: AuthProfileResponseDto | undefined,
+  profile: AuthProfile | undefined,
 ): boolean {
   if (!profile) return false;
   if (isStaffFullUx(profile)) return true;
   const cat = externalCategoria(profile);
   return (
-    cat === AuthProfileResponseDtoCategoria.ESTUDIANTE ||
-    cat === AuthProfileResponseDtoCategoria.EGRESADO ||
-    cat === AuthProfileResponseDtoCategoria.EMPRESA
+    cat === CategoriaUsuarioExterno.ESTUDIANTE ||
+    cat === CategoriaUsuarioExterno.EGRESADO ||
+    cat === CategoriaUsuarioExterno.EMPRESA
   );
 }
 
-/** Talento: staff + estudiante/egresado (no empresa en política UX actual). */
 export function talentoCanAccessModule(
-  profile: AuthProfileResponseDto | undefined,
+  profile: AuthProfile | undefined,
 ): boolean {
   if (!profile) return false;
   if (isStaffFullUx(profile)) return true;
   const cat = externalCategoria(profile);
   return (
-    cat === AuthProfileResponseDtoCategoria.ESTUDIANTE ||
-    cat === AuthProfileResponseDtoCategoria.EGRESADO
+    cat === CategoriaUsuarioExterno.ESTUDIANTE ||
+    cat === CategoriaUsuarioExterno.EGRESADO
   );
 }
 
-/**
- * Ferias — Política B: explorar listado y vitrina (staff o externo con categoría).
- * No implica registrar propuestas; ver `feriasCanPostular`.
- */
-export function feriasCanBrowse(
-  profile: AuthProfileResponseDto | undefined,
-): boolean {
+export function feriasCanBrowse(profile: AuthProfile | undefined): boolean {
   if (!profile) return false;
   if (isStaffFullUx(profile)) return true;
   const cat = externalCategoria(profile);
   return (
-    cat === AuthProfileResponseDtoCategoria.ESTUDIANTE ||
-    cat === AuthProfileResponseDtoCategoria.EGRESADO ||
-    cat === AuthProfileResponseDtoCategoria.EMPRESA
+    cat === CategoriaUsuarioExterno.ESTUDIANTE ||
+    cat === CategoriaUsuarioExterno.EGRESADO ||
+    cat === CategoriaUsuarioExterno.EMPRESA
   );
 }
 
-/** @deprecated Usar `feriasCanBrowse` (mismo criterio). */
+/** @deprecated Usar `feriasCanBrowse`. */
 export function feriasCanAccessModule(
-  profile: AuthProfileResponseDto | undefined,
+  profile: AuthProfile | undefined,
 ): boolean {
   return feriasCanBrowse(profile);
 }
 
-/**
- * Postular propuesta en feria: solo externo categoría ESTUDIANTE (política backend).
- * No usar `isStaffFullUx` — internos gestionan ferias pero no postulan.
- * Futuro: permisos[] módulo Ferias acción PROPUESTA desde GET /usuarios/me.
- */
-export function feriasCanPostular(
-  profile: AuthProfileResponseDto | undefined,
-): boolean {
+export function feriasCanPostular(profile: AuthProfile | undefined): boolean {
   if (!profile) return false;
   return (
-    profile.tipo === AuthProfileResponseDtoTipo.EXTERNO &&
-    profile.categoria === AuthProfileResponseDtoCategoria.ESTUDIANTE
+    profile.tipo === TipoUsuario.EXTERNO &&
+    profile.categoria === CategoriaUsuarioExterno.ESTUDIANTE
   );
 }

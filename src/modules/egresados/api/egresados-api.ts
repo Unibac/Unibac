@@ -1,32 +1,52 @@
-import { getEgresados } from "@/api/generated/egresados/egresados";
 import type {
   CreateEgresadoDto,
-  EgresadosControllerFindAllParams,
+  EgresadoResponseDto,
+  FindEgresadosParams,
   UpdateEgresadoDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
+import { fetchApi } from "@/lib/api/fetch-api";
 
-const api = getEgresados();
+function egresadosPath(params?: FindEgresadosParams): string {
+  if (!params) return "/api/egresados";
+  const sp = new URLSearchParams();
+  if (params.nombre) sp.set("nombre", params.nombre);
+  if (params.anioEgreso !== undefined) {
+    sp.set("anioEgreso", String(params.anioEgreso));
+  }
+  if (params.programaCarrera) {
+    sp.set("programaCarrera", params.programaCarrera);
+  }
+  if (params.estadoLaboral) sp.set("estadoLaboral", params.estadoLaboral);
+  const q = sp.toString();
+  return q ? `/api/egresados?${q}` : "/api/egresados";
+}
 
-export async function listEgresados(params?: EgresadosControllerFindAllParams) {
-  return api.egresadosControllerFindAll(params);
+export async function listEgresados(params?: FindEgresadosParams) {
+  return fetchApi<EgresadoResponseDto[]>(egresadosPath(params));
 }
 
 export async function getEgresado(id: number) {
-  return api.egresadosControllerFindOne(id);
+  return fetchApi<EgresadoResponseDto>(`/api/egresados/${id}`);
 }
 
 export async function getEgresadoMe() {
-  return api.egresadosControllerFindMe();
+  return fetchApi<EgresadoResponseDto>("/api/egresados/me");
 }
 
 export async function createEgresado(body: CreateEgresadoDto) {
-  return api.egresadosControllerCreate(body);
+  return fetchApi<EgresadoResponseDto>("/api/egresados", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }
 
 export async function updateEgresado(id: number, body: UpdateEgresadoDto) {
-  return api.egresadosControllerUpdate(id, body);
+  return fetchApi<EgresadoResponseDto>(`/api/egresados/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
 }
 
 export async function deleteEgresado(id: number) {
-  return api.egresadosControllerRemove(id);
+  return fetchApi<void>(`/api/egresados/${id}`, { method: "DELETE" });
 }

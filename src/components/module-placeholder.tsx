@@ -1,9 +1,5 @@
 import { PanelCard } from "@/components/shared/panel-card";
-import {
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 type ModulePlaceholderProps = {
   title: string;

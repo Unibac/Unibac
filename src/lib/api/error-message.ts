@@ -1,4 +1,4 @@
-import axios from "axios";
+import { ApiClientError } from "@/lib/api/fetch-api";
 
 function messageFromBody(data: unknown): string | undefined {
   if (!data || typeof data !== "object") {
@@ -18,14 +18,7 @@ function messageFromBody(data: unknown): string | undefined {
 }
 
 export function getApiErrorMessage(error: unknown): string {
-  if (axios.isAxiosError(error)) {
-    const fromBody = messageFromBody(error.response?.data);
-    if (fromBody) {
-      return fromBody;
-    }
-    if (error.response?.statusText) {
-      return error.response.statusText;
-    }
+  if (error instanceof ApiClientError) {
     return error.message;
   }
   if (error instanceof Error) {
@@ -33,3 +26,5 @@ export function getApiErrorMessage(error: unknown): string {
   }
   return "Ha ocurrido un error inesperado.";
 }
+
+export { messageFromBody };

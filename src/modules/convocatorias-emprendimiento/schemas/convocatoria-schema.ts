@@ -2,15 +2,15 @@ import { z } from "zod";
 
 import {
   type CreatePublicacionConvocatoriaDto,
-  CreatePublicacionConvocatoriaDtoTipoConvocatoria,
+  TipoConvocatoriaEmprendimiento,
   type PublicacionEmprendimientoResponseDto,
   type UpdatePublicacionConvocatoriaDto,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 
 const tipoSchema = z.enum([
-  CreatePublicacionConvocatoriaDtoTipoConvocatoria.FINANCIAMIENTO,
-  CreatePublicacionConvocatoriaDtoTipoConvocatoria.FORMACION,
-  CreatePublicacionConvocatoriaDtoTipoConvocatoria.PRACTICAS,
+  TipoConvocatoriaEmprendimiento.FINANCIAMIENTO,
+  TipoConvocatoriaEmprendimiento.FORMACION,
+  TipoConvocatoriaEmprendimiento.PRACTICAS,
 ]);
 
 const optionalTrimmed = z
@@ -39,8 +39,7 @@ export function emptyConvocatoriaFormValues(): ConvocatoriaFormValues {
   return {
     titulo: "",
     descripcion: "",
-    tipoConvocatoria:
-      CreatePublicacionConvocatoriaDtoTipoConvocatoria.FINANCIAMIENTO,
+    tipoConvocatoria: TipoConvocatoriaEmprendimiento.FINANCIAMIENTO,
     convocados: "",
     fechaLimite: iso,
     montoTipoApoyo: undefined,

@@ -4,11 +4,10 @@ import { MoreVerticalIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import {
-  AuthProfileResponseDtoNivel,
-  CreateEgresadoDtoEstadoLaboral,
+  NivelUsuario,
+  EstadoLaboralEgresado,
   type EgresadoResponseDto,
-  EgresadosControllerFindAllEstadoLaboral,
-} from "@/api/generated/models";
+} from "@/modules/shared/types/api-models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCard } from "@/components/shared/list-card";
 import { ListCardContent } from "@/components/shared/list-card-content";
@@ -28,11 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  CardAction,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
+import { CardAction, CardDescription, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,21 +63,18 @@ import {
 } from "@/modules/egresados/hooks/use-egresados-queries";
 import type { EgresadosListFilters } from "@/modules/egresados/query-keys";
 
-const ESTADO_FILTER_LABELS: Record<
-  EgresadosControllerFindAllEstadoLaboral,
-  string
-> = {
-  [EgresadosControllerFindAllEstadoLaboral.EMPLEADO]: "Empleado",
-  [EgresadosControllerFindAllEstadoLaboral.EMPRENDEDOR]: "Emprendedor",
-  [EgresadosControllerFindAllEstadoLaboral.DESEMPLEADO]: "Desempleado",
-  [EgresadosControllerFindAllEstadoLaboral.ESTUDIANDO]: "Estudiando",
+const ESTADO_FILTER_LABELS: Record<EstadoLaboralEgresado, string> = {
+  [EstadoLaboralEgresado.EMPLEADO]: "Empleado",
+  [EstadoLaboralEgresado.EMPRENDEDOR]: "Emprendedor",
+  [EstadoLaboralEgresado.DESEMPLEADO]: "Desempleado",
+  [EstadoLaboralEgresado.ESTUDIANDO]: "Estudiando",
 };
 
-const ESTADO_TABLA_LABELS: Record<CreateEgresadoDtoEstadoLaboral, string> = {
-  [CreateEgresadoDtoEstadoLaboral.EMPLEADO]: "Empleado",
-  [CreateEgresadoDtoEstadoLaboral.EMPRENDEDOR]: "Emprendedor",
-  [CreateEgresadoDtoEstadoLaboral.DESEMPLEADO]: "Desempleado",
-  [CreateEgresadoDtoEstadoLaboral.ESTUDIANDO]: "Estudiando",
+const ESTADO_TABLA_LABELS: Record<EstadoLaboralEgresado, string> = {
+  [EstadoLaboralEgresado.EMPLEADO]: "Empleado",
+  [EstadoLaboralEgresado.EMPRENDEDOR]: "Emprendedor",
+  [EstadoLaboralEgresado.DESEMPLEADO]: "Desempleado",
+  [EstadoLaboralEgresado.ESTUDIANDO]: "Estudiando",
 };
 
 const FILTER_ALL = "__all__";
@@ -91,7 +83,7 @@ type FilterDraft = {
   nombre: string;
   anioEgreso: string;
   programaCarrera: string;
-  estadoLaboral: EgresadosControllerFindAllEstadoLaboral | "";
+  estadoLaboral: EstadoLaboralEgresado | "";
 };
 
 function emptyDraft(): FilterDraft {
@@ -128,8 +120,7 @@ export function EgresadosView() {
   const listQuery = useEgresadosListQuery(appliedFilters);
   const deleteMut = useDeleteEgresadoMutation();
 
-  const isAdmin =
-    profile.data?.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR;
+  const isAdmin = profile.data?.nivel === NivelUsuario.ADMINISTRADOR;
 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMode, setSheetMode] = useState<"create" | "edit">("create");
@@ -179,7 +170,7 @@ export function EgresadosView() {
   function canEditRow(row: EgresadoResponseDto): boolean {
     if (!profile.data) return false;
     return (
-      profile.data.nivel === AuthProfileResponseDtoNivel.ADMINISTRADOR ||
+      profile.data.nivel === NivelUsuario.ADMINISTRADOR ||
       profile.data.id === row.usuarioId
     );
   }
@@ -284,9 +275,7 @@ export function EgresadosView() {
                 setDraft((d) => ({
                   ...d,
                   estadoLaboral:
-                    v === FILTER_ALL
-                      ? ""
-                      : (v as EgresadosControllerFindAllEstadoLaboral),
+                    v === FILTER_ALL ? "" : (v as EstadoLaboralEgresado),
                 }))
               }
             >
@@ -297,8 +286,8 @@ export function EgresadosView() {
                 <SelectItem value={FILTER_ALL}>Todos</SelectItem>
                 {(
                   Object.values(
-                    EgresadosControllerFindAllEstadoLaboral,
-                  ) as EgresadosControllerFindAllEstadoLaboral[]
+                    EstadoLaboralEgresado,
+                  ) as EstadoLaboralEgresado[]
                 ).map((v) => (
                   <SelectItem key={v} value={v}>
                     {ESTADO_FILTER_LABELS[v]}
@@ -349,36 +338,36 @@ export function EgresadosView() {
                     <CardTitle className="truncate text-base leading-snug">
                       {row.nombreCompleto}
                     </CardTitle>
-                      {showMenu ? (
-                        <CardAction>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                aria-label={`Acciones para ${row.nombreCompleto}`}
+                    {showMenu ? (
+                      <CardAction>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              aria-label={`Acciones para ${row.nombreCompleto}`}
+                            >
+                              <MoreVerticalIcon className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {editable ? (
+                              <DropdownMenuItem onClick={() => openEdit(row)}>
+                                Editar
+                              </DropdownMenuItem>
+                            ) : null}
+                            {deletable ? (
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => setDeleteTargetId(row.id)}
                               >
-                                <MoreVerticalIcon className="size-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              {editable ? (
-                                <DropdownMenuItem onClick={() => openEdit(row)}>
-                                  Editar
-                                </DropdownMenuItem>
-                              ) : null}
-                              {deletable ? (
-                                <DropdownMenuItem
-                                  variant="destructive"
-                                  onClick={() => setDeleteTargetId(row.id)}
-                                >
-                                  Eliminar
-                                </DropdownMenuItem>
-                              ) : null}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </CardAction>
-                      ) : null}
+                                Eliminar
+                              </DropdownMenuItem>
+                            ) : null}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </CardAction>
+                    ) : null}
                   </ListCardHeader>
                   <ListCardContent>
                     <div className="flex flex-wrap items-center gap-2">

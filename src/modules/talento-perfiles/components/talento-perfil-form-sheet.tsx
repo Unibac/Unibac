@@ -5,11 +5,11 @@ import { Loader2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
 
-import type { TalentoPerfilResponseDto } from "@/api/generated/models";
+import type { TalentoPerfilResponseDto } from "@/modules/shared/types/api-models";
 import {
-  CreateTalentoPerfilDtoArea,
-  CreateTalentoPerfilDtoTipoPerfil,
-} from "@/api/generated/models";
+  AreaTalento,
+  TipoPerfilTalento,
+} from "@/modules/shared/types/api-models";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -54,18 +54,18 @@ const textareaClassName = cn(
   "flex min-h-[88px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:bg-input/30 dark:aria-invalid:ring-destructive/40 md:text-sm",
 );
 
-const AREA_LABELS: Record<CreateTalentoPerfilDtoArea, string> = {
-  [CreateTalentoPerfilDtoArea.MUSICA]: "Música",
-  [CreateTalentoPerfilDtoArea.ARTES_PLASTICAS]: "Artes plásticas",
-  [CreateTalentoPerfilDtoArea.DISENO]: "Diseño",
-  [CreateTalentoPerfilDtoArea.AUDIOVISUAL]: "Audiovisual",
-  [CreateTalentoPerfilDtoArea.ARTES_ESCENICAS]: "Artes escénicas",
+const AREA_LABELS: Record<AreaTalento, string> = {
+  [AreaTalento.MUSICA]: "Música",
+  [AreaTalento.ARTES_PLASTICAS]: "Artes plásticas",
+  [AreaTalento.DISENO]: "Diseño",
+  [AreaTalento.AUDIOVISUAL]: "Audiovisual",
+  [AreaTalento.ARTES_ESCENICAS]: "Artes escénicas",
 };
 
-const TIPO_PERFIL_LABELS: Record<CreateTalentoPerfilDtoTipoPerfil, string> = {
-  [CreateTalentoPerfilDtoTipoPerfil.ESTUDIANTE]: "Estudiante",
-  [CreateTalentoPerfilDtoTipoPerfil.EGRESADO]: "Egresado",
-  [CreateTalentoPerfilDtoTipoPerfil.EMPRENDEDOR]: "Emprendedor",
+const TIPO_PERFIL_LABELS: Record<TipoPerfilTalento, string> = {
+  [TipoPerfilTalento.ESTUDIANTE]: "Estudiante",
+  [TipoPerfilTalento.EGRESADO]: "Egresado",
+  [TipoPerfilTalento.EMPRENDEDOR]: "Emprendedor",
 };
 
 export type TalentoPerfilFormSheetProps = {
@@ -192,15 +192,13 @@ export function TalentoPerfilFormSheet({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {(
-                            Object.values(
-                              CreateTalentoPerfilDtoArea,
-                            ) as CreateTalentoPerfilDtoArea[]
-                          ).map((v) => (
-                            <SelectItem key={v} value={v}>
-                              {AREA_LABELS[v]}
-                            </SelectItem>
-                          ))}
+                          {(Object.values(AreaTalento) as AreaTalento[]).map(
+                            (v) => (
+                              <SelectItem key={v} value={v}>
+                                {AREA_LABELS[v]}
+                              </SelectItem>
+                            ),
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -225,8 +223,8 @@ export function TalentoPerfilFormSheet({
                         <SelectContent>
                           {(
                             Object.values(
-                              CreateTalentoPerfilDtoTipoPerfil,
-                            ) as CreateTalentoPerfilDtoTipoPerfil[]
+                              TipoPerfilTalento,
+                            ) as TipoPerfilTalento[]
                           ).map((v) => (
                             <SelectItem key={v} value={v}>
                               {TIPO_PERFIL_LABELS[v]}

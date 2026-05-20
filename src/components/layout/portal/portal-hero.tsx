@@ -1,9 +1,9 @@
-import type { AuthProfileResponseDtoCategoria } from "@/api/generated/models";
+import type { CategoriaUsuarioExterno } from "@/modules/shared/types/enums";
 
 import { portalCategoriaLabel } from "@/modules/auth/lib/portal-ux";
 
 type PortalHeroProps = {
-  categoria: AuthProfileResponseDtoCategoria;
+  categoria: CategoriaUsuarioExterno;
 };
 
 export function PortalHero({ categoria }: PortalHeroProps) {

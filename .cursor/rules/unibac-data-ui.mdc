@@ -74,24 +74,26 @@ export const permisosKeys = {
 Componente (UI)
   → Hook del feature (`modules/<feature>/hooks`)
   → Wrapper (`modules/<feature>/api/*.ts`)
-  → Cliente generado Orval (`src/api/generated/...`)
-  → Mutador Axios (`src/lib/api/mutator.ts` → `src/lib/api-client.ts`)
+  → fetchApi same-origin (`src/lib/api/fetch-api.ts`)
+  → Route Handler (`src/app/api/**`)
+  → Servicio de dominio + Prisma (`modules/<feature>/server`, `@/lib/prisma`)
 ```
 
 ### Wrappers
 
-- Un archivo o grupo coherente por agregado (`login.ts`, `permisos.ts`, …).
-- Funciones **puras del lado cliente** que delegan en funciones generadas; firma tipada con DTO generated o tipos de entrada estrechos.
-- Responsabilidades permitidas: normalizar paginación (`items`, `nextCursor`, etc.), mapear DTO → modelo de vista si reduce acoplamiento, unificar errores Axios en tipo de aplicación.
+- Un archivo o grupo coherente por agregado (`ferias-api.ts`, `usuarios-api.ts`, …).
+- Funciones **puras del lado cliente** que llaman `/api/*` vía `fetchApi`; firma tipada con DTOs de [`api-models.ts`](../../modules/shared/types/api-models.ts) o tipos de entrada estrechos.
+- Responsabilidades permitidas: normalizar paginación (`items`, `nextCursor`, etc.), mapear DTO → modelo de vista si reduce acoplamiento, unificar errores (`ApiClientError`) en mensajes de aplicación.
 
 ### Infraestructura
 
-- [`lib/api-client.ts`](lib/api-client.ts): `baseURL`, `withCredentials`, timeout, headers por defecto.
-- [`src/lib/api/mutator.ts`](src/lib/api/mutator.ts): punto único para interceptores futuros (401, tracing); Orval ya usa `customInstance`.
+- [`src/lib/api/fetch-api.ts`](../../lib/api/fetch-api.ts): `fetch` same-origin con `credentials: "include"` y `ApiClientError`.
+- [`src/modules/shared/types/api-models.ts`](../../modules/shared/types/api-models.ts): contratos JSON compartidos entre Route Handlers y wrappers.
+- [`src/modules/shared/types/prisma-enums.ts`](../../modules/shared/types/prisma-enums.ts): enums de dominio seguros para cliente.
 
 ### Qué no hace la UI
 
-- **Prohibido** `import { getUsuarios } from "@/api/generated/..."` fuera de `modules/*/api/` y código infra autorizado.
+- **Prohibido** llamar Prisma o Route Handlers directamente desde componentes; solo hooks → wrappers.
 
 ### Errores y paginación
 
@@ -116,8 +118,8 @@ Componente (UI)
 
 ### Relación con DTOs backend
 
-- Los schemas del frontend son **independientes** del contrato OpenAPI; pueden alinearse pero no se regeneran solos.
-- Tras `npm run codegen`, revisar drift DTO ↔ schema; usar tests o capa de mapping en `api/` al enviar (`schema.parse` → construir DTO generated).
+- Los schemas del frontend son **independientes** del contrato de la API; pueden alinearse pero no se regeneran solos.
+- Tras cambios en Route Handlers o `api-models.ts`, revisar drift DTO ↔ schema; usar tests o capa de mapping en `api/` al enviar (`schema.parse` → construir DTO).
 
 ### Anti-patrones
 
@@ -197,6 +199,5 @@ Componente (UI)
 UI (RSC/client)
   → hooks (TanStack Query)
   → api wrappers (feature)
-  → generated Orval
-  → mutator + apiClient
+  → fetchApi → /api Route Handlers → Prisma
 ```

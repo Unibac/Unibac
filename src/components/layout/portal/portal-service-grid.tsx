@@ -4,7 +4,10 @@ import { SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import { NavModuleCard, navModuleCardClassName } from "@/components/shared/nav-module-card";
+import {
+  NavModuleCard,
+  navModuleCardClassName,
+} from "@/components/shared/nav-module-card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { DashboardNavItemData } from "@/modules/auth/lib/dashboard-nav-items";

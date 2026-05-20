@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import type { PropuestaFeriaResponseDto } from "@/api/generated/models";
-import { ModerarPropuestaFeriaDtoEstado } from "@/api/generated/models";
+import type { PropuestaFeriaResponseDto } from "@/modules/shared/types/api-models";
+import { ModerarPropuestaFeriaEstado } from "@/modules/shared/types/api-models";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -45,8 +45,8 @@ export function ModerarPropuestaDialog({
     setApiError(null);
     const estado =
       target.accion === "aceptar"
-        ? ModerarPropuestaFeriaDtoEstado.ACEPTADO
-        : ModerarPropuestaFeriaDtoEstado.RECHAZADO;
+        ? ModerarPropuestaFeriaEstado.ACEPTADO
+        : ModerarPropuestaFeriaEstado.RECHAZADO;
     try {
       await moderateMut.mutateAsync({
         propuestaId: target.propuesta.id,
