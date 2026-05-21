@@ -6,4 +6,4 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Arquitectura frontend (Unibac)
 
-Convenciones de código (features, TanStack Query, wrappers sobre el cliente OpenAPI, Zod/React Hook Form, imports y checklist de PR): [`.cursor/rules/unibac-architecture.mdc`](.cursor/rules/unibac-architecture.mdc) y [`.cursor/rules/unibac-data-ui.mdc`](.cursor/rules/unibac-data-ui.mdc).
+Convenciones de código (features, Route Handlers + Prisma/Supabase, TanStack Query, `fetchApi`, Supabase Auth, Traiker, Zod/React Hook Form, imports y checklist de PR): [`.cursor/rules/unibac-architecture.mdc`](.cursor/rules/unibac-architecture.mdc) y [`.cursor/rules/unibac-data-ui.mdc`](.cursor/rules/unibac-data-ui.mdc).

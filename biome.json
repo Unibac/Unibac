@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!!src/components/ui", "!!src/api/generated"]
+    "includes": ["**", "!!src/components/ui", "!!src/generated/prisma"]
   },
   "formatter": {
     "enabled": true,

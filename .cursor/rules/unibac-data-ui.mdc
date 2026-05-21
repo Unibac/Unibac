@@ -1,12 +1,12 @@
 ---
-description: TanStack Query, capa API, Zod/forms, estado, componentes y App Router Unibac
+description: TanStack Query, Route Handlers, Supabase Auth, Zod/forms, estado, UI y App Router Unibac
 globs: "**/*.{ts,tsx}"
 alwaysApply: false
 ---
 
-# Unibac — Datos remotos, API, formularios, estado, UI y Next.js
+# Unibac — Datos remotos, API, auth, formularios, estado, UI y Next.js
 
-Coherente con [unibac-architecture.mdc](unibac-architecture.mdc) (estructura bajo `src/`, imports, TypeScript).
+Coherente con [unibac-architecture.mdc](unibac-architecture.mdc). **No usar Orval** ni patrones de cliente OpenAPI generado.
 
 ---
 
@@ -14,190 +14,178 @@ Coherente con [unibac-architecture.mdc](unibac-architecture.mdc) (estructura baj
 
 ### Principios
 
-- **TanStack Query es la fuente única de verdad del estado servidor** (listas, detalle, perfil, paginación).
-- Los **componentes de UI no** llaman HTTP, no conocen URLs ni métodos REST; consumen hooks del feature.
+- **TanStack Query** = única fuente de verdad del **estado servidor** en el cliente.
+- La UI **no** llama `fetch` directo ni conoce Prisma; solo hooks del feature.
 
-### Ubicación del código
+### Ubicación
 
-- Toda configuración de `useQuery`, `useMutation`, `useInfiniteQuery` vive en `src/modules/<feature>/hooks/`.
-- **Prohibido** definir `queryFn`/`mutationFn` inline en componentes de página o árbol presentacional que llame a `getX()` generado.
+- `useQuery` / `useMutation` en `src/modules/<feature>/hooks/`.
+- **Prohibido** `queryFn` inline en componentes que llame wrappers o `/api` directamente.
 
 ### Query keys
 
-- Centralizar en `src/modules/<feature>/query-keys.ts`.
-- Forma jerárquica y estable; incluir parámetros serializables en el nivel hoja.
-
-Ejemplo orientativo:
+- Centralizar en `query-keys.ts`; forma jerárquica estable.
 
 ```ts
-export const permisosKeys = {
-  all: ["permisos"] as const,
-  list: (usuarioId?: string) =>
-    [...permisosKeys.all, "list", usuarioId ?? "all"] as const,
+export const feriasKeys = {
+  all: ["ferias"] as const,
+  list: () => [...feriasKeys.all, "list"] as const,
+  detail: (id: number) => [...feriasKeys.all, "detail", id] as const,
 };
 ```
 
-### Opciones por defecto y overrides
-
-- Defaults globales (`staleTime`, `retry`, `refetchOnWindowFocus`) en `QueryClient` dentro de `providers/`.
-- Overrides locales cuando el dominio lo exija (ej. `retry: false` para endpoints que devuelven 401 esperado en rutas públicas).
-
 ### Invalidación
 
-- Cada mutación debe documentar qué keys invalida (array explícito o helper `invalidatePermisos()`).
-- Evitar `invalidateQueries` disperso sin convención ni comentario de intención.
-
-### Optimistic updates
-
-- Usar solo cuando el UX lo requiera y el rollback esté claro; encapsular en el hook de mutación.
-- Combinar con invalidación o `setQueryData` según consistencia con el backend.
+- Cada mutación declara qué keys invalida (helper o array explícito).
+- Tras mutaciones que cambian permisos o perfil, invalidar `auth` / profile si aplica.
 
 ### Suspense
 
-- `useSuspenseQuery` **solo** donde exista boundary explícita (`loading.tsx`, `<Suspense>` en `app/`).
-- Si no hay boundary garantizada, usar `useQuery` y manejar `isPending`/`isError` en UI.
-
-### Anti-patrones Query
-
-- Duplicar datos del servidor en Context o Zustand.
-- Keys mágicas repartidas por archivos.
-- Mutaciones sin manejo de error normalizado (ver §3).
-- Mezclar lógica de negocio pesada dentro del `queryFn` (extraer a wrapper `api/`).
+- `useSuspenseQuery` solo con boundary (`loading.tsx`, `<Suspense>`).
 
 ---
 
-## §3 Reglas de la capa API (wrappers)
+## §3 Capa API (wrappers + Route Handlers)
 
-### Flujo obligatorio (código nuevo)
+### Flujo obligatorio
 
 ```
-Componente (UI)
-  → Hook del feature (`modules/<feature>/hooks`)
+Componente (client)
+  → Hook (`modules/<feature>/hooks`)
   → Wrapper (`modules/<feature>/api/*.ts`)
-  → fetchApi same-origin (`src/lib/api/fetch-api.ts`)
-  → Route Handler (`src/app/api/**`)
-  → Servicio de dominio + Prisma (`modules/<feature>/server`, `@/lib/prisma`)
+  → fetchApi (`src/lib/api/fetch-api.ts`, credentials: "include")
+  → Route Handler (`src/app/api/**/route.ts`)
+  → Servicio (`modules/<feature>/server/*-service.ts`)
+  → Prisma (`@/lib/prisma`) / Supabase admin / Traiker
 ```
 
-### Wrappers
+### Wrappers (`modules/<feature>/api/`)
 
-- Un archivo o grupo coherente por agregado (`ferias-api.ts`, `usuarios-api.ts`, …).
-- Funciones **puras del lado cliente** que llaman `/api/*` vía `fetchApi`; firma tipada con DTOs de [`api-models.ts`](../../modules/shared/types/api-models.ts) o tipos de entrada estrechos.
-- Responsabilidades permitidas: normalizar paginación (`items`, `nextCursor`, etc.), mapear DTO → modelo de vista si reduce acoplamiento, unificar errores (`ApiClientError`) en mensajes de aplicación.
+- Funciones que llaman `/api/...` con `fetchApi<T>`.
+- Tipos de entrada/salida desde [`api-models.ts`](../../src/modules/shared/types/api-models.ts).
+- Normalizar errores con `ApiClientError` + `getApiErrorMessage` en UI.
+- **Multipart**: `FormData` sin forzar `Content-Type` (lo gestiona `fetchApi`).
 
-### Infraestructura
+### Route Handlers (`src/app/api/`)
 
-- [`src/lib/api/fetch-api.ts`](../../lib/api/fetch-api.ts): `fetch` same-origin con `credentials: "include"` y `ApiClientError`.
-- [`src/modules/shared/types/api-models.ts`](../../modules/shared/types/api-models.ts): contratos JSON compartidos entre Route Handlers y wrappers.
-- [`src/modules/shared/types/prisma-enums.ts`](../../modules/shared/types/prisma-enums.ts): enums de dominio seguros para cliente.
+- Delgados: sesión → `assertPermission` (si aplica) → servicio → `jsonOk` / `jsonError`.
+- Parseo body/query con helpers en `@/lib/server/route-helpers`.
+- **Sin** lógica de negocio pesada inline; extraer a `server/`.
+
+### Infra compartida
+
+| Pieza | Uso |
+|-------|-----|
+| [`fetch-api.ts`](../../lib/api/fetch-api.ts) | Cliente HTTP same-origin |
+| [`api-models.ts`](../../modules/shared/types/api-models.ts) | DTOs JSON |
+| [`api-error.ts`](../../lib/server/api-error.ts) | `ApiError`, respuestas uniformes |
+| [`session.ts`](../../lib/server/session.ts) | `getSessionUsuario`, `toAuthProfile` |
+| [`authorization.ts`](../../modules/shared/server/authorization.ts) | `assertPermission`, RBAC por rol |
+
+### Uploads (Traiker)
+
+- Rutas bajo `/api/uploads/**`; servicio en `@/lib/traiker/storage`.
+- Variables `TRAIKER_*`; sin Traiker configurado → 503 documentado.
+- Wrappers del feature exponen `uploadX(file: File)` con `FormData`.
 
 ### Qué no hace la UI
 
-- **Prohibido** llamar Prisma o Route Handlers directamente desde componentes; solo hooks → wrappers.
+- No Prisma, no `createSupabaseAdminClient`, no importar `*-service.ts`.
 
-### Errores y paginación
+---
 
-- Clasificar: red, 4xx cliente, 5xx servidor, validación; no propagar stack traces al usuario.
-- Paginación: si el backend cambia forma de envelope, **absorber el cambio en el wrapper**, no en diez hooks.
+## §3b Supabase Auth y sesión
+
+### Login
+
+- Formulario: `usuario` + `clave` (no email visible).
+- `POST /api/auth/login` → valida `Usuario` en BD, puente bcrypt legacy si falta `authUserId`, luego `signInWithPassword` con email interno.
+- Perfil: `GET /api/auth/profile` → `AuthProfile` (incluye `rolId`, `categoria`, `nivel`, `tipo`).
+
+### Clientes Supabase
+
+| Archivo | Uso |
+|---------|-----|
+| `lib/supabase/server.ts` | Route Handlers, Server Components con cookies |
+| `lib/supabase/client.ts` | Cliente navegador (raro; preferir `/api/auth/*`) |
+| `lib/supabase/admin.ts` | **Solo servidor** — service role |
+
+### Middleware
+
+- [`middleware.ts`](../../middleware.ts): refresh cookie Supabase; redirige `/dashboard` sin sesión a `/login`.
+
+### Registro público
+
+- Gated por `PUBLIC_REGISTRATION_ENABLED` (servidor) y opcional `NEXT_PUBLIC_PUBLIC_REGISTRATION_ENABLED` (UI).
+- Asigna `categoria` + rol por categoría (`EXTERNO_ESTUDIANTE`, etc.) y crea usuario en Supabase Auth.
+
+### Variables (ver `.env.example`, `prisma/README.md`)
+
+- `NEXT_PUBLIC_SUPABASE_URL`, clave anon/publishable, `SUPABASE_SERVICE_ROLE_KEY`.
+- `DATABASE_URL` (pooler), `DIRECT_URL` (CLI Prisma).
 
 ---
 
 ## §4 Reglas Zod y formularios
 
-- **Zod es la única fuente de verdad de validación** para datos introducidos por el usuario.
-- **React Hook Form + `@hookform/resolvers` + `zodResolver`** es el estándar para forms interactivos.
+- **Zod** = validación de entrada usuario; **RHF + zodResolver** estándar.
+- Schemas en `modules/<feature>/schemas/`.
+- `type X = z.infer<typeof schema>`; no duplicar interfaces.
 
-### Ubicación
+### Campos URL opcionales en formularios
 
-- Esquemas en `src/modules/<feature>/schemas/` con nombre explícito (`loginSchema`, `crearUsuarioSchema`).
-- Componentes de formulario del feature junto a `components/` del mismo feature (o subcarpeta `forms/` si crece).
+- Estado del formulario: **string vacío `""`**, nunca `undefined` en inputs controlados (evita warning React al subir imagen y rellenar URL).
+- Al enviar al API: schema con preprocess/transform `""` → omitir en DTO.
 
-### Tipos
+### Borradores en sheets
 
-- Inferir: `type LoginValues = z.infer<typeof loginSchema>`; **no** duplicar interfaces idénticas al schema.
+- No resetear formulario al **cerrar** sheet; conservar borrador.
+- Reset al **crear con éxito** o al abrir acción explícita “Nueva …” (patrón `key` en el sheet para remount).
+- En **editar**, cargar datos al abrir cuando `mode === "edit"` y hay `row`.
 
-### Relación con DTOs backend
+### Relación con API
 
-- Los schemas del frontend son **independientes** del contrato de la API; pueden alinearse pero no se regeneran solos.
-- Tras cambios en Route Handlers o `api-models.ts`, revisar drift DTO ↔ schema; usar tests o capa de mapping en `api/` al enviar (`schema.parse` → construir DTO).
-
-### Anti-patrones
-
-- Validación condicional dispersa en `onSubmit` sin Zod.
-- Dos fuentes de verdad (regex en UI + schema distinto).
-- Cast agresivo `as LoginDto` sin validación previa.
+- Schemas frontend independientes de Route Handlers; revisar drift tras cambios en `api-models`.
+- Mapping en submit: `schema.parse` → `buildXDto(values)`.
 
 ---
 
-## §6 Reglas de gestión de estado
+## §6 Gestión de estado
 
-| Herramienta | Uso permitido |
-|-------------|----------------|
-| **TanStack Query** | Estado servidor: entidades, listas, resultado de mutaciones cacheadas |
-| **useState / useReducer** | Estado UI local: toggles, pasos de wizard, inputs controlados efímeros |
-| **React Context** | Infra transversal (tema, i18n futuro, flags de shell); **no** almacenar listados de negocio ni copias de respuestas API |
-| **Zustand** (opcional futuro) | Estado cliente global persistente en navegación: preferencias UI, filtros de lista **no** respaldados por servidor, estado de UI compleja **sin** duplicar entidades del backend |
-
-### Vetado
-
-- Stores globales que espejan usuarios, permisos o cualquier entidad ya cubierta por Query (salvo caché deliberada y documentada con TTL propio — preferir no).
+| Herramienta | Uso |
+|-------------|-----|
+| TanStack Query | Estado servidor |
+| useState / useReducer | UI local, wizards, filtros no persistidos |
+| Context | Tema, shell — **no** listas de negocio |
+| Zustand (futuro) | Preferencias UI, filtros locales — **no** duplicar entidades del backend |
 
 ---
 
-## §7 Reglas de componentes
+## §7 Componentes
 
-### Separación
-
-- **Presentacional**: recibe datos y callbacks por props; sin hooks de datos remotos.
-- **Contenedor / feature**: ensambla hooks del feature y pasa props a presentacionales.
-- Evitar “god components”; partir por responsabilidad cuando se acerque a ~200–250 líneas.
-
-### Server vs Client
-
-- **Server Components por defecto** en `app/`.
-- `"use client"` solo cuando se necesite: estado local, efectos, event handlers del navegador, TanStack Query, librerías solo cliente.
-
-### Feature leakage
-
-- `modules/A/components` **no** importa `modules/B/components` directamente.
-- Componer en ruta (`src/app/...`) o mover piezas realesmente compartidas a `modules/shared` o `components` globales sin negocio.
-
-### Accesibilidad y composición
-
-- Respetar primitivas Radix/shadcn; no romper roles ni foco.
-- Preferir composición (slots, children) frente a props booleanas explosivas.
+- Presentacional vs contenedor; sin hooks de datos remotos en presentacionales.
+- RSC por defecto; `"use client"` para Query, forms, eventos.
+- Sin leakage entre `modules/A` y `modules/B` (componer en `app/`).
+- Capabilities UX: [`profile-capabilities.ts`](../../modules/auth/lib/profile-capabilities.ts) — alineadas con RBAC pero no sustituyen `assertPermission` en servidor.
 
 ---
 
-## §8 Reglas Next.js App Router
+## §8 Next.js App Router
 
-- Antes de usar APIs nuevas de Next, revisar la guía local del runtime en `node_modules/next/dist/docs/` (ver también [`AGENTS.md`](../../AGENTS.md)).
-
-### Datos en servidor vs cliente
-
-- **RSC + `fetch`** (u helpers del servidor) para datos públicos, SEO, primera pintura sin sesión cookie compleja; respetar políticas de cache de Next cuando aplique.
-- **TanStack Query en cliente** cuando: datos dependen de sesión cookie con UX rica, invalidación fina tras mutaciones, uploads, polling o interacción frecuente.
-
-### loading / error
-
-- Usar `loading.tsx` y `error.tsx` por segmento cuando mejore UX; alinear con boundaries de Suspense si se usa suspense queries.
-
-### Server Actions
-
-- Política **conservadora**: el stack principal es REST + cookies vía wrappers.
-- Server Actions solo tras decisión explícita del equipo (formularios muy simples, integración estrecha con servidor sin duplicar contrato REST).
-
-### SEO y metadata
-
-- Metadata estática/dinámica en layouts y páginas según App Router; no acoplar SEO a hooks cliente-only.
+- Consultar `node_modules/next/dist/docs/` y [`AGENTS.md`](../../AGENTS.md) ante APIs nuevas.
+- Datos con sesión e invalidación fina → TanStack Query en cliente.
+- `loading.tsx` / `error.tsx` por segmento cuando mejore UX.
+- **Server Actions**: política conservadora; stack principal REST + cookies vía wrappers.
 
 ---
 
-## Referencia rápida de capas
+## Referencia rápida
 
 ```
-UI (RSC/client)
+UI (client)
   → hooks (TanStack Query)
-  → api wrappers (feature)
-  → fetchApi → /api Route Handlers → Prisma
+  → api wrappers
+  → fetchApi + cookies
+  → app/api Route Handlers
+  → server/*-service + Prisma (+ Supabase Auth / Traiker)
 ```
