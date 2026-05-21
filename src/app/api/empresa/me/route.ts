@@ -5,6 +5,7 @@ import {
   getEmpresaMine,
   updateEmpresaMine,
 } from "@/modules/empresa/server/empresa-service";
+import type { UpdateEmpresaMeDto } from "@/modules/shared/types/api-models";
 
 export async function GET() {
   try {
@@ -18,8 +19,7 @@ export async function GET() {
 export async function PATCH(request: Request) {
   try {
     const user = await requireSessionUsuario();
-    const body =
-      await parseJsonBody<Parameters<typeof updateEmpresaMine>[1]>(request);
+    const body = await parseJsonBody<UpdateEmpresaMeDto>(request);
     return jsonOk(await updateEmpresaMine(toAuthProfile(user), body));
   } catch (error) {
     return jsonError(error);

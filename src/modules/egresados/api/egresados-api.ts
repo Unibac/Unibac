@@ -33,6 +33,20 @@ export async function getEgresadoMe() {
   return fetchApi<EgresadoResponseDto>("/api/egresados/me");
 }
 
+export async function createEgresadoMe(body: CreateEgresadoDto) {
+  return fetchApi<EgresadoResponseDto>("/api/egresados/me", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function updateEgresadoMe(body: UpdateEgresadoDto) {
+  return fetchApi<EgresadoResponseDto>("/api/egresados/me", {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
 export async function createEgresado(body: CreateEgresadoDto) {
   return fetchApi<EgresadoResponseDto>("/api/egresados", {
     method: "POST",

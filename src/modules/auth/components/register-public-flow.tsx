@@ -1,15 +1,21 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeftIcon, Loader2Icon, UserPlusIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  Building2Icon,
+  GraduationCapIcon,
+  Loader2Icon,
+  UserPlusIcon,
+  UserSquareIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
-
-import { CategoriaUsuarioExterno } from "@/modules/shared/types/enums";
 import { PanelCard } from "@/components/shared/panel-card";
 import { UnibacLogo } from "@/components/shared/unibac-logo";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   CardContent,
@@ -35,8 +41,18 @@ import {
   type RegisterPublicFormValues,
   registerPublicFormSchema,
 } from "@/modules/auth/schemas/register-public-schema";
+import { CategoriaUsuarioExterno } from "@/modules/shared/types/enums";
 
 type Step = "pick" | "form";
+
+const CATEGORIA_ICONS: Record<
+  RegisterPublicFormValues["categoria"],
+  typeof GraduationCapIcon
+> = {
+  [CategoriaUsuarioExterno.ESTUDIANTE]: GraduationCapIcon,
+  [CategoriaUsuarioExterno.EGRESADO]: UserSquareIcon,
+  [CategoriaUsuarioExterno.EMPRESA]: Building2Icon,
+};
 
 const CATEGORIA_COPY: Record<
   RegisterPublicFormValues["categoria"],
@@ -77,6 +93,13 @@ export function RegisterPublicFlow() {
   });
 
   const categoria = form.watch("categoria");
+
+  useEffect(() => {
+    const valid = Object.values(CategoriaUsuarioExterno);
+    if (step === "form" && !valid.includes(categoria)) {
+      setStep("pick");
+    }
+  }, [step, categoria]);
 
   function selectCategoria(cat: RegisterPublicFormValues["categoria"]) {
     setApiError(null);
@@ -135,10 +158,10 @@ export function RegisterPublicFlow() {
           <div className="flex justify-center sm:justify-start">
             <UnibacLogo priority imgClassName="max-h-28 sm:max-h-32" />
           </div>
-          <CardTitle className="text-lg">Crear cuenta externa</CardTitle>
+          <CardTitle className="text-lg">¿Cómo te registrás?</CardTitle>
           <CardDescription>
-            Elegí el tipo de cuenta. El sistema asignará el rol y permisos según
-            tu perfil.
+            Primero elegí si sos estudiante, egresado o empresa. Después verás
+            el formulario con los datos que corresponden a tu tipo de cuenta.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
@@ -148,19 +171,26 @@ export function RegisterPublicFlow() {
             ) as RegisterPublicFormValues["categoria"][]
           ).map((cat) => {
             const copy = CATEGORIA_COPY[cat];
+            const Icon = CATEGORIA_ICONS[cat];
             return (
               <button
                 key={cat}
                 type="button"
-                className="rounded-md border border-border bg-card p-4 text-start transition-colors duration-150 hover:border-border/80 hover:bg-accent/50"
+                className="flex gap-3 rounded-md border border-border bg-card p-4 text-start transition-colors duration-150 hover:border-border/80 hover:bg-accent/50"
                 onClick={() => selectCategoria(cat)}
               >
-                <p className="text-sm font-medium text-foreground">
-                  {copy.title}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {copy.description}
-                </p>
+                <Icon
+                  className="mt-0.5 size-5 shrink-0 text-muted-foreground"
+                  aria-hidden
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-foreground">
+                    {copy.title}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {copy.description}
+                  </p>
+                </div>
               </button>
             );
           })}
@@ -180,11 +210,13 @@ export function RegisterPublicFlow() {
         <div className="flex justify-center sm:justify-start">
           <UnibacLogo priority imgClassName="max-h-28 sm:max-h-32" />
         </div>
-        <CardTitle className="text-lg">
-          Registro — {CATEGORIA_COPY[categoria].title}
-        </CardTitle>
+        <div className="flex flex-wrap items-center gap-2">
+          <CardTitle className="text-lg">Completá tu registro</CardTitle>
+          <Badge variant="secondary">{CATEGORIA_COPY[categoria].title}</Badge>
+        </div>
         <CardDescription>
-          Completá los datos. Podés volver atrás para cambiar el tipo de cuenta.
+          {CATEGORIA_COPY[categoria].description} Podés cambiar el tipo de
+          cuenta antes de enviar el formulario.
         </CardDescription>
       </CardHeader>
       <Form {...form}>

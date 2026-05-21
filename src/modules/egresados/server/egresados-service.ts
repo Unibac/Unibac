@@ -1,9 +1,17 @@
-import { NivelUsuario } from "@/generated/prisma/client";
+import {
+  CategoriaUsuarioExterno,
+  NivelUsuario,
+} from "@/generated/prisma/client";
+import { prisma } from "@/lib/prisma";
 import {
   ApiError,
   isPrismaUniqueConstraintError,
 } from "@/lib/server/api-error";
-import { prisma } from "@/lib/prisma";
+import type { AuthProfile } from "@/modules/auth/types";
+import type {
+  CreateEgresadoDto,
+  UpdateEgresadoDto,
+} from "@/modules/shared/types/api-models";
 
 const yearNow = new Date().getFullYear();
 
@@ -104,6 +112,41 @@ function assertAnio(anio: number) {
   if (anio < 1950 || anio > yearNow + 1) {
     throw new ApiError(400, `Año de egreso inválido (${anio})`);
   }
+}
+
+function assertEgresadoCategoria(user: AuthProfile) {
+  if (user.categoria !== CategoriaUsuarioExterno.EGRESADO) {
+    throw new ApiError(403, "Solo usuarios categoría EGRESADO pueden acceder");
+  }
+}
+
+export async function createEgresadoMine(
+  user: AuthProfile,
+  dto: CreateEgresadoDto,
+) {
+  assertEgresadoCategoria(user);
+  return createEgresado(dto, user.id);
+}
+
+export async function updateEgresadoMine(
+  user: AuthProfile,
+  dto: UpdateEgresadoDto,
+) {
+  assertEgresadoCategoria(user);
+  const current = await prisma.egresado.findUnique({
+    where: { usuarioId: user.id },
+  });
+  if (!current) {
+    throw new ApiError(
+      404,
+      "No hay registro de egresado asociado a esta cuenta",
+    );
+  }
+  const { identificacion: _omit, ...rest } = dto;
+  if (Object.keys(rest).length === 0) {
+    throw new ApiError(400, "No hay campos para actualizar");
+  }
+  return updateEgresado(current.id, rest, user.id, false);
 }
 
 export async function createEgresado(

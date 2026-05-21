@@ -5,17 +5,17 @@ import {
   CalendarDaysIcon,
   HomeIcon,
   MegaphoneIcon,
+  UserIcon,
   UserSquareIcon,
   UsersIcon,
 } from "lucide-react";
-
-import type { AuthProfile } from "@/modules/auth/types";
-
 import { getVisibleDashboardNavHrefs } from "@/modules/auth/lib/dashboard-sidebar-policy";
+import type { AuthProfile } from "@/modules/auth/types";
 
 /** Rutas registradas en `app/dashboard/...`. */
 export type DashboardNavHref =
   | "/dashboard"
+  | "/dashboard/perfil"
   | "/dashboard/usuarios"
   | "/dashboard/egresados"
   | "/dashboard/directorio-emprendimientos"
@@ -31,6 +31,7 @@ export type DashboardNavItemData = {
 
 export const DASHBOARD_NAV_ITEM_DATA = [
   { href: "/dashboard", label: "Inicio", icon: HomeIcon },
+  { href: "/dashboard/perfil", label: "Mi perfil", icon: UserIcon },
   { href: "/dashboard/usuarios", label: "Usuarios", icon: UsersIcon },
   { href: "/dashboard/egresados", label: "Egresados", icon: UserSquareIcon },
   {

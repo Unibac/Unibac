@@ -314,6 +314,32 @@ export type FindEgresadosParams = {
   estadoLaboral?: EstadoLaboralEgresado;
 };
 
+// --- Empresa (cuenta propia) ---
+
+export type EmpresaMineResponseDto = {
+  id: number;
+  usuarioId: number;
+  nit: string;
+  razonSocial: string;
+  nombreContacto?: string | null;
+  correoContacto?: string | null;
+  telefono?: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type UpdateEmpresaMeDto = {
+  nombreContacto?: string;
+  correoContacto?: string;
+  telefono?: string;
+};
+
+export type UpdateMeUsuarioDto = {
+  descripcion?: string;
+  correo?: string;
+  celular?: string;
+};
+
 // --- Talento ---
 
 export type TalentoPerfilResponseDto = {

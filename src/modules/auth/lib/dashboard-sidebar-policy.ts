@@ -2,11 +2,6 @@
  * Rutas del menú lateral del dashboard y visibilidad por perfil.
  * Alinear `SIDEBAR_HREFS_BY_CATEGORIA` con permisos de módulo en backend.
  */
-import type { AuthProfile } from "@/modules/auth/types";
-import {
-  CategoriaUsuarioExterno,
-  TipoUsuario,
-} from "@/modules/shared/types/enums";
 
 import type { DashboardNavHref } from "@/modules/auth/lib/dashboard-nav-items";
 import { DASHBOARD_NAV_ITEM_DATA } from "@/modules/auth/lib/dashboard-nav-items";
@@ -15,6 +10,11 @@ import {
   isAdministrador,
   isStaffFullUx,
 } from "@/modules/auth/lib/profile-capabilities";
+import type { AuthProfile } from "@/modules/auth/types";
+import {
+  CategoriaUsuarioExterno,
+  TipoUsuario,
+} from "@/modules/shared/types/enums";
 
 /** Allow-list por categoría de usuario externo (literales del API).
  * Mantener coherente con `*-CanAccessModule` en profile-capabilities y RBAC backend.
@@ -25,6 +25,7 @@ export const SIDEBAR_HREFS_BY_CATEGORIA: Record<
 > = {
   [CategoriaUsuarioExterno.ESTUDIANTE]: [
     "/dashboard",
+    "/dashboard/perfil",
     "/dashboard/convocatorias",
     "/dashboard/talento-perfiles",
     "/dashboard/ferias",
@@ -32,6 +33,7 @@ export const SIDEBAR_HREFS_BY_CATEGORIA: Record<
   ],
   [CategoriaUsuarioExterno.EGRESADO]: [
     "/dashboard",
+    "/dashboard/perfil",
     "/dashboard/egresados",
     "/dashboard/directorio-emprendimientos",
     "/dashboard/convocatorias",
@@ -40,6 +42,7 @@ export const SIDEBAR_HREFS_BY_CATEGORIA: Record<
   ],
   [CategoriaUsuarioExterno.EMPRESA]: [
     "/dashboard",
+    "/dashboard/perfil",
     "/dashboard/directorio-emprendimientos",
     "/dashboard/convocatorias",
     "/dashboard/ferias",

@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2Icon, LogOutIcon } from "lucide-react";
+import { Loader2Icon, LogOutIcon, UserIcon } from "lucide-react";
+import Link from "next/link";
 
 import { UnibacLogo } from "@/components/shared/unibac-logo";
 import { Button } from "@/components/ui/button";
@@ -23,25 +24,32 @@ export function PortalTopBar({ onLogout, logoutPending }: PortalTopBarProps) {
           Institución Universitaria Bellas Artes
         </span>
       </div>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="shrink-0"
-        onClick={onLogout}
-        disabled={logoutPending}
-      >
-        {logoutPending ? (
-          <Loader2Icon
-            className="size-4 shrink-0 animate-spin"
-            data-icon="inline-start"
-            aria-hidden
-          />
-        ) : (
-          <LogOutIcon className="size-4 shrink-0" data-icon="inline-start" />
-        )}
-        Cerrar sesión
-      </Button>
+      <div className="flex shrink-0 items-center gap-2">
+        <Button type="button" variant="ghost" size="sm" asChild>
+          <Link href="/dashboard/perfil">
+            <UserIcon className="size-4 shrink-0" data-icon="inline-start" />
+            Mi perfil
+          </Link>
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onLogout}
+          disabled={logoutPending}
+        >
+          {logoutPending ? (
+            <Loader2Icon
+              className="size-4 shrink-0 animate-spin"
+              data-icon="inline-start"
+              aria-hidden
+            />
+          ) : (
+            <LogOutIcon className="size-4 shrink-0" data-icon="inline-start" />
+          )}
+          Cerrar sesión
+        </Button>
+      </div>
     </header>
   );
 }
