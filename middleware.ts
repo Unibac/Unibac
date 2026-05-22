@@ -43,7 +43,10 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse;
   }
 
-  if ((pathname === "/register" || pathname === "/login") && user) {
+  if (
+    (pathname === "/" || pathname === "/register" || pathname === "/login") &&
+    user
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
@@ -53,5 +56,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register"],
+  matcher: ["/", "/dashboard/:path*", "/login", "/register"],
 };

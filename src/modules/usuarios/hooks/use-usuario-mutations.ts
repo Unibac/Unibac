@@ -4,6 +4,7 @@ import type {
   CreateUsuarioDto,
   UpdateUsuarioDto,
 } from "@/modules/shared/types/api-models";
+import { TipoUsuario } from "@/modules/shared/types/api-models";
 
 import {
   createUsuario,
@@ -17,7 +18,7 @@ import type {
 } from "@/modules/usuarios/schemas/usuario-schema";
 
 function buildCreateDto(values: CreateUsuarioFormValues): CreateUsuarioDto {
-  return {
+  const dto: CreateUsuarioDto = {
     usuario: values.usuario,
     clave: values.clave,
     descripcion: values.descripcion,
@@ -28,6 +29,10 @@ function buildCreateDto(values: CreateUsuarioFormValues): CreateUsuarioDto {
     celular: values.celular,
     rolId: values.rolId,
   };
+  if (values.tipo === TipoUsuario.EXTERNO && values.categoria !== undefined) {
+    dto.categoria = values.categoria;
+  }
+  return dto;
 }
 
 function buildUpdateDto(values: UpdateUsuarioFormValues): UpdateUsuarioDto {
@@ -59,6 +64,12 @@ function buildUpdateDto(values: UpdateUsuarioFormValues): UpdateUsuarioDto {
   }
   if (values.rolId !== undefined) {
     dto.rolId = values.rolId;
+  }
+  if (values.tipo === TipoUsuario.EXTERNO && values.categoria !== undefined) {
+    dto.categoria = values.categoria;
+  }
+  if (values.tipo === TipoUsuario.INTERNO) {
+    dto.categoria = null;
   }
   return dto;
 }

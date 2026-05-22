@@ -17,6 +17,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
+import { getAdminNavItemsForProfile } from "@/modules/auth/lib/admin-nav-items";
 import { getDashboardNavItemsForProfile } from "@/modules/auth/lib/dashboard-nav-items";
 
 export function AppSidebar() {
@@ -25,6 +26,8 @@ export function AppSidebar() {
 
   const navItems =
     profile.data != null ? getDashboardNavItemsForProfile(profile.data) : [];
+  const adminNavItems =
+    profile.data != null ? getAdminNavItemsForProfile(profile.data) : [];
 
   return (
     <Sidebar collapsible="icon" variant="inset">
@@ -74,6 +77,35 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        {adminNavItems.length > 0 ? (
+          <SidebarGroup>
+            <SidebarGroupLabel>Sistema</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminNavItems.map((item) => {
+                  const Icon = item.icon;
+                  const active =
+                    pathname === item.href ||
+                    pathname.startsWith(`${item.href}/`);
+                  return (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={active}
+                        tooltip={item.label}
+                      >
+                        <Link href={item.href}>
+                          <Icon className="size-4 shrink-0" />
+                          <span>{item.label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ) : null}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

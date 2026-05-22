@@ -88,6 +88,59 @@ export type RolResponseDto = {
   activo: boolean;
 };
 
+export type CreateRolPermisoDto = {
+  rolId: number;
+  moduloId: number;
+  accionId: number;
+};
+
+// --- Padrones de registro público ---
+
+export type EstudianteHabilitadoResponseDto = {
+  id: number;
+  identificacion: string;
+  codigoEstudiantil: string;
+  nombres: string;
+  apellidos: string;
+  programa?: string | null;
+  semestre?: number | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateEstudianteHabilitadoDto = {
+  identificacion: string;
+  codigoEstudiantil: string;
+  nombres: string;
+  apellidos: string;
+  programa?: string;
+  semestre?: number;
+};
+
+export type UpdateEstudianteHabilitadoDto = {
+  identificacion?: string;
+  codigoEstudiantil?: string;
+  nombres?: string;
+  apellidos?: string;
+  programa?: string;
+  semestre?: number;
+};
+
+export type EgresadoHabilitadoResponseDto = {
+  id: number;
+  identificacion: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateEgresadoHabilitadoDto = {
+  identificacion: string;
+};
+
+export type UpdateEgresadoHabilitadoDto = {
+  identificacion?: string;
+};
+
 // --- Usuarios ---
 
 export type UsuarioResponseDto = {
@@ -130,7 +183,7 @@ export type UpdateUsuarioDto = {
   correo?: string;
   celular?: string;
   rolId?: number;
-  categoria?: CategoriaUsuarioExterno;
+  categoria?: CategoriaUsuarioExterno | null;
 };
 
 // --- Ferias ---

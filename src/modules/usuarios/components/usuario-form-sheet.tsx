@@ -4,8 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2Icon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { type Resolver, useForm } from "react-hook-form";
-
-import { NivelUsuario, TipoUsuario } from "@/modules/shared/types/api-models";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -34,6 +32,16 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import {
+  ROL_EXTERNO_EGRESADO,
+  ROL_EXTERNO_EMPRESA,
+  ROL_EXTERNO_ESTUDIANTE,
+} from "@/modules/shared/constants/rol-codigos";
+import {
+  CategoriaUsuarioExterno,
+  NivelUsuario,
+  TipoUsuario,
+} from "@/modules/shared/types/api-models";
+import {
   useCreateUsuarioMutation,
   useUpdateUsuarioMutation,
 } from "@/modules/usuarios/hooks/use-usuario-mutations";
@@ -48,6 +56,18 @@ import {
   updateUsuarioFormSchema,
 } from "@/modules/usuarios/schemas/usuario-schema";
 
+const CATEGORIA_ROL_CODIGO: Record<CategoriaUsuarioExterno, string> = {
+  [CategoriaUsuarioExterno.ESTUDIANTE]: ROL_EXTERNO_ESTUDIANTE,
+  [CategoriaUsuarioExterno.EGRESADO]: ROL_EXTERNO_EGRESADO,
+  [CategoriaUsuarioExterno.EMPRESA]: ROL_EXTERNO_EMPRESA,
+};
+
+const CATEGORIA_LABELS: Record<CategoriaUsuarioExterno, string> = {
+  [CategoriaUsuarioExterno.ESTUDIANTE]: "Estudiante",
+  [CategoriaUsuarioExterno.EGRESADO]: "Egresado",
+  [CategoriaUsuarioExterno.EMPRESA]: "Empresa",
+};
+
 function emptyCreateValues(): CreateUsuarioFormValues {
   return {
     usuario: "",
@@ -56,6 +76,7 @@ function emptyCreateValues(): CreateUsuarioFormValues {
     activo: true,
     nivel: NivelUsuario.USUARIO,
     tipo: TipoUsuario.INTERNO,
+    categoria: undefined,
     correo: "",
     celular: "",
     rolId: 0,
@@ -104,6 +125,9 @@ export function UsuarioFormSheet({
     [rolesQuery.data],
   );
 
+  const tipoWatch = form.watch("tipo");
+  const categoriaWatch = form.watch("categoria");
+
   useEffect(() => {
     if (!open) {
       return;
@@ -135,8 +159,23 @@ export function UsuarioFormSheet({
       celular:
         u.celular !== undefined && u.celular !== null ? String(u.celular) : "",
       rolId,
+      categoria: u.categoria ?? undefined,
     });
   }, [open, mode, usuarioQuery.data, form]);
+
+  useEffect(() => {
+    if (tipoWatch !== TipoUsuario.EXTERNO) {
+      return;
+    }
+    if (categoriaWatch === undefined) {
+      return;
+    }
+    const codigo = CATEGORIA_ROL_CODIGO[categoriaWatch];
+    const rol = rolesActivos.find((r) => r.codigo === codigo);
+    if (rol && form.getValues("rolId") !== rol.id) {
+      form.setValue("rolId", rol.id);
+    }
+  }, [tipoWatch, categoriaWatch, rolesActivos, form]);
 
   const catalogPending =
     rolesQuery.isPending ||
@@ -335,7 +374,12 @@ export function UsuarioFormSheet({
                             <FormLabel>Tipo</FormLabel>
                             <Select
                               value={field.value}
-                              onValueChange={field.onChange}
+                              onValueChange={(v) => {
+                                field.onChange(v);
+                                if (v === TipoUsuario.INTERNO) {
+                                  form.setValue("categoria", undefined);
+                                }
+                              }}
                             >
                               <FormControl>
                                 <SelectTrigger className="w-full">
@@ -355,6 +399,41 @@ export function UsuarioFormSheet({
                           </FormItem>
                         )}
                       />
+                      {tipoWatch === TipoUsuario.EXTERNO ? (
+                        <FormField
+                          control={form.control}
+                          name="categoria"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Categoría externa</FormLabel>
+                              <Select
+                                value={field.value ?? ""}
+                                onValueChange={(v) =>
+                                  field.onChange(v as CategoriaUsuarioExterno)
+                                }
+                              >
+                                <FormControl>
+                                  <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Categoría" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {(
+                                    Object.values(
+                                      CategoriaUsuarioExterno,
+                                    ) as CategoriaUsuarioExterno[]
+                                  ).map((cat) => (
+                                    <SelectItem key={cat} value={cat}>
+                                      {CATEGORIA_LABELS[cat]}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      ) : null}
                       <FormField
                         control={form.control}
                         name="rolId"

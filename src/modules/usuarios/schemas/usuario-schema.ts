@@ -1,10 +1,16 @@
 import { z } from "zod";
 
-import { NivelUsuario, TipoUsuario } from "@/modules/shared/types/api-models";
+import {
+  CategoriaUsuarioExterno,
+  NivelUsuario,
+  TipoUsuario,
+} from "@/modules/shared/types/api-models";
 
 const nivelSchema = z.enum([NivelUsuario.USUARIO, NivelUsuario.ADMINISTRADOR]);
 
 const tipoSchema = z.enum([TipoUsuario.INTERNO, TipoUsuario.EXTERNO]);
+
+const categoriaSchema = z.nativeEnum(CategoriaUsuarioExterno).optional();
 
 const rolIdSchema = z.coerce
   .number()
@@ -24,17 +30,28 @@ const optionalCorreo = z
   .optional()
   .transform((v) => (v === "" || v === undefined ? undefined : v));
 
-export const createUsuarioFormSchema = z.object({
-  usuario: z.string().min(3, "Mínimo 3 caracteres"),
-  clave: z.string().min(6, "Mínimo 6 caracteres"),
-  descripcion: optionalTrimmed,
-  activo: z.boolean(),
-  nivel: nivelSchema,
-  tipo: tipoSchema,
-  correo: optionalCorreo,
-  celular: optionalTrimmed,
-  rolId: rolIdSchema,
-});
+export const createUsuarioFormSchema = z
+  .object({
+    usuario: z.string().min(3, "Mínimo 3 caracteres"),
+    clave: z.string().min(6, "Mínimo 6 caracteres"),
+    descripcion: optionalTrimmed,
+    activo: z.boolean(),
+    nivel: nivelSchema,
+    tipo: tipoSchema,
+    categoria: categoriaSchema,
+    correo: optionalCorreo,
+    celular: optionalTrimmed,
+    rolId: rolIdSchema,
+  })
+  .superRefine((data, ctx) => {
+    if (data.tipo === TipoUsuario.EXTERNO && data.categoria === undefined) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Seleccioná la categoría del usuario externo",
+        path: ["categoria"],
+      });
+    }
+  });
 
 export type CreateUsuarioFormValues = z.infer<typeof createUsuarioFormSchema>;
 
@@ -46,6 +63,7 @@ export const updateUsuarioFormSchema = z
     activo: z.boolean().optional(),
     nivel: nivelSchema.optional(),
     tipo: tipoSchema.optional(),
+    categoria: categoriaSchema,
     correo: optionalCorreo,
     celular: optionalTrimmed,
     rolId: rolIdSchema,
