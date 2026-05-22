@@ -30,7 +30,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       } catch {
         /* cookie puede estar ya inválida; seguir saliendo */
       }
-      router.replace("/login");
+      router.replace("/");
       router.refresh();
     })();
   }
