@@ -50,6 +50,14 @@ export function useModulosAdminQuery(enabled = true) {
   });
 }
 
+export function useModulosCatalogAdminQuery(enabled = true) {
+  return useQuery({
+    queryKey: [...administracionKeys.modulos(), "catalog"] as const,
+    queryFn: () => listModulos(),
+    enabled,
+  });
+}
+
 export function useAccionesAdminQuery(enabled = true) {
   return useQuery({
     queryKey: administracionKeys.acciones(),

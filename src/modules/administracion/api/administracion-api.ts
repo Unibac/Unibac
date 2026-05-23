@@ -1,16 +1,21 @@
 import { fetchApi } from "@/lib/api/fetch-api";
 import type {
   AccionResponseDto,
+  CreateAccionDto,
   CreateEgresadoHabilitadoDto,
   CreateEstudianteHabilitadoDto,
+  CreateModuloDto,
   CreateRolPermisoDto,
   EgresadoHabilitadoResponseDto,
   EstudianteHabilitadoResponseDto,
   ModuloResponseDto,
   PermisoEnUsuarioResponseDto,
-  RolResponseDto,
+  RolWithStatsResponseDto,
+  UpdateAccionDto,
   UpdateEgresadoHabilitadoDto,
   UpdateEstudianteHabilitadoDto,
+  UpdateModuloDto,
+  UpdateRolDto,
 } from "@/modules/shared/types/api-models";
 
 export async function listEstudiantesHabilitados() {
@@ -85,7 +90,14 @@ export async function deleteEgresadoHabilitado(id: number) {
 }
 
 export async function listRoles() {
-  return fetchApi<RolResponseDto[]>("/api/roles");
+  return fetchApi<RolWithStatsResponseDto[]>("/api/roles");
+}
+
+export async function updateRol(id: number, body: UpdateRolDto) {
+  return fetchApi<RolWithStatsResponseDto>(`/api/roles/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
 }
 
 export async function listPermisos() {
@@ -108,8 +120,44 @@ export async function listModulos(activo?: boolean) {
   return fetchApi<ModuloResponseDto[]>(`/api/modulos${q}`);
 }
 
+export async function createModulo(body: CreateModuloDto) {
+  return fetchApi<ModuloResponseDto>("/api/modulos", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function updateModulo(id: number, body: UpdateModuloDto) {
+  return fetchApi<ModuloResponseDto>(`/api/modulos/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function deleteModulo(id: number) {
+  return fetchApi<void>(`/api/modulos/${id}`, { method: "DELETE" });
+}
+
 export async function listAcciones() {
   return fetchApi<AccionResponseDto[]>("/api/acciones");
+}
+
+export async function createAccion(body: CreateAccionDto) {
+  return fetchApi<AccionResponseDto>("/api/acciones", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function updateAccion(id: number, body: UpdateAccionDto) {
+  return fetchApi<AccionResponseDto>(`/api/acciones/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function deleteAccion(id: number) {
+  return fetchApi<void>(`/api/acciones/${id}`, { method: "DELETE" });
 }
 
 /** En `/api/permisos`, `permiso.usuario.id` corresponde al id del rol (legacy del mapper). */

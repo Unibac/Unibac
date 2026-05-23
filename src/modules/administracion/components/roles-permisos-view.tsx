@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { PageCallout } from "@/components/shared/page-callout";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,7 @@ import {
 } from "@/modules/administracion/hooks/use-administracion-queries";
 
 export function RolesPermisosView() {
+  const searchParams = useSearchParams();
   const rolesQuery = useRolesAdminQuery();
   const permisosQuery = usePermisosAdminQuery();
   const modulosQuery = useModulosAdminQuery();
@@ -39,6 +41,15 @@ export function RolesPermisosView() {
 
   const [rolId, setRolId] = useState<number | null>(null);
   const [toggleError, setToggleError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const raw = searchParams.get("rolId");
+    if (!raw) return;
+    const parsed = Number(raw);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      setRolId(parsed);
+    }
+  }, [searchParams]);
 
   const roles = useMemo(
     () => (rolesQuery.data ?? []).filter((r) => r.activo),

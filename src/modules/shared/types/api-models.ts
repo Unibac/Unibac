@@ -96,6 +96,42 @@ export type CreateRolPermisoDto = {
   accionId: number;
 };
 
+export type RolWithStatsResponseDto = RolResponseDto & {
+  usuariosCount: number;
+  permisosCount: number;
+};
+
+export type UpdateRolDto = {
+  nombre?: string;
+  activo?: boolean;
+};
+
+export type CreateModuloDto = {
+  nombre: string;
+  activo?: boolean;
+};
+
+export type UpdateModuloDto = {
+  nombre?: string;
+  activo?: boolean;
+};
+
+export type CreateAccionDto = {
+  nombre: string;
+};
+
+export type UpdateAccionDto = {
+  nombre?: string;
+};
+
+export type DashboardResumenResponseDto = {
+  postulacionesConvocatoriaPendientes: number;
+  propuestasFeriaPendientes: number;
+  convocatoriasAbiertas: number;
+  feriasVigentes: number;
+  egresadosSinFicha: number;
+};
+
 // --- Padrones de registro público ---
 
 export type EstudianteHabilitadoResponseDto = {

@@ -46,6 +46,18 @@ export function isAdmin(user: SessionUsuario): boolean {
   return user.nivel === "ADMINISTRADOR";
 }
 
+export function isStaff(user: SessionUsuario): boolean {
+  return isAdmin(user) || user.tipo === "INTERNO";
+}
+
+export async function requireStaff(): Promise<SessionUsuario> {
+  const user = await requireSessionUsuario();
+  if (!isStaff(user)) {
+    throw new ApiError(403, "Se requiere usuario institucional");
+  }
+  return user;
+}
+
 export async function requireAdmin(): Promise<SessionUsuario> {
   const user = await requireSessionUsuario();
   if (!isAdmin(user)) {

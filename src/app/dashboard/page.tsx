@@ -10,7 +10,9 @@ import { NavModuleCard } from "@/components/shared/nav-module-card";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
 import { getDashboardNavItemsForProfile } from "@/modules/auth/lib/dashboard-nav-items";
+import { isStaffFullUx } from "@/modules/auth/lib/profile-capabilities";
 import { isPortalExternoUx } from "@/modules/auth/lib/portal-ux";
+import { StaffDashboardResumen } from "@/modules/dashboard/components/staff-dashboard-resumen";
 
 export default function DashboardHomePage() {
   const { data } = useProfile();
@@ -44,7 +46,9 @@ export default function DashboardHomePage() {
         title={`Hola, ${data.usuario}`}
         description={`Nivel ${data.nivel} · ${data.tipo}`}
       />
-      {navItems.length === 0 ? (
+      <div className="flex flex-col gap-8">
+        {isStaffFullUx(data) ? <StaffDashboardResumen /> : null}
+        {navItems.length === 0 ? (
         <p className="text-sm text-muted-foreground">
           No hay módulos disponibles para tu cuenta.
         </p>
@@ -65,7 +69,8 @@ export default function DashboardHomePage() {
             </Link>
           ))}
         </div>
-      )}
+        )}
+      </div>
     </DashboardPage>
   );
 }

@@ -3,7 +3,10 @@
 import {
   ClipboardListIcon,
   GraduationCapIcon,
+  LayersIcon,
+  ListChecksIcon,
   ShieldIcon,
+  UserCogIcon,
   UserSquareIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -24,10 +27,28 @@ const LINKS = [
     icon: UserSquareIcon,
   },
   {
+    href: "/dashboard/administracion/roles",
+    title: "Catálogo de roles",
+    description: "Activar roles y ver usuarios y permisos asignados.",
+    icon: UserCogIcon,
+  },
+  {
     href: "/dashboard/administracion/roles-permisos",
-    title: "Roles y permisos",
-    description: "Matriz rol × módulo × acción (RBAC).",
+    title: "Matriz de permisos",
+    description: "Rol × módulo × acción (RBAC).",
     icon: ShieldIcon,
+  },
+  {
+    href: "/dashboard/administracion/modulos",
+    title: "Módulos",
+    description: "Áreas del sistema en la matriz de permisos.",
+    icon: LayersIcon,
+  },
+  {
+    href: "/dashboard/administracion/acciones",
+    title: "Acciones",
+    description: "Operaciones (consulta, edición, postulación, etc.).",
+    icon: ListChecksIcon,
   },
   {
     href: "/dashboard/usuarios",
