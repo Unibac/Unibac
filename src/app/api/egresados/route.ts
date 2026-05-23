@@ -1,10 +1,11 @@
-import { jsonError, jsonOk } from "@/lib/server/api-error";
+import { ApiError, jsonError, jsonOk } from "@/lib/server/api-error";
 import { parseJsonBody } from "@/lib/server/route-helpers";
-import { requireSessionUsuario, toAuthProfile } from "@/lib/server/session";
+import { isStaff, requireSessionUsuario } from "@/lib/server/session";
 import { assertPermission } from "@/modules/shared/server/authorization";
 import {
   createEgresado,
   findAllEgresados,
+  findEgresadosSinFicha,
 } from "@/modules/egresados/server/egresados-service";
 
 export async function GET(request: Request) {
@@ -12,6 +13,20 @@ export async function GET(request: Request) {
     const user = await requireSessionUsuario();
     await assertPermission(user, "Egresados", "CONSULTA");
     const params = new URL(request.url).searchParams;
+    const sinFicha = params.get("sinFicha") === "true";
+    if (sinFicha) {
+      if (!isStaff(user)) {
+        throw new ApiError(
+          403,
+          "Solo personal institucional puede listar egresados sin ficha",
+        );
+      }
+      return jsonOk(
+        await findEgresadosSinFicha({
+          nombre: params.get("nombre") ?? undefined,
+        }),
+      );
+    }
     const anioRaw = params.get("anioEgreso");
     const query = {
       nombre: params.get("nombre") ?? undefined,

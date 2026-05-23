@@ -38,7 +38,7 @@ const METRICS = [
     key: "egresadosSinFicha" as const,
     label: "Egresados sin ficha",
     description: "Cuentas sin completar perfil",
-    href: "/dashboard/egresados",
+    href: "/dashboard/egresados?sinFicha=true",
   },
 ] as const;
 

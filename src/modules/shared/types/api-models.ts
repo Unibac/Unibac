@@ -398,11 +398,22 @@ export type UpdateEgresadoDto = {
   informacionEmprendimiento?: string;
 };
 
+/** Cuenta EGRESADO activa sin fila en `EGRESADOS` (ficha pendiente). */
+export type EgresadoSinFichaResponseDto = {
+  usuarioId: number;
+  usuario: string;
+  descripcion?: string | null;
+  correo?: string | null;
+  celular?: string | null;
+};
+
 export type FindEgresadosParams = {
   nombre?: string;
   anioEgreso?: number;
   programaCarrera?: string;
   estadoLaboral?: EstadoLaboralEgresado;
+  /** Solo staff: listar cuentas sin ficha de egresado. */
+  sinFicha?: boolean;
 };
 
 // --- Empresa (cuenta propia) ---

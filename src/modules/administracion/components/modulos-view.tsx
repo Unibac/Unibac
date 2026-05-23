@@ -201,8 +201,8 @@ export function ModulosView() {
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar módulo?</AlertDialogTitle>
             <AlertDialogDescription>
-              Se eliminará &quot;{deleteTarget?.nombre}&quot;. Si está referenciado
-              en permisos, la operación fallará.
+              Se eliminará &quot;{deleteTarget?.nombre}&quot;. Si está
+              referenciado en permisos, la operación fallará.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

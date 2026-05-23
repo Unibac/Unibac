@@ -16,12 +16,20 @@ export type EgresadosListFilters = {
   anioEgreso?: number;
   programaCarrera?: string;
   estadoLaboral?: FindEgresadosParams["estadoLaboral"];
+  sinFicha?: boolean;
 };
 
 export function toFindAllParams(
   filters: EgresadosListFilters,
 ): FindEgresadosParams | undefined {
   const params: FindEgresadosParams = {};
+  if (filters.sinFicha === true) {
+    params.sinFicha = true;
+    if (filters.nombre?.trim()) {
+      params.nombre = filters.nombre.trim();
+    }
+    return params;
+  }
   if (filters.nombre?.trim()) {
     params.nombre = filters.nombre.trim();
   }

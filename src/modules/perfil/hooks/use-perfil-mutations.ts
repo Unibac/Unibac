@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { dashboardKeys } from "@/modules/dashboard/query-keys";
 import { egresadosKeys } from "@/modules/egresados/query-keys";
 import {
   createEgresadoMe,
@@ -41,6 +42,8 @@ export function useCreateMiEgresadoMutation() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: perfilKeys.egresado() });
       void queryClient.invalidateQueries({ queryKey: egresadosKeys.me() });
+      void queryClient.invalidateQueries({ queryKey: egresadosKeys.lists() });
+      void queryClient.invalidateQueries({ queryKey: dashboardKeys.resumen() });
     },
   });
 }

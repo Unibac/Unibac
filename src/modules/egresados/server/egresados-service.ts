@@ -1,6 +1,7 @@
 import {
   CategoriaUsuarioExterno,
   NivelUsuario,
+  type Prisma,
 } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
@@ -57,6 +58,40 @@ async function findOneEgresadoRaw(id: number) {
       },
     },
   });
+}
+
+export async function findEgresadosSinFicha(query: { nombre?: string }) {
+  const where: Prisma.UsuarioWhereInput = {
+    activo: true,
+    categoria: CategoriaUsuarioExterno.EGRESADO,
+    egreso: null,
+  };
+  const term = query.nombre?.trim();
+  if (term) {
+    where.OR = [
+      { usuario: { contains: term, mode: "insensitive" } },
+      { descripcion: { contains: term, mode: "insensitive" } },
+      { correo: { contains: term, mode: "insensitive" } },
+    ];
+  }
+  const rows = await prisma.usuario.findMany({
+    where,
+    orderBy: { id: "asc" },
+    select: {
+      id: true,
+      usuario: true,
+      descripcion: true,
+      correo: true,
+      celular: true,
+    },
+  });
+  return rows.map((r) => ({
+    usuarioId: r.id,
+    usuario: r.usuario,
+    descripcion: r.descripcion,
+    correo: r.correo,
+    celular: r.celular,
+  }));
 }
 
 export async function findAllEgresados(query: {

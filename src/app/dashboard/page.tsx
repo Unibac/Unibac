@@ -49,26 +49,26 @@ export default function DashboardHomePage() {
       <div className="flex flex-col gap-8">
         {isStaffFullUx(data) ? <StaffDashboardResumen /> : null}
         {navItems.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          No hay módulos disponibles para tu cuenta.
-        </p>
-      ) : (
-        <div className="layout-list-grid">
-          {navItems.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="group block h-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <NavModuleCard className="h-full">
-                <CardHeader className="flex flex-col gap-2">
-                  <CardTitle className="text-base">{link.label}</CardTitle>
-                  <CardDescription>Ir al módulo</CardDescription>
-                </CardHeader>
-              </NavModuleCard>
-            </Link>
-          ))}
-        </div>
+          <p className="text-sm text-muted-foreground">
+            No hay módulos disponibles para tu cuenta.
+          </p>
+        ) : (
+          <div className="layout-list-grid">
+            {navItems.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="group block h-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <NavModuleCard className="h-full">
+                  <CardHeader className="flex flex-col gap-2">
+                    <CardTitle className="text-base">{link.label}</CardTitle>
+                    <CardDescription>Ir al módulo</CardDescription>
+                  </CardHeader>
+                </NavModuleCard>
+              </Link>
+            ))}
+          </div>
         )}
       </div>
     </DashboardPage>

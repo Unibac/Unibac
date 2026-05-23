@@ -1,12 +1,14 @@
 "use client";
 
 import { MoreVerticalIcon } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
   NivelUsuario,
   EstadoLaboralEgresado,
   type EgresadoResponseDto,
+  type EgresadoSinFichaResponseDto,
 } from "@/modules/shared/types/api-models";
 import { useDashboardListLayout } from "@/components/layout/dashboard-list-layout";
 import { ListCard } from "@/components/shared/list-card";
@@ -27,6 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CardAction, CardDescription, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -54,7 +57,10 @@ import {
 } from "@/components/ui/table";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { useProfile } from "@/modules/auth/hooks/use-profile";
-import { egresadosCanAccessModule } from "@/modules/auth/lib/profile-capabilities";
+import {
+  egresadosCanAccessModule,
+  isStaffFullUx,
+} from "@/modules/auth/lib/profile-capabilities";
 import { EgresadoFormSheet } from "@/modules/egresados/components/egresado-form-sheet";
 import { useDeleteEgresadoMutation } from "@/modules/egresados/hooks/use-egresado-mutations";
 import {
@@ -84,15 +90,37 @@ type FilterDraft = {
   anioEgreso: string;
   programaCarrera: string;
   estadoLaboral: EstadoLaboralEgresado | "";
+  sinFicha: boolean;
 };
 
-function emptyDraft(): FilterDraft {
+function emptyDraft(sinFicha = false): FilterDraft {
   return {
     nombre: "",
     anioEgreso: "",
     programaCarrera: "",
     estadoLaboral: "",
+    sinFicha,
   };
+}
+
+function filtersToSearchParams(filters: EgresadosListFilters): string {
+  const sp = new URLSearchParams();
+  if (filters.sinFicha === true) {
+    sp.set("sinFicha", "true");
+    if (filters.nombre?.trim()) {
+      sp.set("nombre", filters.nombre.trim());
+    }
+    return sp.toString();
+  }
+  if (filters.nombre?.trim()) sp.set("nombre", filters.nombre.trim());
+  if (filters.anioEgreso !== undefined) {
+    sp.set("anioEgreso", String(filters.anioEgreso));
+  }
+  if (filters.programaCarrera?.trim()) {
+    sp.set("programaCarrera", filters.programaCarrera.trim());
+  }
+  if (filters.estadoLaboral) sp.set("estadoLaboral", filters.estadoLaboral);
+  return sp.toString();
 }
 
 function vinculosLabel(e: EgresadoResponseDto): string {
@@ -110,14 +138,36 @@ function vinculosLabel(e: EgresadoResponseDto): string {
 
 export function EgresadosView() {
   const profile = useProfile();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { layout } = useDashboardListLayout();
   const meQuery = useEgresadoMeQuery();
+  const isStaff = isStaffFullUx(profile.data);
   const [appliedFilters, setAppliedFilters] = useState<EgresadosListFilters>(
     {},
   );
   const [draft, setDraft] = useState<FilterDraft>(() => emptyDraft());
 
   const listQuery = useEgresadosListQuery(appliedFilters);
+  const sinFichaMode = appliedFilters.sinFicha === true;
+  const sinFichaRows = sinFichaMode
+    ? ((listQuery.data ?? []) as EgresadoSinFichaResponseDto[])
+    : [];
+  const fichaRows = !sinFichaMode
+    ? ((listQuery.data ?? []) as EgresadoResponseDto[])
+    : [];
+
+  useEffect(() => {
+    if (!isStaff || searchParams.get("sinFicha") !== "true") return;
+    const next: EgresadosListFilters = { sinFicha: true };
+    const nombre = searchParams.get("nombre");
+    if (nombre?.trim()) next.nombre = nombre.trim();
+    setAppliedFilters(next);
+    setDraft({
+      ...emptyDraft(true),
+      nombre: nombre?.trim() ?? "",
+    });
+  }, [isStaff, searchParams]);
   const deleteMut = useDeleteEgresadoMutation();
 
   const isAdmin = profile.data?.nivel === NivelUsuario.ADMINISTRADOR;
@@ -136,23 +186,37 @@ export function EgresadosView() {
   }, [deleteTargetId]);
 
   function applyFilters() {
-    const anioParsed = draft.anioEgreso.trim()
-      ? Number(draft.anioEgreso)
-      : undefined;
-    setAppliedFilters({
-      nombre: draft.nombre.trim() || undefined,
-      anioEgreso:
-        anioParsed !== undefined && !Number.isNaN(anioParsed)
-          ? anioParsed
-          : undefined,
-      programaCarrera: draft.programaCarrera.trim() || undefined,
-      estadoLaboral: draft.estadoLaboral || undefined,
+    let next: EgresadosListFilters;
+    if (isStaff && draft.sinFicha) {
+      next = {
+        sinFicha: true,
+        nombre: draft.nombre.trim() || undefined,
+      };
+    } else {
+      const anioParsed = draft.anioEgreso.trim()
+        ? Number(draft.anioEgreso)
+        : undefined;
+      next = {
+        nombre: draft.nombre.trim() || undefined,
+        anioEgreso:
+          anioParsed !== undefined && !Number.isNaN(anioParsed)
+            ? anioParsed
+            : undefined,
+        programaCarrera: draft.programaCarrera.trim() || undefined,
+        estadoLaboral: draft.estadoLaboral || undefined,
+      };
+    }
+    setAppliedFilters(next);
+    const q = filtersToSearchParams(next);
+    router.replace(q ? `/dashboard/egresados?${q}` : "/dashboard/egresados", {
+      scroll: false,
     });
   }
 
   function clearFilters() {
     setDraft(emptyDraft());
     setAppliedFilters({});
+    router.replace("/dashboard/egresados", { scroll: false });
   }
 
   function openCreate() {
@@ -231,10 +295,43 @@ export function EgresadosView() {
         }
       />
 
+      {sinFichaMode ? (
+        <PageCallout>
+          Cuentas registradas como egresado que aún no completaron la ficha en
+          Mi perfil. El contador del inicio coincide con esta lista.
+        </PageCallout>
+      ) : null}
+
       <FilterPanel>
+        {isStaff ? (
+          <div className="mb-4 flex items-center gap-2">
+            <Checkbox
+              id="flt-sin-ficha"
+              checked={draft.sinFicha}
+              onCheckedChange={(v) =>
+                setDraft((d) => ({
+                  ...d,
+                  sinFicha: v === true,
+                  ...(v === true
+                    ? {
+                        anioEgreso: "",
+                        programaCarrera: "",
+                        estadoLaboral: "" as const,
+                      }
+                    : {}),
+                }))
+              }
+            />
+            <Label htmlFor="flt-sin-ficha" className="font-normal">
+              Solo cuentas sin ficha de egresado
+            </Label>
+          </div>
+        ) : null}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <div className="grid gap-2">
-            <Label htmlFor="flt-nombre">Nombre</Label>
+            <Label htmlFor="flt-nombre">
+              {sinFichaMode ? "Buscar cuenta" : "Nombre"}
+            </Label>
             <Input
               id="flt-nombre"
               value={draft.nombre}
@@ -244,58 +341,67 @@ export function EgresadosView() {
               placeholder="Buscar…"
             />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="flt-anio">Año de egreso</Label>
-            <Input
-              id="flt-anio"
-              type="number"
-              value={draft.anioEgreso}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, anioEgreso: e.target.value }))
-              }
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="flt-carrera">Programa / carrera</Label>
-            <Input
-              id="flt-carrera"
-              value={draft.programaCarrera}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, programaCarrera: e.target.value }))
-              }
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label>Estado laboral</Label>
-            <Select
-              value={
-                draft.estadoLaboral === "" ? FILTER_ALL : draft.estadoLaboral
-              }
-              onValueChange={(v) =>
-                setDraft((d) => ({
-                  ...d,
-                  estadoLaboral:
-                    v === FILTER_ALL ? "" : (v as EstadoLaboralEgresado),
-                }))
-              }
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Todos" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={FILTER_ALL}>Todos</SelectItem>
-                {(
-                  Object.values(
-                    EstadoLaboralEgresado,
-                  ) as EstadoLaboralEgresado[]
-                ).map((v) => (
-                  <SelectItem key={v} value={v}>
-                    {ESTADO_FILTER_LABELS[v]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {!sinFichaMode ? (
+            <>
+              <div className="grid gap-2">
+                <Label htmlFor="flt-anio">Año de egreso</Label>
+                <Input
+                  id="flt-anio"
+                  type="number"
+                  value={draft.anioEgreso}
+                  onChange={(e) =>
+                    setDraft((d) => ({ ...d, anioEgreso: e.target.value }))
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="flt-carrera">Programa / carrera</Label>
+                <Input
+                  id="flt-carrera"
+                  value={draft.programaCarrera}
+                  onChange={(e) =>
+                    setDraft((d) => ({
+                      ...d,
+                      programaCarrera: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label>Estado laboral</Label>
+                <Select
+                  value={
+                    draft.estadoLaboral === ""
+                      ? FILTER_ALL
+                      : draft.estadoLaboral
+                  }
+                  onValueChange={(v) =>
+                    setDraft((d) => ({
+                      ...d,
+                      estadoLaboral:
+                        v === FILTER_ALL ? "" : (v as EstadoLaboralEgresado),
+                    }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={FILTER_ALL}>Todos</SelectItem>
+                    {(
+                      Object.values(
+                        EstadoLaboralEgresado,
+                      ) as EstadoLaboralEgresado[]
+                    ).map((v) => (
+                      <SelectItem key={v} value={v}>
+                        {ESTADO_FILTER_LABELS[v]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
+          ) : null}
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
           <Button type="button" size="sm" onClick={() => applyFilters()}>
@@ -321,14 +427,47 @@ export function EgresadosView() {
         <PageCallout variant="destructive">
           {getApiErrorMessage(listQuery.error)}
         </PageCallout>
+      ) : sinFichaMode ? (
+        sinFichaRows.length === 0 ? (
+          <ListCardGridEmpty>
+            No hay cuentas egresado pendientes de completar la ficha.
+          </ListCardGridEmpty>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Usuario</TableHead>
+                <TableHead>Nombre / descripción</TableHead>
+                <TableHead>Correo</TableHead>
+                <TableHead>Celular</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sinFichaRows.map((row) => (
+                <TableRow key={row.usuarioId}>
+                  <TableCell className="font-medium">{row.usuario}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {row.descripcion?.trim() || "—"}
+                  </TableCell>
+                  <TableCell className="max-w-[180px] truncate text-muted-foreground">
+                    {row.correo?.trim() || "—"}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {row.celular?.trim() || "—"}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )
       ) : layout === "cards" ? (
-        (listQuery.data ?? []).length === 0 ? (
+        fichaRows.length === 0 ? (
           <ListCardGridEmpty>
             No hay egresados que coincidan con los filtros.
           </ListCardGridEmpty>
         ) : (
           <div className="layout-list-grid">
-            {(listQuery.data ?? []).map((row) => {
+            {fichaRows.map((row) => {
               const editable = canEditRow(row);
               const deletable = isAdmin === true;
               const showMenu = editable || deletable;
@@ -407,7 +546,7 @@ export function EgresadosView() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {(listQuery.data ?? []).length === 0 ? (
+            {fichaRows.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={7}
@@ -417,7 +556,7 @@ export function EgresadosView() {
                 </TableCell>
               </TableRow>
             ) : (
-              (listQuery.data ?? []).map((row) => {
+              fichaRows.map((row) => {
                 const editable = canEditRow(row);
                 const deletable = isAdmin === true;
                 const showMenu = editable || deletable;

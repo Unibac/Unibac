@@ -80,7 +80,9 @@ export function RolesView() {
             ) : (
               rows.map((r) => (
                 <TableRow key={r.id}>
-                  <TableCell className="font-mono text-xs">{r.codigo}</TableCell>
+                  <TableCell className="font-mono text-xs">
+                    {r.codigo}
+                  </TableCell>
                   <TableCell className="text-sm">{r.nombre}</TableCell>
                   <TableCell>
                     {r.activo ? (

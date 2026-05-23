@@ -166,8 +166,8 @@ export function AccionesView() {
           <AlertDialogHeader>
             <AlertDialogTitle>¿Eliminar acción?</AlertDialogTitle>
             <AlertDialogDescription>
-              Se eliminará &quot;{deleteTarget?.nombre}&quot;. Si está referenciada
-              en permisos, la operación fallará.
+              Se eliminará &quot;{deleteTarget?.nombre}&quot;. Si está
+              referenciada en permisos, la operación fallará.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

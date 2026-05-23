@@ -1,6 +1,7 @@
 import type {
   CreateEgresadoDto,
   EgresadoResponseDto,
+  EgresadoSinFichaResponseDto,
   FindEgresadosParams,
   UpdateEgresadoDto,
 } from "@/modules/shared/types/api-models";
@@ -17,11 +18,15 @@ function egresadosPath(params?: FindEgresadosParams): string {
     sp.set("programaCarrera", params.programaCarrera);
   }
   if (params.estadoLaboral) sp.set("estadoLaboral", params.estadoLaboral);
+  if (params.sinFicha === true) sp.set("sinFicha", "true");
   const q = sp.toString();
   return q ? `/api/egresados?${q}` : "/api/egresados";
 }
 
 export async function listEgresados(params?: FindEgresadosParams) {
+  if (params?.sinFicha === true) {
+    return fetchApi<EgresadoSinFichaResponseDto[]>(egresadosPath(params));
+  }
   return fetchApi<EgresadoResponseDto[]>(egresadosPath(params));
 }
 
