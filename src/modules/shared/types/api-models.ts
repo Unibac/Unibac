@@ -79,6 +79,8 @@ export type PermisoEnUsuarioResponseDto = {
   accionId: number;
   modulo: ModuloResponseDto;
   accion: AccionResponseDto;
+  /** Presente en `/api/permisos`: `usuario.id` es el rolId (legacy del mapper). */
+  usuario?: UsuarioResponseDto;
 };
 
 export type RolResponseDto = {

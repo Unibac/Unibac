@@ -112,7 +112,13 @@ export async function listAcciones() {
   return fetchApi<AccionResponseDto[]>("/api/acciones");
 }
 
-/** En la API, `permiso.usuario.id` corresponde al id del rol (legacy del mapper). */
+/** En `/api/permisos`, `permiso.usuario.id` corresponde al id del rol (legacy del mapper). */
 export function rolIdFromPermiso(p: PermisoEnUsuarioResponseDto): number {
-  return p.usuario.id;
+  const rolId = p.usuario?.id;
+  if (rolId == null) {
+    throw new Error(
+      "rolIdFromPermiso: se espera permiso.usuario de GET /api/permisos",
+    );
+  }
+  return rolId;
 }

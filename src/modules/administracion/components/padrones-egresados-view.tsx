@@ -72,7 +72,7 @@ export function PadronesEgresadosView() {
   return (
     <>
       <ListPageToolbar
-        actions={
+        end={
           <Button type="button" size="sm" onClick={openCreate}>
             <PlusIcon className="size-4" data-icon="inline-start" />
             Agregar
@@ -117,7 +117,7 @@ export function PadronesEgresadosView() {
                           <Button
                             type="button"
                             variant="ghost"
-                            size="icon-sm"
+                            size="icon"
                             aria-label="Acciones"
                           >
                             <MoreVerticalIcon className="size-4" />

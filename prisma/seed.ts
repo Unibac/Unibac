@@ -124,9 +124,7 @@ async function ensureSupabaseAuthUser(
       email_confirm: true,
     });
     if (error) {
-      throw new Error(
-        `Supabase updateUser (${usuario}): ${error.message}`,
-      );
+      throw new Error(`Supabase updateUser (${usuario}): ${error.message}`);
     }
     return existingId;
   }
@@ -155,10 +153,7 @@ async function seedUsuarioConAuth(params: {
   /** Externos: obligatoria para menú/UX. Internos: `null`. */
   categoria?: CategoriaUsuarioExterno | null;
 }): Promise<void> {
-  if (
-    params.tipo === TipoUsuario.EXTERNO &&
-    params.categoria == null
-  ) {
+  if (params.tipo === TipoUsuario.EXTERNO && params.categoria == null) {
     throw new Error(
       `Usuario externo "${params.usuario}" requiere categoria (ESTUDIANTE, EGRESADO o EMPRESA)`,
     );
@@ -170,9 +165,7 @@ async function seedUsuarioConAuth(params: {
   );
 
   const categoria =
-    params.tipo === TipoUsuario.INTERNO
-      ? null
-      : (params.categoria ?? null);
+    params.tipo === TipoUsuario.INTERNO ? null : (params.categoria ?? null);
 
   const usuarioData = {
     authUserId,
@@ -386,7 +379,9 @@ async function main(): Promise<void> {
   console.log(
     `  Demo externos (clave="${SEED_DEMO_PASSWORD}"): demo_estudiante, demo_egresado, demo_empresa`,
   );
-  console.log(`  Demo interno (clave="${SEED_DEMO_PASSWORD}"): demo_ferias_interno`);
+  console.log(
+    `  Demo interno (clave="${SEED_DEMO_PASSWORD}"): demo_ferias_interno`,
+  );
   console.log(
     `  Auth email interno: ${authEmailForUsuario(SEED_ADMIN_USUARIO)}`,
   );

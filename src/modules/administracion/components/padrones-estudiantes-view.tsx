@@ -72,7 +72,7 @@ export function PadronesEstudiantesView() {
   return (
     <>
       <ListPageToolbar
-        actions={
+        end={
           <Button type="button" size="sm" onClick={openCreate}>
             <PlusIcon className="size-4" data-icon="inline-start" />
             Agregar
@@ -129,7 +129,7 @@ export function PadronesEstudiantesView() {
                           <Button
                             type="button"
                             variant="ghost"
-                            size="icon-sm"
+                            size="icon"
                             aria-label="Acciones"
                           >
                             <MoreVerticalIcon className="size-4" />
