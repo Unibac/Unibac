@@ -6,8 +6,10 @@ export default function HomePage() {
   return (
     <div className="flex min-h-svh flex-col bg-background">
       <PublicHeader />
-      <main className="flex flex-1 flex-col">
-        <LandingHero />
+      <main className="relative flex flex-1 flex-col bg-[url('/Unibac-2-1.jpg')] bg-cover bg-center bg-no-repeat">
+        <div className="relative flex flex-1 flex-col bg-background/80 dark:bg-background/85">
+          <LandingHero />
+        </div>
       </main>
       <PublicFooter />
     </div>

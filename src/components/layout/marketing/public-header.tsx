@@ -9,10 +9,10 @@ export function PublicHeader() {
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-4 lg:px-6">
         <Link
           href="/"
-          className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex h-10 shrink-0 items-center overflow-visible rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring sm:h-12"
           aria-label="Inicio Unibac Contigo"
         >
-          <UnibacLogo priority imgClassName="max-h-10 sm:max-h-12" />
+          <UnibacLogo priority imgClassName="h-12 w-auto sm:h-16" />
         </Link>
         <nav className="flex flex-wrap items-center gap-2">
           <Button type="button" variant="ghost" size="sm" asChild>
