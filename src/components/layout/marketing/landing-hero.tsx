@@ -6,13 +6,13 @@ export function LandingHero() {
   return (
     <section className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-12 lg:px-6 lg:py-16">
       <div className="flex max-w-2xl flex-col gap-4">
-        <p className="text-sm font-medium text-muted-foreground">
+        <p className="text-sm font-medium text-black">
           Portal de servicios digitales
         </p>
-        <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+        <h1 className="font-heading text-2xl font-semibold tracking-tight text-black sm:text-3xl">
           Unibac Contigo
         </h1>
-        <p className="text-sm text-muted-foreground sm:text-base">
+        <p className="text-sm text-black sm:text-base">
           Accedé a convocatorias de emprendimiento, ferias virtuales, banco de
           talento y directorio de emprendimientos. Estudiantes, egresados y
           empresas pueden registrarse y gestionar su perfil en un solo lugar.
