@@ -3,3 +3,7 @@
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
+
+## Arquitectura frontend (Unibac)
+
+Convenciones de código (features, Route Handlers + Prisma/Supabase, TanStack Query, `fetchApi`, Supabase Auth, Traiker, Zod/React Hook Form, imports y checklist de PR): [`.cursor/rules/unibac-architecture.mdc`](.cursor/rules/unibac-architecture.mdc) y [`.cursor/rules/unibac-data-ui.mdc`](.cursor/rules/unibac-data-ui.mdc).

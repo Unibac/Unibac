@@ -1,0 +1,8 @@
+{
+  // Tailwind IntelliSense no permite desactivar suggestCanonicalClasses sólo bajo `src/components/ui`.
+  // `ignore` aquí silencia ese tipo de sugerencias en todo el workspace sin quitar autocompletado.
+  "tailwindCSS.lint.suggestCanonicalClasses": "ignore"
+
+  // Alternativa si quisieras limitarlo a la carpeta UI: desactiva IntelliSense Tailwind ahí (sin hover/completions):
+  // ,"tailwindCSS.files.exclude": ["**/src/components/ui/**"]
+}

@@ -1,0 +1,179 @@
+---
+description: Arquitectura por features, Supabase, Prisma, Route Handlers, TypeScript e imports Unibac
+globs: "**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# Unibac — Arquitectura, TypeScript, imports y mantenibilidad
+
+## Estado del repo (stack actual)
+
+- **API**: Route Handlers en `src/app/api/**` (sin Orval, sin `src/api/generated`, sin axios hacia backend externo).
+- **Datos**: Prisma → Postgres en **Supabase** (`src/lib/prisma.ts`, cliente en `src/generated/prisma`).
+- **Auth**: **Supabase Auth** (`@supabase/ssr`) + fila `Usuario` en BD (`authUserId`, login por `usuario` + `clave`, email interno vía `authEmailForUsuario`).
+- **Uploads de imágenes**: **Traiker** (`src/lib/traiker/`, rutas `/api/uploads/**`) — no Supabase Storage.
+- **Features**: `src/modules/<feature>/` con `api`, `hooks`, `server`, `schemas`, `components`, `query-keys.ts`.
+- La UI **no** importa Prisma ni clientes Supabase admin; consume hooks → wrappers `fetchApi`.
+
+---
+
+## §1 Reglas de estructura del proyecto
+
+### Layout canónico
+
+```
+src/
+├── app/
+│   ├── api/              # Route Handlers REST (única superficie HTTP del dominio)
+│   ├── dashboard/        # Páginas del panel
+│   └── login/            # Auth UX
+├── modules/
+│   ├── auth/
+│   ├── usuarios/
+│   ├── ferias/
+│   └── shared/           # Tipos, RBAC, authorization (sin primitives UI)
+├── generated/
+│   └── prisma/           # Salida de `prisma generate` — no editar a mano
+├── lib/
+│   ├── api/              # fetchApi, error-message
+│   ├── prisma.ts
+│   ├── supabase/         # client, server, admin, env
+│   ├── server/           # session, api-error, route-helpers
+│   └── traiker/          # storage Traiker
+├── providers/
+├── components/
+│   └── ui/
+└── styles/
+prisma/                   # schema, migrations, seed.ts
+middleware.ts             # Refresh sesión Supabase + guard /dashboard
+```
+
+### Contrato por feature: `src/modules/<feature>/`
+
+| Carpeta / archivo | Responsabilidad |
+|-------------------|-----------------|
+| `api/` | Wrappers cliente: `fetchApi` → `/api/*`; tipos desde `api-models` o inputs estrechos |
+| `server/` | **Solo servidor**: servicios de dominio, Prisma, `assertPermission`, reglas de negocio |
+| `hooks/` | TanStack Query; API estable para la UI |
+| `query-keys.ts` | Factories de query keys |
+| `schemas/` | Zod de formularios del feature |
+| `components/` | UI del feature |
+| `index.ts` | Opcional: export público mínimo |
+
+### Global vs local
+
+- **Global**: `components/ui`, `lib/*`, `providers/*`, shell de `app/*`, `middleware.ts`.
+- **Por feature**: copy, RBAC de módulo, servicios, wrappers, formularios.
+
+### Convenciones de nombres
+
+- Carpetas de módulos en plural cuando aplique (`usuarios`, `ferias`).
+- Hooks: `useNombreClaro` en `use-nombre-claro.ts`.
+- Query keys: factory `recursoKeys`.
+- Constantes de rol: `src/modules/shared/constants/rol-codigos.ts`.
+
+### Tipos y contratos API
+
+- Contratos JSON compartidos: [`src/modules/shared/types/api-models.ts`](../../src/modules/shared/types/api-models.ts).
+- Enums seguros en cliente: [`prisma-enums.ts`](../../src/modules/shared/types/prisma-enums.ts) / [`enums.ts`](../../src/modules/shared/types/enums.ts).
+- **No** hay codegen OpenAPI: al cambiar un endpoint, actualizar Route Handler + `api-models` + wrapper del feature.
+
+### Prisma
+
+- Schema en [`prisma/schema.prisma`](../../prisma/schema.prisma); migraciones en `prisma/migrations/`.
+- **Prohibido** editar `src/generated/prisma/**` manualmente; usar `npm run db:generate` / `db:migrate`.
+- Seed: `npm run db:seed` (RBAC + usuarios Supabase Auth); ver [`prisma/README.md`](../../prisma/README.md).
+
+### Barrel exports
+
+- Evitar barrels masivos; si existe `index.ts`, solo export deliberado.
+
+---
+
+## §5 Reglas TypeScript
+
+- `strict: true` en [`tsconfig.json`](../../tsconfig.json).
+- **Prohibido** `any`; `unknown` solo con narrowing inmediato.
+- Separar: **DTO / api-models** vs **modelo UI** (p. ej. `AuthProfile`, valores de formulario).
+- Preferir uniones discriminadas para estados de UI.
+- `import type` para imports solo de tipos.
+
+### Orden de imports
+
+1. Dependencias externas.
+2. Línea en blanco.
+3. Alias `@/…`.
+4. Línea en blanco.
+5. Relativos del mismo feature.
+
+---
+
+## §9 Reglas de imports y dependencias
+
+### Grafo permitido
+
+- `src/app/**` → `modules/*/components`, `components/ui`, `providers`, `lib` (infra).
+- `src/app/api/**` → `modules/*/server`, `@/lib/prisma`, `@/lib/server/*`, `@/lib/supabase/admin` (solo en handlers).
+- `modules/<A>/components` → hooks del feature, `components/ui`, tipos/capabilities locales.
+- `modules/<A>/hooks` → `modules/<A>/api`, `query-keys`, `modules/shared`.
+- `modules/<A>/api` → `@/lib/api/fetch-api`, tipos de `api-models` — **sin** Prisma ni Supabase admin.
+
+### Prohibido
+
+- `src/api/generated/**`, Orval, axios como cliente de dominio.
+- UI o hooks importando `@/lib/prisma`, `createSupabaseAdminClient`, o servicios `server/` de otro feature.
+- Imports profundos entre features (`modules/A` → `modules/B/...` internos).
+- `lib` importando implementaciones internas de `modules/*` (salvo tipos compartidos acordados).
+
+### Composición cross-feature
+
+- Orquestar en `src/app/` (ruta/layout) o API mínima documentada.
+- Lógica compartida → `modules/shared/`.
+
+### Auth y sesión
+
+- Cliente navegador: `@/lib/supabase/client` solo si hiciera falta Supabase en cliente; el flujo principal es cookie SSR + `/api/auth/*`.
+- Servidor en handlers: `requireSessionUsuario()` → `Usuario` sin `clave`; admin vía `requireAdmin()` / `isAdmin`.
+- Operaciones privilegiadas Auth (crear usuario staff, registro): `createSupabaseAdminClient()` solo en `server/` o Route Handlers.
+
+### Perfil externo: `rolId` + `categoria`
+
+- **RBAC (API)**: `rolId` + `ROLES_PERMISOS` → `assertPermission(user, "Emprendimiento", "CONSULTA")`.
+- **UX (menú y guards)**: `categoria` (`ESTUDIANTE` | `EGRESADO` | `EMPRESA`) en `profile-capabilities` y `dashboard-sidebar-policy`.
+- Usuarios externos en seed/registro deben tener **ambos** alineados (mismo criterio que `registerPublicUser`).
+
+---
+
+## §10 Escalabilidad y mantenibilidad
+
+### Evolución
+
+1. Feature nueva → `modules/<dominio>/` con `api`, `server`, `hooks`, `schemas`, `components`.
+2. Nuevo endpoint → `app/api/.../route.ts` + servicio en `server/` + wrapper + hook + keys.
+
+### Tests (orientativo)
+
+- **server/**: reglas de negocio, RBAC, mapeos.
+- **api/** (wrappers): errores y normalización (mock `fetch`).
+- **hooks**: MSW o mock de wrappers.
+- **Componentes**: Testing Library + a11y.
+
+### Anti-patrones (vetados)
+
+- Fetch/Prisma/Supabase admin desde componentes o páginas.
+- Estado servidor duplicado en Context/Zustand.
+- Query keys sueltas sin factory.
+- Editar `src/generated/prisma` a mano.
+- Reintroducir Orval o cliente generado OpenAPI sin decisión de equipo.
+
+### Checklist de revisión (PR)
+
+- [ ] Capas: UI → hook → wrapper → Route Handler → `server` → Prisma.
+- [ ] Query keys desde `query-keys.ts`.
+- [ ] Sin `any`; errores vía `ApiError` / `ApiClientError`.
+- [ ] Sin Prisma/Supabase admin fuera de `app/api` y `modules/*/server`.
+- [ ] Schemas Zod para formularios; campos opcionales de URL en formulario como `""`, no `undefined` (inputs controlados).
+- [ ] `"use client"` solo donde haga falta.
+- [ ] Mutaciones invalidan keys del feature.
+- [ ] Externos con `categoria` si afectan menú o reglas de dominio.
+- [ ] Variables Supabase/DB documentadas en `.env.example` si se añaden.
