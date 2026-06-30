@@ -17,7 +17,7 @@ export function EstudiantePerfilLinks() {
           Más sobre tu perfil
         </CardTitle>
         <CardDescription>
-          Como estudiante podés ampliar tu presencia en Talento y en el
+          Como estudiante puedes ampliar tu presencia en Talento y en el
           Directorio de emprendimientos desde esos módulos.
         </CardDescription>
       </CardHeader>
@@ -31,7 +31,7 @@ export function EstudiantePerfilLinks() {
               <CardHeader className="flex flex-col gap-2">
                 <CardTitle className="text-base">Talento</CardTitle>
                 <CardDescription>
-                  Creá o editá tu perfil de talento
+                  Crea o edita tu perfil de talento
                 </CardDescription>
               </CardHeader>
             </NavModuleCard>
@@ -46,7 +46,7 @@ export function EstudiantePerfilLinks() {
                   Directorio emprendimientos
                 </CardTitle>
                 <CardDescription>
-                  Publicá o actualizá tu emprendimiento
+                  Publica o actualiza tu emprendimiento
                 </CardDescription>
               </CardHeader>
             </NavModuleCard>

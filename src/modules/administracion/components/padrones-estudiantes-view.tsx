@@ -29,13 +29,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getApiErrorMessage } from "@/lib/api/error-message";
 import { EstudianteHabilitadoFormSheet } from "@/modules/administracion/components/estudiante-habilitado-form-sheet";
+import { PadronSetupImportPanel } from "@/modules/administracion/components/padron-setup-import-panel";
 import { useDeleteEstudianteHabilitadoMutation } from "@/modules/administracion/hooks/use-administracion-mutations";
 import { useEstudiantesHabilitadosQuery } from "@/modules/administracion/hooks/use-administracion-queries";
 import type { EstudianteHabilitadoResponseDto } from "@/modules/shared/types/api-models";
 
-export function PadronesEstudiantesView() {
+function PadronTable() {
   const query = useEstudiantesHabilitadosQuery();
   const deleteMut = useDeleteEstudianteHabilitadoMutation();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -189,5 +191,22 @@ export function PadronesEstudiantesView() {
         </AlertDialogContent>
       </AlertDialog>
     </>
+  );
+}
+
+export function PadronesEstudiantesView() {
+  return (
+    <Tabs defaultValue="padron">
+      <TabsList>
+        <TabsTrigger value="padron">Padrón</TabsTrigger>
+        <TabsTrigger value="import">Carga masiva</TabsTrigger>
+      </TabsList>
+      <TabsContent value="padron" className="mt-4">
+        <PadronTable />
+      </TabsContent>
+      <TabsContent value="import" className="mt-4">
+        <PadronSetupImportPanel />
+      </TabsContent>
+    </Tabs>
   );
 }

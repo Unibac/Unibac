@@ -155,7 +155,7 @@ export function TalentoPerfilesView() {
     return (
       <PageCallout>
         El banco de talento está disponible para personal institucional o
-        cuentas estudiante/egresado. Si necesitás acceso, contactá a
+        cuentas estudiante/egresado. Si necesitas acceso, contacta a
         administración.
       </PageCallout>
     );
@@ -203,8 +203,8 @@ export function TalentoPerfilesView() {
       >
         <p className="text-sm text-muted-foreground">
           {isAdmin
-            ? "Podés editar cualquier perfil. Eliminar solo disponible para administradores."
-            : "Podés editar tu propio perfil."}
+            ? "Puedes editar cualquier perfil. Eliminar solo disponible para administradores."
+            : "Puedes editar tu propio perfil."}
         </p>
       </ListPageToolbar>
 

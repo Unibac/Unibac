@@ -125,8 +125,8 @@ export function EgresadoPerfilSection({
         </CardTitle>
         <CardDescription>
           {mode === "create"
-            ? "Completá tu ficha de egresado. La identificación quedará fija después de guardar."
-            : "Actualizá tu información profesional. La identificación no se puede cambiar."}
+            ? "Completa tu ficha de egresado. La identificación quedará fija después de guardar."
+            : "Actualiza tu información profesional. La identificación no se puede cambiar."}
         </CardDescription>
       </CardHeader>
       <CardContent>

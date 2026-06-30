@@ -100,7 +100,7 @@ export function EmpresaPerfilSection() {
       <CardHeader>
         <CardTitle className="text-base font-semibold">Empresa</CardTitle>
         <CardDescription>
-          Completá datos de contacto. El NIT y la razón social no se pueden
+          Completa datos de contacto. El NIT y la razón social no se pueden
           modificar desde aquí.
         </CardDescription>
       </CardHeader>

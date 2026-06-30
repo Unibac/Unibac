@@ -15,7 +15,7 @@ const categoriaSchema = z.nativeEnum(CategoriaUsuarioExterno).optional();
 const rolIdSchema = z.coerce
   .number()
   .int()
-  .refine((n) => n > 0, { message: "Seleccioná un rol" });
+  .refine((n) => n > 0, { message: "Selecciona un rol" });
 
 const optionalTrimmed = z
   .string()
@@ -47,7 +47,7 @@ export const createUsuarioFormSchema = z
     if (data.tipo === TipoUsuario.EXTERNO && data.categoria === undefined) {
       ctx.addIssue({
         code: "custom",
-        message: "Seleccioná la categoría del usuario externo",
+        message: "Selecciona la categoría del usuario externo",
         path: ["categoria"],
       });
     }

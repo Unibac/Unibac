@@ -9,11 +9,11 @@ const MESSAGES: Record<
 > = {
   403: {
     create:
-      "No tenés permiso para registrar o editar propuestas con este perfil.",
+      "No tienes permiso para registrar o editar propuestas con este perfil.",
     update:
-      "No tenés permiso para registrar o editar propuestas con este perfil.",
+      "No tienes permiso para registrar o editar propuestas con este perfil.",
     uploadImagen:
-      "No tenés permiso para registrar o editar propuestas con este perfil.",
+      "No tienes permiso para registrar o editar propuestas con este perfil.",
   },
   400: {
     create:
@@ -23,7 +23,7 @@ const MESSAGES: Record<
   },
   409: {
     create: "Ya registraste una propuesta en esta feria.",
-    update: "Solo podés editar propuestas en estado Postulado.",
+    update: "Solo puedes editar propuestas en estado Postulado.",
   },
   503: {
     uploadImagen:

@@ -44,16 +44,16 @@ function estadoHint(
   if (estado === EstadoPropuestaFeria.POSTULADO) {
     if (feriaPermitePostulacion(feriaPeriodo)) {
       if (feriaPeriodo === FeriaPeriodo.proxima) {
-        return "Tu propuesta está en revisión. Podés editarla mientras la feria esté próxima o en curso y siga en estado Postulado.";
+        return "Tu propuesta está en revisión. Puedes editarla mientras la feria esté próxima o en curso y siga en estado Postulado.";
       }
-      return "Tu propuesta está en revisión. Podés editarla mientras la feria esté en curso y siga en estado Postulado.";
+      return "Tu propuesta está en revisión. Puedes editarla mientras la feria esté en curso y siga en estado Postulado.";
     }
-    return "Tu propuesta está en revisión. No podés editarla: la feria ya finalizó.";
+    return "Tu propuesta está en revisión. No puedes editarla: la feria ya finalizó.";
   }
   if (estado === EstadoPropuestaFeria.ACEPTADO) {
     return "Tu propuesta fue aceptada y puede aparecer en la vitrina pública.";
   }
-  return "Tu propuesta fue rechazada. No podés editarla ni volver a registrar otra en esta feria.";
+  return "Tu propuesta fue rechazada. No puedes editarla ni volver a registrar otra en esta feria.";
 }
 
 type MiPropuestaEnFeriaCardProps = {

@@ -164,6 +164,35 @@ export type UpdateEstudianteHabilitadoDto = {
   semestre?: number;
 };
 
+export type SetupImportRowEstado = "ok" | "error" | "duplicado" | "omitido";
+
+export type SetupImportRowPreview = {
+  fila: number;
+  identificacion: string;
+  codigoEstudiantil: string;
+  nombres: string;
+  apellidos: string;
+  programa?: string;
+  semestre?: number;
+  estado: SetupImportRowEstado;
+  mensaje?: string;
+};
+
+export type SetupImportResultDto = {
+  dryRun: boolean;
+  resumen: {
+    programasLeidos: number;
+    estudiantesLeidos: number;
+    matriculasLeidas: number;
+    filasValidas: number;
+    creadas: number;
+    duplicadas: number;
+    errores: number;
+    hojaVariablesOmitida: boolean;
+  };
+  filas: SetupImportRowPreview[];
+};
+
 export type EgresadoHabilitadoResponseDto = {
   id: number;
   identificacion: string;

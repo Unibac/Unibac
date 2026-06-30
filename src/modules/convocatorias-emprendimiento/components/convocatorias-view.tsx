@@ -177,8 +177,8 @@ export function ConvocatoriasView() {
   if (!convocatoriasCanAccessModule(profile.data)) {
     return (
       <PageCallout>
-        No tenés acceso a convocatorias con tu tipo de cuenta. Si necesitás
-        permisos, contactá a administración.
+        No tienes acceso a convocatorias con tu tipo de cuenta. Si necesitas
+        permisos, contacta a administración.
       </PageCallout>
     );
   }
@@ -462,7 +462,7 @@ export function ConvocatoriasView() {
             </p>
           ) : myPostulaciones.length === 0 ? (
             <p className="mt-2 text-sm text-muted-foreground">
-              No tenés postulaciones registradas.
+              No tienes postulaciones registradas.
             </p>
           ) : layout === "cards" ? (
             <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

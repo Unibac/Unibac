@@ -134,8 +134,8 @@ export function DirectorioView() {
   if (!directorioCanAccessModule(profile.data)) {
     return (
       <PageCallout>
-        No tenés acceso al directorio de emprendimientos con tu tipo de cuenta.
-        Si necesitás permisos, contactá a administración.
+        No tienes acceso al directorio de emprendimientos con tu tipo de cuenta.
+        Si necesitas permisos, contacta a administración.
       </PageCallout>
     );
   }
@@ -182,8 +182,8 @@ export function DirectorioView() {
       >
         <p className="text-sm text-muted-foreground">
           {isAdmin
-            ? "Podés editar cualquier registro. Eliminar solo disponible para administradores."
-            : "Podés editar tu propio emprendimiento."}
+            ? "Puedes editar cualquier registro. Eliminar solo disponible para administradores."
+            : "Puedes editar tu propio emprendimiento."}
         </p>
       </ListPageToolbar>
 
