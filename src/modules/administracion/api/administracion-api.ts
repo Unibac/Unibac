@@ -11,6 +11,7 @@ import type {
   ModuloResponseDto,
   PermisoEnUsuarioResponseDto,
   RolWithStatsResponseDto,
+  SetupImportResultDto,
   UpdateAccionDto,
   UpdateEgresadoHabilitadoDto,
   UpdateEstudianteHabilitadoDto,
@@ -52,6 +53,16 @@ export async function updateEstudianteHabilitado(
 export async function deleteEstudianteHabilitado(id: number) {
   return fetchApi<void>(`/api/estudiantes-habilitados/${id}`, {
     method: "DELETE",
+  });
+}
+
+export async function setupImportEstudiantes(file: File, dryRun: boolean) {
+  const formData = new FormData();
+  formData.append("archivo", file);
+  formData.append("dryRun", dryRun ? "true" : "false");
+  return fetchApi<SetupImportResultDto>("/api/administracion/setup-import", {
+    method: "POST",
+    body: formData,
   });
 }
 

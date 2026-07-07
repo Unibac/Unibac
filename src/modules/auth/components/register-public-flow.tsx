@@ -71,7 +71,7 @@ const CATEGORIA_COPY: Record<
   [CategoriaUsuarioExterno.EMPRESA]: {
     title: "Empresa",
     description:
-      "Cuenta para organizaciones. Indicá NIT y razón social; el resto es opcional.",
+      "Cuenta para organizaciones. Indica NIT y razón social; el resto es opcional.",
   },
 };
 
@@ -138,8 +138,8 @@ export function RegisterPublicFlow() {
           </div>
           <CardTitle className="text-lg">Registro no disponible</CardTitle>
           <CardDescription>
-            El registro público está deshabilitado en este entorno. Si necesitás
-            una cuenta, contactá a la administración.
+            El registro público está deshabilitado en este entorno. Si necesitas
+            una cuenta, contacta a la administración.
           </CardDescription>
         </CardHeader>
         <CardFooter className="flex flex-col gap-3 border-t border-border pt-6">
@@ -158,9 +158,9 @@ export function RegisterPublicFlow() {
           <div className="flex justify-center sm:justify-start">
             <UnibacLogo priority imgClassName="max-h-28 sm:max-h-32" />
           </div>
-          <CardTitle className="text-lg">¿Cómo te registrás?</CardTitle>
+          <CardTitle className="text-lg">¿Cómo deseas registrarte?</CardTitle>
           <CardDescription>
-            Primero elegí si sos estudiante, egresado o empresa. Después verás
+            Primero elige si eres estudiante, egresado o empresa. Después verás
             el formulario con los datos que corresponden a tu tipo de cuenta.
           </CardDescription>
         </CardHeader>
@@ -211,11 +211,11 @@ export function RegisterPublicFlow() {
           <UnibacLogo priority imgClassName="max-h-28 sm:max-h-32" />
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <CardTitle className="text-lg">Completá tu registro</CardTitle>
+          <CardTitle className="text-lg">Completa tu registro</CardTitle>
           <Badge variant="secondary">{CATEGORIA_COPY[categoria].title}</Badge>
         </div>
         <CardDescription>
-          {CATEGORIA_COPY[categoria].description} Podés cambiar el tipo de
+          {CATEGORIA_COPY[categoria].description} Puedes cambiar el tipo de
           cuenta antes de enviar el formulario.
         </CardDescription>
       </CardHeader>

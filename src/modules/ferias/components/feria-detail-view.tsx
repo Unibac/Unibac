@@ -186,8 +186,8 @@ export function FeriaDetailView({ feriaId }: { feriaId: number }) {
     return (
       <div className="flex flex-col gap-4">
         <PageCallout>
-          No tenés acceso a ferias con tu tipo de cuenta. Si necesitás permisos,
-          contactá a administración.
+          No tienes acceso a ferias con tu tipo de cuenta. Si necesitas permisos,
+          contacta a administración.
         </PageCallout>
         <Button asChild variant="outline" size="sm">
           <Link href="/dashboard/ferias">Volver al listado</Link>

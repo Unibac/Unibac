@@ -11,7 +11,7 @@ export default function PadronesEstudiantesPage() {
       <DashboardPage>
         <PageHeader
           title="Padrón de estudiantes"
-          description="Personas habilitadas para registrarse como estudiante externo."
+          description="Padrón, registro público y carga masiva desde Excel para setup inicial."
         />
         <PadronesEstudiantesView />
       </DashboardPage>

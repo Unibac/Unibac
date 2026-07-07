@@ -25,7 +25,7 @@ export function PerfilPageView() {
     <DashboardPage className="flex flex-col gap-6">
       <PageHeader
         title="Mi perfil"
-        description="Gestioná los datos opcionales de tu cuenta y completá la información de tu perfil según tu tipo de usuario."
+        description="Gestiona los datos opcionales de tu cuenta y completa la información de tu perfil según tu tipo de usuario."
       />
       <CuentaPerfilSection />
       {sections.showEmpresa ? <EmpresaPerfilSection /> : null}

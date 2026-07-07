@@ -177,7 +177,7 @@ export function PropuestaFeriaFormSheet({
             ) : null}
             {!postulacionAbierta ? (
               <p className="text-xs text-muted-foreground">
-                Solo podés registrar o editar propuestas mientras la feria está
+                Solo puedes registrar o editar propuestas mientras la feria está
                 próxima o en curso.
               </p>
             ) : null}

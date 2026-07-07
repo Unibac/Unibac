@@ -84,7 +84,7 @@ export function PostulacionesSheet({
         <SheetHeader className="border-b border-border pb-4">
           <SheetTitle>Postulaciones</SheetTitle>
           <SheetDescription>
-            Solo administradores. Podés aprobar o rechazar postulaciones en
+            Solo administradores. Puedes aprobar o rechazar postulaciones en
             estado POSTULADO.
           </SheetDescription>
         </SheetHeader>

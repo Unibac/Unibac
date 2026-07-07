@@ -259,7 +259,7 @@ export function EgresadosView() {
     return (
       <PageCallout>
         El directorio de egresados está disponible solo para personal
-        institucional o cuentas de egresado. Si necesitás acceso, contactá a
+        institucional o cuentas de egresado. Si necesitas acceso, contacta a
         administración.
       </PageCallout>
     );

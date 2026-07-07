@@ -45,7 +45,7 @@ export function LoginForm() {
     const sp = new URLSearchParams(window.location.search);
     if (sp.get("registrado") === "1") {
       setRegisteredHint(
-        "Cuenta creada. Iniciá sesión con tu usuario y contraseña.",
+        "Cuenta creada. Inicia sesión con tu usuario y contraseña.",
       );
       sp.delete("registrado");
       const qs = sp.toString();

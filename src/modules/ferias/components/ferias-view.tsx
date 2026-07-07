@@ -166,8 +166,8 @@ export function FeriasView() {
   if (!feriasCanBrowse(profile.data)) {
     return (
       <PageCallout>
-        No tenés acceso a ferias con tu tipo de cuenta. Si necesitás permisos,
-        contactá a administración.
+        No tienes acceso a ferias con tu tipo de cuenta. Si necesitas permisos,
+        contacta a administración.
       </PageCallout>
     );
   }

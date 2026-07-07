@@ -140,7 +140,7 @@ export function TalentoPerfilFormSheet({
           <SheetDescription>
             {mode === "create"
               ? "El perfil quedará asociado a tu cuenta de usuario."
-              : "Actualizá los datos del perfil."}
+              : "Actualiza los datos del perfil."}
           </SheetDescription>
         </SheetHeader>
 

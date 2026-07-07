@@ -220,7 +220,7 @@ export function UsuarioFormSheet({
           <SheetDescription>
             {mode === "create"
               ? "Credenciales, nivel y rol RBAC (los permisos vienen del rol)."
-              : "Actualizá los datos y el rol; los permisos efectivos son los del rol."}
+              : "Actualiza los datos y el rol; los permisos efectivos son los del rol."}
           </SheetDescription>
         </SheetHeader>
 
@@ -239,7 +239,7 @@ export function UsuarioFormSheet({
         ) : rolesActivos.length === 0 ? (
           <div className="p-4">
             <p role="alert" className="text-xs text-muted-foreground">
-              No hay roles activos en el sistema. Creá roles en el backend antes
+              No hay roles activos en el sistema. Crea roles en el backend antes
               de asignar usuarios.
             </p>
           </div>
@@ -446,7 +446,7 @@ export function UsuarioFormSheet({
                             >
                               <FormControl>
                                 <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Seleccioná un rol" />
+                                  <SelectValue placeholder="Selecciona un rol" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>

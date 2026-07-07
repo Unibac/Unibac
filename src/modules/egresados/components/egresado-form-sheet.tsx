@@ -128,7 +128,7 @@ export function EgresadoFormSheet({
           <SheetDescription>
             {mode === "create"
               ? "El registro quedará asociado a tu cuenta de usuario."
-              : "Actualizá los datos del egresado."}
+              : "Actualiza los datos del egresado."}
           </SheetDescription>
         </SheetHeader>
 

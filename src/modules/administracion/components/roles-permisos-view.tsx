@@ -116,7 +116,7 @@ export function RolesPermisosView() {
           onValueChange={(v) => setRolId(v ? Number(v) : null)}
         >
           <SelectTrigger id="rol-select" className="w-full">
-            <SelectValue placeholder="Seleccioná un rol" />
+            <SelectValue placeholder="Selecciona un rol" />
           </SelectTrigger>
           <SelectContent>
             {roles.map((r) => (
@@ -149,7 +149,7 @@ export function RolesPermisosView() {
         <Skeleton className="h-72 w-full" />
       ) : rolId == null ? (
         <p className="text-sm text-muted-foreground">
-          Elegí un rol para editar sus permisos.
+          Elige un rol para editar sus permisos.
         </p>
       ) : (
         <div className="overflow-x-auto rounded-md border border-border">

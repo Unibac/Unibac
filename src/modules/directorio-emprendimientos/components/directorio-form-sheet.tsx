@@ -147,7 +147,7 @@ export function DirectorioFormSheet({
           <SheetDescription>
             {mode === "create"
               ? "El registro quedará asociado a tu cuenta de usuario."
-              : "Actualizá los datos del emprendimiento."}
+              : "Actualiza los datos del emprendimiento."}
           </SheetDescription>
         </SheetHeader>
 
